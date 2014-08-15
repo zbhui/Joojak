@@ -3,6 +3,34 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
+/// 单元积分
+#include "EulerCellKernel.h"
+
+
+/// 面积分
+#include "EulerFaceKernel.h"
+
+/// 初始条件
+#include "IsoVortexIC.h"
+
+
+/// 边界条件
+
+
+/// 函数
+
+
+/// 辅助kernel
+
+
+/// Action
+
+
+/// 材料属性
+#include "EulerMaterial.h"
+
+/// 时间步长增加策略
+
 template<>
 InputParameters validParams<JoojakApp>()
 {
@@ -37,6 +65,17 @@ JoojakApp::registerApps()
 void
 JoojakApp::registerObjects(Factory & factory)
 {
+	/// 注册初始条件
+	registerInitialCondition(IsoVortexIC);
+
+	/// 注册Kernel
+	registerKernel(EulerCellKernel);
+
+	/// 注册DGKernel
+	registerDGKernel(EulerFaceKernel);
+
+	/// 注册材料属性
+	registerMaterial(EulerMaterial);
 }
 
 void
