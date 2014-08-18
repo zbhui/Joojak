@@ -2,7 +2,6 @@
 #pragma once
 
 #include "DGKernel.h"
-#include "EulerMaterial.h"
 
 class EulerFaceKernel;
 
@@ -17,8 +16,9 @@ public:
 	virtual ~EulerFaceKernel(){}
 
 protected:
-	MaterialProperty<RealVectorValue*> &_invis_term;
-	MaterialProperty<RealVectorValue*> &_invis_term_neighbor;
+	MaterialProperty<std::vector<RealVectorValue> > &_invis_term;
+	MaterialProperty<std::vector<RealVectorValue> > &_invis_term_neighbor;
+	MaterialProperty<Real > &_flux_diff;
 
 	virtual Real computeQpResidual(Moose::DGResidualType type);
 	virtual Real computeQpJacobian(Moose::DGJacobianType type);

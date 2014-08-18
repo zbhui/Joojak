@@ -5,6 +5,7 @@
 #include "MooseObject.h"
 #include "Eigen/Dense"
 typedef Eigen::Matrix<Real, 5, 5> Matrix5x5;
+typedef RealVectorValue RealVector10[10];
 
 class CFDBase;
 
@@ -33,6 +34,7 @@ protected:
 
 
   virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
+  virtual void inviscousTerm(std::vector<RealVectorValue> &inviscous_term, Real *uh);
   virtual void viscousTerm(RealVectorValue *viscous_term, Real *uh, RealGradient *duh);
 
 //	void liftOperator(Real *lift, Real *ul, Real *ur, Point &normal);

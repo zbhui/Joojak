@@ -32,6 +32,8 @@ CFDBase::CFDBase(const std::string & name, InputParameters parameters)
 	_epsilon = (moose_object.getParam<Real>("epsilon"));
 	_sigma = (moose_object.getParam<Real>("sigma"));
 
+	_gamma = parameters.get<Real>("gamma");
+
 //	_n_equation = 5;
 }
 
@@ -174,6 +176,10 @@ void CFDBase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient 
 
 }
 
+void CFDBase::inviscousTerm(std::vector<RealVectorValue>& inviscous_term, Real* uh)
+{
+	inviscousTerm(&inviscous_term[0], uh);
+}
 //void CFDBase::liftOperator(Real *lift, Real *ul, Real *ur, Point &normal)
 //{
 //	Real uh[5];

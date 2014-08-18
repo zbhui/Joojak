@@ -107,10 +107,6 @@
 		type = TimeDerivative
 		variable = rhoe
 	[../]
-	[./multi_kernel]
-		type = EulerCellKernel
-		variable = rho
-	[../]		
 
 	[./mass_space]
 		type =EulerCellKernel
@@ -136,18 +132,48 @@
 
 # 材料属性
 [Materials]
-  [./Fluid]
-    type = EulerMaterial
+  [./cell_materical]
+    type = EulerCellMaterial
   [../]
+
+  [./face_materical]
+    type = EulerFaceMaterial
+  [../]
+
+  [./bnd_materical]
+    type = EulerBndMaterial
+  [../]
+
 []
 
 # 边界条件
 [BCs]
-	[./multi_bc]
-		type = IsoVortexBC
-		variable = rho
+	[./mass_bc]
 		boundary = 'left right bottom top'
-	[../]			
+		type =IsoVortexBC
+		variable = rho
+	[../]		
+	[./x-momentumum_bc]
+		boundary = 'left right bottom top'
+		type =IsoVortexBC
+		variable = momentum_x
+	[../]	
+	[./y-momentumum_bc]
+		boundary = 'left right bottom top'
+		type =IsoVortexBC
+		variable = momentum_y
+	[../]
+	[./z-momentumum_bc]
+		boundary = 'left right bottom top'
+		type =IsoVortexBC
+		variable = momentum_z
+	[../]		
+	[./total-energy_bc]
+		boundary = 'left right bottom top'
+		type =IsoVortexBC
+		variable = rhoe
+	[../]
+	
 []
 
 # 非线性系统求解

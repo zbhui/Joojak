@@ -27,7 +27,8 @@
 
 
 /// 材料属性
-#include "EulerMaterial.h"
+#include "EulerCellMaterial.h"
+#include "EulerFaceMaterial.h"
 
 /// 时间步长增加策略
 
@@ -75,7 +76,8 @@ JoojakApp::registerObjects(Factory & factory)
 	registerDGKernel(EulerFaceKernel);
 
 	/// 注册材料属性
-	registerMaterial(EulerMaterial);
+	registerMaterial(EulerCellMaterial);
+	registerMaterial(EulerFaceMaterial);
 }
 
 void
