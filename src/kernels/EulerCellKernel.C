@@ -4,13 +4,13 @@ template<>
 InputParameters validParams<EulerCellKernel>()
 {
   InputParameters params = validParams<Kernel>();
-
+//  params.addRequiredParam<std::string>("material", "单元的材料属性");
   return params;
 }
 
 EulerCellKernel::EulerCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
-		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("invis_term_mt"))
+		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("cell_material"))
 {
 	std::string var_name = _var.name();
 

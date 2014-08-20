@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = FOURTH
+ 	order = FIRST
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -109,23 +109,76 @@
 	[../]
 
 	[./mass_space]
-		type =EulerCellKernel
+		type = EulerCellKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_space]
-		type =EulerCellKernel
+		type = EulerCellKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_space]
-		type =EulerCellKernel
+		type = EulerCellKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_space]
-		type =EulerCellKernel
+		type = EulerCellKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_space]
-		type =EulerCellKernel
+		type = EulerCellKernel
+		variable = rhoe
+	[../]
+[]
+
+
+[DGKernels]
+	[./mass_dg]
+		type = EulerFaceKernel
+		variable = rho
+	[../]		
+	[./x-momentumum_dg]
+		type = EulerFaceKernel
+		variable = momentum_x
+	[../]	
+	[./y-momentumum_dg]
+		type = EulerFaceKernel
+		variable = momentum_y
+	[../]
+	[./z-momentumum_dg]
+		type = EulerFaceKernel
+		variable = momentum_z
+	[../]		
+	[./total-energy_dg]
+		type = EulerFaceKernel
+		variable = rhoe
+	[../]
+[]
+
+# 边界条件
+[BCs]
+	[./mass_bc]
+		boundary = 'left right bottom top'
+		type =EulerBC
+		variable = rho
+	[../]		
+	[./x-momentumum_bc]
+		boundary = 'left right bottom top'
+		type =EulerBC
+		variable = momentum_x
+	[../]	
+	[./y-momentumum_bc]
+		boundary = 'left right bottom top'
+		type =EulerBC
+		variable = momentum_y
+	[../]
+	[./z-momentumum_bc]
+		boundary = 'left right bottom top'
+		type =EulerBC
+		variable = momentum_z
+	[../]		
+	[./total-energy_bc]
+		boundary = 'left right bottom top'
+		type =EulerBC
 		variable = rhoe
 	[../]
 []
@@ -133,48 +186,22 @@
 # 材料属性
 [Materials]
   [./cell_materical]
+		block = 0
     type = EulerCellMaterial
   [../]
 
   [./face_materical]
+		boundary = 12345
     type = EulerFaceMaterial
   [../]
 
   [./bnd_materical]
-    type = EulerBndMaterial
+		boundary = 'left right bottom top'
+    type = IsoVortexBndMaterial
   [../]
-
 []
 
-# 边界条件
-[BCs]
-	[./mass_bc]
-		boundary = 'left right bottom top'
-		type =IsoVortexBC
-		variable = rho
-	[../]		
-	[./x-momentumum_bc]
-		boundary = 'left right bottom top'
-		type =IsoVortexBC
-		variable = momentum_x
-	[../]	
-	[./y-momentumum_bc]
-		boundary = 'left right bottom top'
-		type =IsoVortexBC
-		variable = momentum_y
-	[../]
-	[./z-momentumum_bc]
-		boundary = 'left right bottom top'
-		type =IsoVortexBC
-		variable = momentum_z
-	[../]		
-	[./total-energy_bc]
-		boundary = 'left right bottom top'
-		type =IsoVortexBC
-		variable = rhoe
-	[../]
-	
-[]
+
 
 # 非线性系统求解
 [Executioner]

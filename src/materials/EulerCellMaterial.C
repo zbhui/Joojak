@@ -18,6 +18,7 @@ InputParameters validParams<EulerCellMaterial>()
   params += validParams<CFDBase>();
 
   params.addRequiredCoupledVar("variables", "守恒变量");
+//  params.addRequiredParam<std::vector<std::string> >("materials", "材料属性名");
 
   return params;
 }
@@ -25,22 +26,21 @@ InputParameters validParams<EulerCellMaterial>()
 EulerCellMaterial::EulerCellMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
 		CFDBase(name, parameters),
-		_invis_term(declareProperty<std::vector<RealVectorValue> >("invis_term_mt"))
+//		_materials(getParam<std::vector<std::string> >("materials")),
+		_invis_term(declareProperty<std::vector<RealVectorValue> >("cell_material"))
 {
 	_n_equations = coupledComponents("variables");
 	for (int eq = 0; eq < _n_equations; ++eq)
-		_uh.push_back(&coupledValue("varialbes", eq));
-
-	for (int qp = 0; qp < _qrule->n_points(); ++qp)
-	{
-		_invis_term[qp].resize(_n_equations);
-	}
+		_uh.push_back(&coupledValue("variables", eq));
 }
 
 void EulerCellMaterial::computeQpProperties()
 {
+	if(_bnd) return;
+
 	Real uh[10];
 	computeQpValue(uh);
+	_invis_term[_qp].resize(_n_equations);
 	inviscousTerm(_invis_term[_qp], uh);
 }
 

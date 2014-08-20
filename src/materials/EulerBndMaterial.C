@@ -10,15 +10,13 @@
 **/
 
 #include "EulerBndMaterial.h"
-//#include "MooseObject.h"
 
 template<>
 InputParameters validParams<EulerBndMaterial>()
 {
   InputParameters params = validParams<Material>();
   params += validParams<CFDBase>();
-
-  params.addRequiredParam<std::vector<NonlinearVariableName> >("variables", "多个求解变量");
+  params.addRequiredCoupledVar("variables", "守恒变量");
 
   return params;
 }
@@ -26,19 +24,16 @@ InputParameters validParams<EulerBndMaterial>()
 EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
 		CFDBase(name, parameters),
-		_invis_term(declareProperty<std::vector<RealVectorValue> >("invis_term_left")),
-		_invis_term_neighbor(declareProperty<std::vector<RealVectorValue> >("invis_term_right")),
-		_flux_diff(declareProperty<Real>("flux_diff"))
+		_invis_term(declareProperty<std::vector<RealVectorValue> >("left_material")),
+		_invis_term_neighbor(declareProperty<std::vector<RealVectorValue> >("right_material")),
+		_flux_diff(declareProperty<Real>("flux_diff")),
+		_ur(declareProperty<std::vector<Real> >("right_value"))
 {
-	 std::vector<NonlinearVariableName> _variables = getParam<std::vector<NonlinearVariableName> >("variables");
 	_n_equations = coupledComponents("variables");
-	for (size_t i = 0; i < _n_equations; ++i)
+	for (size_t eq = 0; eq < _n_equations; ++eq)
 	{
-		SystemBase &_sys = (*parameters.get<SystemBase *>("_sys"));
-		MooseVariable &val = _sys.getVariable(_tid, _variables[i]);
-
+		MooseVariable &val = *getVar("variables", eq);
 		_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
-//		_ur.push_back(_is_implicit ? &val.slnNeighbor() : &val.slnOldNeighbor());
 	}
 }
 

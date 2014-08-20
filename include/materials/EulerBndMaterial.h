@@ -32,11 +32,13 @@ protected:
 	int _n_equations;
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _ul;
-	std::vector<VariableValue*> _ur;
+//	std::vector<VariableValue*> _ur;
 
 	MaterialProperty<std::vector<RealVectorValue> > & _invis_term;
 	MaterialProperty<std::vector<RealVectorValue> > & _invis_term_neighbor;
 	MaterialProperty<Real> & _flux_diff;
+
+	MaterialProperty<std::vector<Real> > &_ur;
 
 	virtual void computeQpLeftValue(Real *ul);
 	virtual void computeQpRightValue(Real *ur);

@@ -35,6 +35,7 @@ protected:
 	int _n_equations;
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _uh;
+	std::vector<std::string> _materials;
 
 	MaterialProperty<std::vector<RealVectorValue> > & _invis_term;
 

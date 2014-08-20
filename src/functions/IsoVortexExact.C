@@ -12,42 +12,35 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#include "IsoVortexIC.h"
+#include "IsoVortexExact.h"
 
 template<>
-InputParameters validParams<IsoVortexIC>()
+InputParameters validParams<IsoVortexExact>()
 {
-  InputParameters params = validParams<CFDInitialCondition>();
+  InputParameters params = validParams<Function>();
   params += validParams<IsoVortexBase>();
   return params;
 }
 
-IsoVortexIC::IsoVortexIC(const std::string & name, InputParameters parameters) :
-    CFDInitialCondition(name, parameters),
+IsoVortexExact::IsoVortexExact(const std::string & name, InputParameters parameters) :
+    Function(name, parameters),
     IsoVortexBase(name, parameters)
-{}
-
-Real IsoVortexIC::density(const Point &p)
 {
-	return IsoVortexBase::density(0, p);
+//	std::string var_name = _var.name();
+//
+//	if(var_name == "rho")
+//		_eq = 0;
+//	if(var_name == "momentum_x")
+//		_eq = 1;
+//	if(var_name == "momentum_y")
+//		_eq = 2;
+//	if(var_name == "momentum_z")
+//		_eq = 3;
+//	if(var_name == "rhoe")
+//		_eq = 4;
 }
 
-Real IsoVortexIC::x_momentum(const Point &p)
+Real IsoVortexExact::value(Real t, const Point & p)
 {
-	return IsoVortexBase::x_momentum(0, p);
-}
-
-Real IsoVortexIC::y_momentum(const Point &p)
-{
-	return IsoVortexBase::y_momentum(0, p);
-}
-
-Real IsoVortexIC::z_momentum(const Point &p)
-{
-	return IsoVortexBase::z_momentum(0, p);
-}
-
-Real IsoVortexIC::total_energy(const Point &p)
-{
-	return IsoVortexBase::total_energy(0, p);
+	return IsoVortexBase::value(t, p, 0);
 }

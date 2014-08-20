@@ -20,21 +20,16 @@ InputParameters validParams<CFDBase>()
 
 CFDBase::CFDBase(const std::string & name, InputParameters parameters)
 {
-	MooseObject moose_object(name, parameters);
-	_gamma = (moose_object.getParam<Real>("gamma"));
-	_prandtl = (moose_object.getParam<Real>("prandtl"));
-	_mach = (moose_object.getParam<Real>("mach"));
-	_reynolds = (moose_object.getParam<Real>("reynolds"));
+	_gamma = (parameters.get<Real>("gamma"));
+	_prandtl = (parameters.get<Real>("prandtl"));
+	_mach = (parameters.get<Real>("mach"));
+	_reynolds = (parameters.get<Real>("reynolds"));
 
-	_attack = (moose_object.getParam<Real>("attack"));
-	_slide = (moose_object.getParam<Real>("slide"));
+	_attack = (parameters.get<Real>("attack"));
+	_slide = (parameters.get<Real>("slide"));
 
-	_epsilon = (moose_object.getParam<Real>("epsilon"));
-	_sigma = (moose_object.getParam<Real>("sigma"));
-
-	_gamma = parameters.get<Real>("gamma");
-
-//	_n_equation = 5;
+	_epsilon = (parameters.get<Real>("epsilon"));
+	_sigma = (parameters.get<Real>("sigma"));
 }
 
 Real CFDBase::pressure(Real *uh)

@@ -9,8 +9,8 @@ InputParameters validParams<EulerFaceKernel>()
 }
 EulerFaceKernel::EulerFaceKernel(const std::string & name, InputParameters parameters):
 		DGKernel(name, parameters),
-		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("invis_term_left")),
-		_invis_term_neighbor(getNeighborMaterialProperty<std::vector<RealVectorValue> >("invis_term_right")),
+		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("left_material")),
+		_invis_term_neighbor(getMaterialProperty<std::vector<RealVectorValue> >("right_material")),
 		_flux_diff(getMaterialProperty<Real>("flux_diff"))
 {
 	std::string var_name = _var.name();
