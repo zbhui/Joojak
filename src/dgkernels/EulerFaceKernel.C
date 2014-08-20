@@ -9,9 +9,7 @@ InputParameters validParams<EulerFaceKernel>()
 }
 EulerFaceKernel::EulerFaceKernel(const std::string & name, InputParameters parameters):
 		DGKernel(name, parameters),
-		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("left_material")),
-		_invis_term_neighbor(getMaterialProperty<std::vector<RealVectorValue> >("right_material")),
-		_flux_diff(getMaterialProperty<Real>("flux_diff"))
+		_flux(getNeighborMaterialProperty<std::vector<Real> >("flux"))
 {
 	std::string var_name = _var.name();
 
@@ -29,8 +27,7 @@ EulerFaceKernel::EulerFaceKernel(const std::string & name, InputParameters param
 
 Real EulerFaceKernel::computeQpResidual(Moose::DGResidualType type)
 {
-	Real flux = 0.5*(_invis_term[_qp][_eq] + _invis_term_neighbor[_qp][_eq])*_normals[_qp];
-	flux += 1*(_u[_qp]-_u_neighbor[_qp]);
+	Real flux = _flux[_qp][_eq];
 	if(type == Moose::Element)
 	{
 		return flux * _test[_i][_qp];

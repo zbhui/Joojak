@@ -24,31 +24,39 @@ InputParameters validParams<EulerFaceMaterial>()
 EulerFaceMaterial::EulerFaceMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
 		CFDBase(name, parameters),
-		_invis_term(declareProperty<std::vector<RealVectorValue> >("left_material")),
-		_invis_term_neighbor(declareProperty<std::vector<RealVectorValue> >("right_material")),
-		_flux_diff(declareProperty<Real>("flux_diff"))
+		_flux(declareProperty<std::vector<Real> >("flux"))
 {
 	_n_equations = coupledComponents("variables");
-	for (int eq = 0; eq < _n_equations; ++eq)
+
+	if(_bnd && _neighbor)
 	{
-		MooseVariable &val = *getVar("variables", eq);
-		_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
-		_ur.push_back(_is_implicit ? &val.slnNeighbor() : &val.slnOldNeighbor());
+		for (int eq = 0; eq < _n_equations; ++eq)
+		{
+			MooseVariable &val = *getVar("variables", eq);
+			_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
+			_ur.push_back(_is_implicit ? &val.slnNeighbor() : &val.slnOldNeighbor());
+		}
 	}
 }
 
 void EulerFaceMaterial::computeQpProperties()
 {
-	_invis_term[_qp].resize(_n_equations);
-	_invis_term_neighbor[_qp].resize(_n_equations);
+	if(_bnd && _neighbor)
+	{
+		_flux[_qp].resize(_n_equations);
 
-	Real ul[10], ur[10];
-	computeQpLeftValue(ul);
-	computeQpRightValue(ur);
+		Real ul[10], ur[10];
+		RealVectorValue invis_term[10], invis_term_neighbor[10];
 
-	inviscousTerm(_invis_term[_qp], ul);
-	inviscousTerm(_invis_term_neighbor[_qp], ur);
-	_flux_diff[_qp] = 1.;
+		computeQpLeftValue(ul);
+		computeQpRightValue(ur);
+		inviscousTerm(invis_term, ul);
+		inviscousTerm(invis_term_neighbor, ur);
+
+		Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
+		for (int eq = 0; eq < _n_equations; ++eq)
+			_flux[_qp][eq] = 0.5*(invis_term[eq] + invis_term_neighbor[eq])*_normals[_qp] + lam*(ul[eq]-ur[eq]);
+	}
 }
 
 void EulerFaceMaterial::computeQpLeftValue(Real* ul)

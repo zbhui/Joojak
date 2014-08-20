@@ -15,11 +15,7 @@ public:
 	  EulerBC(const std::string & name, InputParameters params);
 
 protected:
-	  MaterialProperty<std::vector<RealVectorValue> > &_invis_term;
-	  MaterialProperty<std::vector<RealVectorValue> > &_invis_term_neighbor;
-	  MaterialProperty<Real > &_flux_diff;
-	  MaterialProperty<std::vector<Real> > &_uh_neighbor;
-
+	  MaterialProperty<std::vector<Real> > &_flux;
 	  virtual Real computeQpResidual();
 
 };

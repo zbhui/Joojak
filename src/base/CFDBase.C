@@ -60,6 +60,14 @@ Real CFDBase::mach_local(Real* uh)
 	return vel/c;
 }
 
+Real CFDBase::maxEigenValue(Real *uh, const Point &normal)
+{
+	RealVectorValue vel(uh[1]/uh[0], uh[2]/uh[0], uh[3]/uh[0]);
+	Real vel_size = vel.size();
+	Real c = std::sqrt(temperature(uh))/_mach;
+	return vel*normal+c;
+}
+
 void CFDBase::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 {
 	Real rho, p, h;
@@ -175,6 +183,7 @@ void CFDBase::inviscousTerm(std::vector<RealVectorValue>& inviscous_term, Real* 
 {
 	inviscousTerm(&inviscous_term[0], uh);
 }
+
 //void CFDBase::liftOperator(Real *lift, Real *ul, Real *ur, Point &normal)
 //{
 //	Real uh[5];

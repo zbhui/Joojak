@@ -16,9 +16,7 @@ InputParameters validParams<EulerCellMaterial>()
 {
   InputParameters params = validParams<Material>();
   params += validParams<CFDBase>();
-
   params.addRequiredCoupledVar("variables", "守恒变量");
-//  params.addRequiredParam<std::vector<std::string> >("materials", "材料属性名");
 
   return params;
 }
@@ -26,7 +24,6 @@ InputParameters validParams<EulerCellMaterial>()
 EulerCellMaterial::EulerCellMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
 		CFDBase(name, parameters),
-//		_materials(getParam<std::vector<std::string> >("materials")),
 		_invis_term(declareProperty<std::vector<RealVectorValue> >("cell_material"))
 {
 	_n_equations = coupledComponents("variables");

@@ -16,9 +16,7 @@ public:
 	virtual ~EulerFaceKernel(){}
 
 protected:
-	MaterialProperty<std::vector<RealVectorValue> > &_invis_term;
-	MaterialProperty<std::vector<RealVectorValue> > &_invis_term_neighbor;
-	MaterialProperty<Real > &_flux_diff;
+	MaterialProperty<std::vector<Real> > &_flux;
 
 	virtual Real computeQpResidual(Moose::DGResidualType type);
 	virtual Real computeQpJacobian(Moose::DGJacobianType type);

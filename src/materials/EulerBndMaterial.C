@@ -24,10 +24,7 @@ InputParameters validParams<EulerBndMaterial>()
 EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
 		CFDBase(name, parameters),
-		_invis_term(declareProperty<std::vector<RealVectorValue> >("left_material")),
-		_invis_term_neighbor(declareProperty<std::vector<RealVectorValue> >("right_material")),
-		_flux_diff(declareProperty<Real>("flux_diff")),
-		_ur(declareProperty<std::vector<Real> >("right_value"))
+		_flux(declareProperty<std::vector<Real> >("flux"))
 {
 	_n_equations = coupledComponents("variables");
 	for (size_t eq = 0; eq < _n_equations; ++eq)
@@ -39,17 +36,19 @@ EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters par
 
 void EulerBndMaterial::computeQpProperties()
 {
-	_invis_term[_qp].resize(_n_equations);
-	_invis_term_neighbor[_qp].resize(_n_equations);
-	_ur[_qp].resize(_n_equations);
+	_flux[_qp].resize(_n_equations);
 
-	Real ul[10];
+	Real ul[10], ur[10];
+	RealVectorValue invis_term[10], invis_term_neighbor[10];
+
 	computeQpLeftValue(ul);
-	computeQpRightValue(&_ur[_qp][0]);
+	computeQpRightValue(ur);
+	inviscousTerm(invis_term, ul);
+	inviscousTerm(invis_term_neighbor, ur);
 
-	inviscousTerm(_invis_term[_qp], ul);
-	inviscousTerm(_invis_term_neighbor[_qp], &_ur[_qp][0]);
-	_flux_diff[_qp] = 1.;
+	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
+	for (int eq = 0; eq < _n_equations; ++eq)
+		_flux[_qp][eq] = 0.5*(invis_term[eq] + invis_term_neighbor[eq])*_normals[_qp] + lam*(ul[eq]-ur[eq]);
 }
 
 void EulerBndMaterial::computeQpLeftValue(Real* ul)
