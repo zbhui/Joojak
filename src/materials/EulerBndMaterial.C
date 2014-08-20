@@ -39,11 +39,16 @@ EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters par
 
 void EulerBndMaterial::computeQpProperties()
 {
-	Real ul[10], ur[10];
+	_invis_term[_qp].resize(_n_equations);
+	_invis_term_neighbor[_qp].resize(_n_equations);
+	_ur[_qp].resize(_n_equations);
+
+	Real ul[10];
 	computeQpLeftValue(ul);
-	computeQpRightValue(ur);
+	computeQpRightValue(&_ur[_qp][0]);
+
 	inviscousTerm(_invis_term[_qp], ul);
-	inviscousTerm(_invis_term_neighbor[_qp], ur);
+	inviscousTerm(_invis_term_neighbor[_qp], &_ur[_qp][0]);
 	_flux_diff[_qp] = 1.;
 }
 

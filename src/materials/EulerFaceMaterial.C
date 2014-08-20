@@ -29,7 +29,7 @@ EulerFaceMaterial::EulerFaceMaterial(const std::string & name, InputParameters p
 		_flux_diff(declareProperty<Real>("flux_diff"))
 {
 	_n_equations = coupledComponents("variables");
-	for (size_t eq = 0; eq < _n_equations; ++eq)
+	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		MooseVariable &val = *getVar("variables", eq);
 		_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
@@ -39,12 +39,12 @@ EulerFaceMaterial::EulerFaceMaterial(const std::string & name, InputParameters p
 
 void EulerFaceMaterial::computeQpProperties()
 {
+	_invis_term[_qp].resize(_n_equations);
+	_invis_term_neighbor[_qp].resize(_n_equations);
+
 	Real ul[10], ur[10];
 	computeQpLeftValue(ul);
 	computeQpRightValue(ur);
-
-	_invis_term[_qp].resize(_n_equations);
-	_invis_term_neighbor[_qp].resize(_n_equations);
 
 	inviscousTerm(_invis_term[_qp], ul);
 	inviscousTerm(_invis_term_neighbor[_qp], ur);
