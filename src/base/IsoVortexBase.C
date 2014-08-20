@@ -14,11 +14,35 @@ IsoVortexBase::IsoVortexBase(const std::string & name, InputParameters parameter
 {
 }
 
-Real IsoVortexBase::density(const Point &p)
+Real IsoVortexBase::value(Real t, const Point& p, int eq)
 {
-	Real x = p(0);
-	Real y = p(1);
-	Real z = p(2);
+	switch (eq) {
+	case 0:
+		return density(t, p);
+		break;
+	case 1:
+		return x_momentum(t, p);
+		break;
+	case 2:
+		return y_momentum(t, p);
+		break;
+	case 3:
+		return z_momentum(t, p);
+	case 4:
+		return total_energy(t, p);
+		break;
+	default:
+		return 0.0;
+		mooseError("不可用的分量" << eq);
+		break;
+	}
+}
+
+Real IsoVortexBase::density(Real t, const Point &p)
+{
+	Real x = p(0)-t;
+	Real y = p(1)-t;
+	Real z = p(2)-t;
 //
 //	Real pi = 3.1415926535;
 //	return std::sin(2*pi*(x+y+z));
@@ -37,11 +61,11 @@ Real IsoVortexBase::density(const Point &p)
 	return rho;
 }
 
-Real IsoVortexBase::x_momentum(const Point &p)
+Real IsoVortexBase::x_momentum(Real t, const Point &p)
 {
-	Real x = p(0);
-	Real y = p(1);
-	Real z = p(2);
+	Real x = p(0)-t;
+	Real y = p(1)-t;
+	Real z = p(2)-t;
 
 	Real gam=1.4, gamm1=gam-1, epi=5.;
 	Real xb, yb, r2;
@@ -58,11 +82,11 @@ Real IsoVortexBase::x_momentum(const Point &p)
 	return rho*u;
 }
 
-Real IsoVortexBase::y_momentum(const Point &p)
+Real IsoVortexBase::y_momentum(Real t, const Point &p)
 {
-	Real x = p(0);
-	Real y = p(1);
-	Real z = p(2);
+	Real x = p(0)-t;
+	Real y = p(1)-t;
+	Real z = p(2)-t;
 
 	Real gam=1.4, gamm1=gam-1, epi=5.;
 	Real xb, yb, r2;
@@ -79,16 +103,17 @@ Real IsoVortexBase::y_momentum(const Point &p)
 	return rho*v;
 }
 
-Real IsoVortexBase::z_momentum(const Point &p)
+Real IsoVortexBase::z_momentum(Real t, const Point &p)
 {
 	return 0.0;
 }
 
-Real IsoVortexBase::total_energy(const Point &p)
+
+Real IsoVortexBase::total_energy(Real t, const Point &p)
 {
-	Real x = p(0);
-	Real y = p(1);
-	Real z = p(2);
+	Real x = p(0)-t;
+	Real y = p(1)-t;
+	Real z = p(2)-t;
 
 	Real gam=1.4, gamm1=gam-1, epi=5.;
 	Real xb, yb, r2;

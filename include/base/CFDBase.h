@@ -30,9 +30,10 @@ protected:
   Real mach_local(Real *uh);
   Real acous(Real *uh);
   Real physicalViscosity(Real *uh);
-
+  Real maxEigenValue(Real *uh, const Point &normal);
 
   virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
+  virtual void inviscousTerm(std::vector<RealVectorValue> &inviscous_term, Real *uh);
   virtual void viscousTerm(RealVectorValue *viscous_term, Real *uh, RealGradient *duh);
 
 //	void liftOperator(Real *lift, Real *ul, Real *ur, Point &normal);

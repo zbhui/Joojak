@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Kernel.h"
-#include "EulerMaterial.h"
 
 class EulerCellKernel;
 
@@ -16,7 +15,7 @@ public:
 	virtual ~EulerCellKernel(){}
 
 protected:
-	MaterialProperty<RealVectorValue*> &_inviscous_term;
+	MaterialProperty<std::vector<RealVectorValue> > &_invis_term;
 
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();

@@ -15,10 +15,10 @@
 
 
 /// 边界条件
-
+#include "EulerBC.h"
 
 /// 函数
-
+#include "IsoVortexExact.h"
 
 /// 辅助kernel
 
@@ -27,7 +27,10 @@
 
 
 /// 材料属性
-#include "EulerMaterial.h"
+#include "EulerCellMaterial.h"
+#include "EulerFaceMaterial.h"
+#include "EulerBndMaterial.h"
+#include "IsoVortexBndMaterial.h"
 
 /// 时间步长增加策略
 
@@ -68,6 +71,9 @@ JoojakApp::registerObjects(Factory & factory)
 	/// 注册初始条件
 	registerInitialCondition(IsoVortexIC);
 
+	/// 注册边界条件
+	registerBoundaryCondition(EulerBC);
+
 	/// 注册Kernel
 	registerKernel(EulerCellKernel);
 
@@ -75,7 +81,13 @@ JoojakApp::registerObjects(Factory & factory)
 	registerDGKernel(EulerFaceKernel);
 
 	/// 注册材料属性
-	registerMaterial(EulerMaterial);
+	registerMaterial(EulerCellMaterial);
+	registerMaterial(EulerFaceMaterial);
+	registerMaterial(EulerBndMaterial);
+	registerMaterial(IsoVortexBndMaterial);
+
+	/// 注册函数
+	registerFunction(IsoVortexExact);
 }
 
 void

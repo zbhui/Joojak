@@ -16,12 +16,13 @@ class IsoVortexBase : public CFDBase
 public:
 	IsoVortexBase(const std::string & name, InputParameters parameters);
 
+	Real value(Real t, const Point &p, int eq);
 protected:
-	Real density(const Point &p);
-	Real x_momentum(const Point &p);
-	Real y_momentum(const Point &p);
-	Real z_momentum(const Point &p);
-	Real total_energy(const Point &p);
+	Real density(Real t, const Point &p);
+	Real x_momentum(Real t, const Point &p);
+	Real y_momentum(Real t, const Point &p);
+	Real z_momentum(Real t, const Point &p);
+	Real total_energy(Real t, const Point &p);
 
 };
 

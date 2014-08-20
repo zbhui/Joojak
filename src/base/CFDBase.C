@@ -20,19 +20,16 @@ InputParameters validParams<CFDBase>()
 
 CFDBase::CFDBase(const std::string & name, InputParameters parameters)
 {
-	MooseObject moose_object(name, parameters);
-	_gamma = (moose_object.getParam<Real>("gamma"));
-	_prandtl = (moose_object.getParam<Real>("prandtl"));
-	_mach = (moose_object.getParam<Real>("mach"));
-	_reynolds = (moose_object.getParam<Real>("reynolds"));
+	_gamma = (parameters.get<Real>("gamma"));
+	_prandtl = (parameters.get<Real>("prandtl"));
+	_mach = (parameters.get<Real>("mach"));
+	_reynolds = (parameters.get<Real>("reynolds"));
 
-	_attack = (moose_object.getParam<Real>("attack"));
-	_slide = (moose_object.getParam<Real>("slide"));
+	_attack = (parameters.get<Real>("attack"));
+	_slide = (parameters.get<Real>("slide"));
 
-	_epsilon = (moose_object.getParam<Real>("epsilon"));
-	_sigma = (moose_object.getParam<Real>("sigma"));
-
-//	_n_equation = 5;
+	_epsilon = (parameters.get<Real>("epsilon"));
+	_sigma = (parameters.get<Real>("sigma"));
 }
 
 Real CFDBase::pressure(Real *uh)
@@ -61,6 +58,14 @@ Real CFDBase::mach_local(Real* uh)
 	Real vel = std::sqrt(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0];
 	Real c = std::sqrt(temperature(uh))/_mach;
 	return vel/c;
+}
+
+Real CFDBase::maxEigenValue(Real *uh, const Point &normal)
+{
+	RealVectorValue vel(uh[1]/uh[0], uh[2]/uh[0], uh[3]/uh[0]);
+	Real vel_size = vel.size();
+	Real c = std::sqrt(temperature(uh))/_mach;
+	return vel*normal+c;
 }
 
 void CFDBase::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
@@ -172,6 +177,11 @@ void CFDBase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient 
 	viscous_term[component](1) = vel_tau(1);
 	viscous_term[component](2) = vel_tau(2);
 
+}
+
+void CFDBase::inviscousTerm(std::vector<RealVectorValue>& inviscous_term, Real* uh)
+{
+	inviscousTerm(&inviscous_term[0], uh);
 }
 
 //void CFDBase::liftOperator(Real *lift, Real *ul, Real *ur, Point &normal)

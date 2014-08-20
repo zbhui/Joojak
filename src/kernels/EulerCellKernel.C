@@ -4,13 +4,13 @@ template<>
 InputParameters validParams<EulerCellKernel>()
 {
   InputParameters params = validParams<Kernel>();
-
+//  params.addRequiredParam<std::string>("material", "单元的材料属性");
   return params;
 }
 
 EulerCellKernel::EulerCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
-		_inviscous_term(getMaterialProperty<RealVectorValue*>("inviscous"))
+		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("cell_material"))
 {
 	std::string var_name = _var.name();
 
@@ -33,5 +33,5 @@ Real EulerCellKernel::computeQpJacobian()
 
 Real EulerCellKernel::computeQpResidual()
 {
-	return -_inviscous_term[_qp][_eq]*_grad_test[_i][_qp];
+	return -_invis_term[_qp][_eq]*_grad_test[_i][_qp];
 }
