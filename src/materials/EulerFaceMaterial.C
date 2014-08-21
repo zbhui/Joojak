@@ -50,20 +50,11 @@ void EulerFaceMaterial::computeQpProperties()
 		_flux[_qp].resize(_n_equations);
 
 		Real ul[10], ur[10];
-		RealVectorValue invis_term[10], invis_term_neighbor[10];
+		Real flux_new[10];
 
 		computeQpLeftValue(ul);
 		computeQpRightValue(ur);
-		inviscousTerm(invis_term, ul);
-		inviscousTerm(invis_term_neighbor, ur);
-
-//		Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
-//		for (int eq = 0; eq < _n_equations; ++eq)
-//			_flux[_qp][eq] = 0.5*(invis_term[eq] + invis_term_neighbor[eq])*_normals[_qp] + lam*(ul[eq]-ur[eq]);
-
 		fluxRiemann(&_flux[_qp][0], ul, ur);
-
-		Real flux_new[10];
 
 		_jacobi_variable_ee[_qp].resize(_n_equations);
 		_jacobi_variable_en[_qp].resize(_n_equations);
@@ -77,7 +68,6 @@ void EulerFaceMaterial::computeQpProperties()
 			_jacobi_variable_nn[_qp][p].resize(_n_equations);
 		}
 
-		fluxRiemann(flux_new, ul, ur);
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			ul[q] += _ds;
@@ -122,16 +112,7 @@ void EulerFaceMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur)
 	inviscousTerm(fl, ul);
 	inviscousTerm(fr, ur);
 
-	Real rho, u, v, w, pre;
-	rho = (ul[0] + ur[0])/2.;
-	u = (ul[1] + ur [1])/rho/2;
-	v = (ul[2] + ur [2])/rho/2;
-	w = (ul[3] + ur [3])/rho/2;
-	pre = (pressure(ul) + pressure(ur))/2.;
-//	Real lam = fabs(u*normal(0) + v * normal(1) + w * normal(2)) + sqrt(_gamma*pre/rho);
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
 	for (int eq = 0; eq < _n_equations; ++eq)
-	{
 		flux[eq] = 0.5*(fl[eq] + fr[eq])*normal + lam*(ul[eq] - ur[eq]);
-	}
 }

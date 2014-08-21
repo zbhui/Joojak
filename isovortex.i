@@ -51,14 +51,14 @@
 
 [Preconditioning]
 	[./FDP]
-		type = FDP
+		type = SMP
 		full = true
 	[../]
 []
 # 非线性系统求解
 [Executioner]
   type = Transient
-  solve_type = PJFNK
+  solve_type = NEWTON
  	scheme = 'bdf2'
   dt = 0.005
   num_steps = 100
