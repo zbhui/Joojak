@@ -36,6 +36,7 @@ protected:
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _uh;
 	MaterialProperty<std::vector<RealVectorValue> > & _invis_term;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _jacobi;
 
 	void computeQpValue(Real *uh);
 };

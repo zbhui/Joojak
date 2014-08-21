@@ -15,6 +15,7 @@ InputParameters validParams<CFDBase>()
 
   params.addParam<Real>("epsilon", -1, "对称项罚值，可以取-1, 0 , 1，分别对应SIP, IIP, NIP");
   params.addParam<Real>("sigma", 1, "通量罚值，默认值为6");
+  params.addParam<Real>("ds", 1E-08, "微扰量");
   return params;
 }
 
@@ -30,6 +31,7 @@ CFDBase::CFDBase(const std::string & name, InputParameters parameters)
 
 	_epsilon = (parameters.get<Real>("epsilon"));
 	_sigma = (parameters.get<Real>("sigma"));
+	_ds = (parameters.get<Real>("ds"));
 }
 
 Real CFDBase::pressure(Real *uh)
@@ -64,7 +66,7 @@ Real CFDBase::maxEigenValue(Real *uh, const Point &normal)
 {
 	RealVectorValue vel(uh[1]/uh[0], uh[2]/uh[0], uh[3]/uh[0]);
 	Real vel_size = vel.size();
-	Real c = std::sqrt(temperature(uh))/_mach;
+	Real c = std::sqrt(_gamma*pressure(uh)/uh[0]);
 	return vel*normal+c;
 }
 

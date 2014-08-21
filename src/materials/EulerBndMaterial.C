@@ -24,7 +24,8 @@ InputParameters validParams<EulerBndMaterial>()
 EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
 		CFDBase(name, parameters),
-		_flux(declareProperty<std::vector<Real> >("flux"))
+		_flux(declareProperty<std::vector<Real> >("flux")),
+		_jacobi_variable(declareProperty<std::vector<std::vector<Real> > >("bnd_jacobi_variable"))
 {
 	_n_equations = coupledComponents("variables");
 	for (size_t eq = 0; eq < _n_equations; ++eq)
@@ -49,6 +50,22 @@ void EulerBndMaterial::computeQpProperties()
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
 	for (int eq = 0; eq < _n_equations; ++eq)
 		_flux[_qp][eq] = 0.5*(invis_term[eq] + invis_term_neighbor[eq])*_normals[_qp] + lam*(ul[eq]-ur[eq]);
+
+	fluxRiemann(&_flux[_qp][0], ul, ur);
+	Real flux_new[10];
+	_jacobi_variable[_qp].resize(_n_equations);
+	for (int p = 0; p < _n_equations; ++p)
+		_jacobi_variable[_qp][p].resize(_n_equations);
+
+	for (int q = 0; q < _n_equations; ++q)
+	{
+		ul[q] += _ds;
+		fluxRiemann(flux_new, ul, ur);
+		for (int p = 0; p < _n_equations; ++p)
+			_jacobi_variable[_qp][p][q] = (flux_new[p] - _flux[_qp][p])/_ds;
+
+		ul[q] -= _ds;
+	}
 }
 
 void EulerBndMaterial::computeQpLeftValue(Real* ul)
@@ -61,4 +78,25 @@ void EulerBndMaterial::computeQpRightValue(Real* ur)
 {
 	for (int eq = 0; eq < _n_equations; ++eq)
 		ur[eq] = (*_ul[eq])[_qp];
+}
+
+void EulerBndMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur)
+{
+	const Point &normal = _normals[_qp];
+	RealVectorValue fl[10], fr[10];
+	inviscousTerm(fl, ul);
+	inviscousTerm(fr, ur);
+
+	Real rho, u, v, w, pre;
+	rho = (ul[0] + ur[0])/2.;
+	u = (ul[1] + ur [1])/rho/2;
+	v = (ul[2] + ur [2])/rho/2;
+	w = (ul[3] + ur [3])/rho/2;
+	pre = (pressure(ul) + pressure(ur))/2.;
+//	Real lam = fabs(u*normal(0) + v * normal(1) + w * normal(2)) + sqrt(_gamma*pre/rho);
+	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
+	for (int eq = 0; eq < _n_equations; ++eq)
+	{
+		flux[eq] = 0.5*(fl[eq] + fr[eq])*normal + lam*(ul[eq] - ur[eq]);
+	}
 }

@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -19,8 +19,8 @@
   type = GeneratedMesh
   dim = 2
   
-  nx = 40
-  ny = 40 
+  nx = 20
+  ny = 20 
   
   xmin = -10
   xmax = 0
@@ -49,14 +49,19 @@
   [../]
 []
 
-
+[Preconditioning]
+	[./FDP]
+		type = FDP
+		full = true
+	[../]
+[]
 # 非线性系统求解
 [Executioner]
-  	type = Transient
-  	solve_type = PJFNK
+  type = Transient
+  solve_type = PJFNK
  	scheme = 'bdf2'
-  	dt = 0.005
-  	num_steps = 100
+  dt = 0.005
+  num_steps = 100
   
     # 线性迭代步的残差下降（相对）量级
  	l_tol = 1e-04
