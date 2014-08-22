@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = SECOND
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -12,6 +12,7 @@
   slide = 0
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
+	lumping = false
 []
 
 # 网格
@@ -19,8 +20,8 @@
   type = GeneratedMesh
   dim = 2
   
-  nx = 1
-  ny = 1
+  nx = 20
+  ny = 20
   
   xmin = -10
   xmax = 0
@@ -49,23 +50,53 @@
   [../]
 []
 
+[AuxKernels]
+  [./pressure]
+		type = NSAuxVariable
+		variable = pressure
+  [../]
+
+  [./mach]
+		type = NSAuxVariable
+		variable = mach
+  [../]
+
+  [./velocity_x]
+		type = NSAuxVariable
+		variable = velocity_x
+  [../]
+
+  [./velocity_y]
+		type = NSAuxVariable
+		variable = velocity_x
+  [../]
+
+  [./velocity_z]
+		type = NSAuxVariable
+		variable = velocity_x
+  [../]
+[]
+
 [Preconditioning]
-	[./FDP]
+	[./SMP]
 		type = SMP
 		full = true
 
-	  petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
-    petsc_options_iname = '-pc_type -snes_type'
-  	petsc_options_value = 'lu test'
+	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+  	#petsc_options_value = 'lu test'
+    petsc_options_iname = '-pc_type '
+  	petsc_options_value = 'ilu'
 	[../]
+
 []
 # 非线性系统求解
 [Executioner]
-  type = Steady
+  type = Transient
   solve_type = NEWTON
- 	#scheme = 'bdf2'
-  dt = 0.1
-  num_steps = 100
+ 	scheme = 'bdf2'
+  dt = 0.001
+  num_steps = 10
   
     # 线性迭代步的残差下降（相对）量级
  	l_tol = 1e-04
@@ -132,16 +163,8 @@
 # 输出和后处理
 [Outputs]
   	file_base = isovortex
- # 	hide = 'rhoe'
-  	#tecplot = true
-  	csv = true
-	gnuplot = true	
+	
  	
- #	 [./tecplot]
-#		file_base = tecplot
- #  	type = Tecplot
- #  	binary = true
- #	[../]
 	[./exodus]
 		type = Exodus
 		output_initial = true
@@ -207,7 +230,26 @@
 
 # 体积分
 [Kernels]
-
+	[./mass_time]
+		type = TimeDerivative
+		variable = rho
+	[../]		
+	[./x-momentumum_time]
+		type = TimeDerivative
+		variable = momentum_x
+	[../]	
+	[./y-momentumum_time]
+		type = TimeDerivative
+		variable = momentum_y
+	[../]
+	[./z-momentumum_time]
+		type = TimeDerivative
+		variable = momentum_z
+	[../]		
+	[./total-energy_time]
+		type = TimeDerivative
+		variable = rhoe
+	[../]
 
 	[./mass_space]
 		type = EulerCellKernel
