@@ -15,7 +15,7 @@ InputParameters validParams<CFDBase>()
 
   params.addParam<Real>("epsilon", -1, "对称项罚值，可以取-1, 0 , 1，分别对应SIP, IIP, NIP");
   params.addParam<Real>("sigma", 1, "通量罚值，默认值为6");
-  params.addParam<Real>("ds", 1E-08, "微扰量");
+  params.addParam<Real>("ds", 1.490116119384766e-08, "微扰量");
   return params;
 }
 

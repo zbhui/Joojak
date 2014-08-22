@@ -19,8 +19,8 @@
   type = GeneratedMesh
   dim = 2
   
-  nx = 20
-  ny = 20 
+  nx = 1
+  ny = 1
   
   xmin = -10
   xmax = 0
@@ -53,14 +53,18 @@
 	[./FDP]
 		type = SMP
 		full = true
+
+	  petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    petsc_options_iname = '-pc_type -snes_type'
+  	petsc_options_value = 'lu test'
 	[../]
 []
 # 非线性系统求解
 [Executioner]
-  type = Transient
+  type = Steady
   solve_type = NEWTON
- 	scheme = 'bdf2'
-  dt = 0.005
+ 	#scheme = 'bdf2'
+  dt = 0.1
   num_steps = 100
   
     # 线性迭代步的残差下降（相对）量级
@@ -75,9 +79,7 @@
   	nl_rel_tol = 1e-05
   	# 非线性迭代绝对残值
   	#nl_abs_tol = 1e-05
-  
-    #petsc_options_iname = '-pc_type -pc_hypre_type'
-  	#petsc_options_value = 'hypre boomeramg'
+
   	
 	 abort_on_solve_fail = true	
   #end_time = 0.1
@@ -205,26 +207,7 @@
 
 # 体积分
 [Kernels]
-	[./mass_time]
-		type =TimeDerivative
-		variable = rho
-	[../]		
-	[./x-momentumum_time]
-		type = TimeDerivative
-		variable = momentum_x
-	[../]	
-	[./y-momentumum_time]
-		type = TimeDerivative
-		variable = momentum_y
-	[../]
-	[./z-momentumum_time]
-		type = TimeDerivative
-		variable = momentum_z
-	[../]		
-	[./total-energy_time]
-		type = TimeDerivative
-		variable = rhoe
-	[../]
+
 
 	[./mass_space]
 		type = EulerCellKernel

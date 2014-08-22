@@ -37,6 +37,11 @@ EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters par
 
 void EulerBndMaterial::computeQpProperties()
 {
+	if(!_bnd)
+	{
+		mooseError("边界Material不在边界");
+		return;
+	}
 	_flux[_qp].resize(_n_equations);
 
 	Real ul[10], ur[10];
