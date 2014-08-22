@@ -10,7 +10,8 @@ InputParameters validParams<EulerCellKernel>()
 
 EulerCellKernel::EulerCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
-		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("cell_material"))
+		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("cell_material")),
+		_jacobi(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("cell_jacobi_variable"))
 {
 	std::string var_name = _var.name();
 
@@ -26,12 +27,16 @@ EulerCellKernel::EulerCellKernel(const std::string & name, InputParameters param
 		_eq = 4;
 }
 
-Real EulerCellKernel::computeQpJacobian()
-{
-	return 0.;
-}
-
 Real EulerCellKernel::computeQpResidual()
 {
-	return -_invis_term[_qp][_eq]*_grad_test[_i][_qp];
+	return -(_invis_term[_qp][_eq]*_grad_test[_i][_qp]);
+}
+
+Real EulerCellKernel::computeQpJacobian()
+{
+	return -_jacobi[_qp][_eq][_eq]*_phi[_j][_qp]*_grad_test[_i][_qp];
+}
+Real EulerCellKernel::computeQpOffDiagJacobian(unsigned int jvar)
+{
+	return -_jacobi[_qp][_eq][jvar]*_phi[_j][_qp]*_grad_test[_i][_qp];
 }

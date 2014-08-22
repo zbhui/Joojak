@@ -16,6 +16,8 @@ public:
 
 protected:
 	  MaterialProperty<std::vector<Real> > &_flux;
+	  MaterialProperty<std::vector<std::vector<Real> > > &_jacobi_variable;
 	  virtual Real computeQpResidual();
-
+	  virtual Real computeQpJacobian();
+	  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 };

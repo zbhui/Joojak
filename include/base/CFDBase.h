@@ -53,5 +53,7 @@ protected:
 
   Real _epsilon;
   Real _sigma;
+
+  Real _ds;
 };
 

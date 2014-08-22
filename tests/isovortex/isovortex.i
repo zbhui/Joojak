@@ -49,6 +49,46 @@
   [../]
 []
 
+[AuxKernels]
+  [./pressure]
+		type = NSAuxVariable
+		variable = pressure
+  [../]
+
+  [./mach]
+		type = NSAuxVariable
+		variable = mach
+  [../]
+
+  [./velocity_x]
+		type = NSAuxVariable
+		variable = velocity_x
+  [../]
+
+  [./velocity_y]
+		type = NSAuxVariable
+		variable = velocity_x
+  [../]
+
+  [./velocity_z]
+		type = NSAuxVariable
+		variable = velocity_x
+  [../]
+[]
+
+[Preconditioning]
+	[./SMP]
+		type = SMP
+		full = true
+
+	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+  	#petsc_options_value = 'lu test'
+    petsc_options_iname = '-pc_type '
+  	petsc_options_value = 'ilu'
+	[../]
+
+[]
 
 # 非线性系统求解
 [Executioner]

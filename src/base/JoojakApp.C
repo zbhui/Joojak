@@ -21,7 +21,7 @@
 #include "IsoVortexExact.h"
 
 /// 辅助kernel
-
+#include "NSAuxVariable.h"
 
 /// Action
 
@@ -88,6 +88,9 @@ JoojakApp::registerObjects(Factory & factory)
 
 	/// 注册函数
 	registerFunction(IsoVortexExact);
+
+	///注册辅助kernel
+	registerAux(NSAuxVariable);
 }
 
 void

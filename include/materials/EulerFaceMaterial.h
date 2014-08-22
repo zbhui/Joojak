@@ -38,7 +38,13 @@ protected:
 	std::vector<VariableValue*> _ur;
 
 	MaterialProperty<std::vector<Real> > & _flux;
+	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_ee;
+	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_en;
+	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_ne;
+	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_nn;
 
 	virtual void computeQpLeftValue(Real *ul);
 	virtual void computeQpRightValue(Real *ur);
+
+	void fluxRiemann(Real *flux, Real *ul, Real *ur);
 };
