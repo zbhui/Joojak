@@ -20,4 +20,6 @@ protected:
 	  virtual Real computeQpResidual();
 	  virtual Real computeQpJacobian();
 	  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
+
+	  int _eq;
 };

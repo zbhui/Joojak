@@ -12,7 +12,7 @@
 
 /// 初始条件
 #include "IsoVortexIC.h"
-
+#include "CFDPassFlowIC.h"
 
 /// 边界条件
 #include "EulerBC.h"
@@ -33,6 +33,7 @@
 #include "IsoVortexBndMaterial.h"
 
 /// 时间步长增加策略
+#include "RatioTimeStepper.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -70,6 +71,7 @@ JoojakApp::registerObjects(Factory & factory)
 {
 	/// 注册初始条件
 	registerInitialCondition(IsoVortexIC);
+	registerInitialCondition(CFDPassFlowIC);
 
 	/// 注册边界条件
 	registerBoundaryCondition(EulerBC);
@@ -91,6 +93,9 @@ JoojakApp::registerObjects(Factory & factory)
 
 	///注册辅助kernel
 	registerAux(NSAuxVariable);
+
+	/// 注册时间步长
+	registerTimeStepper(RatioTimeStepper);
 }
 
 void

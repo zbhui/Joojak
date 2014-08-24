@@ -65,9 +65,8 @@ Real CFDBase::mach_local(Real* uh)
 Real CFDBase::maxEigenValue(Real *uh, const Point &normal)
 {
 	RealVectorValue vel(uh[1]/uh[0], uh[2]/uh[0], uh[3]/uh[0]);
-	Real vel_size = vel.size();
 	Real c = std::sqrt(_gamma*pressure(uh)/uh[0]);
-	return vel*normal+c;
+	return std::fabs(vel*normal)+c;
 }
 
 void CFDBase::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
