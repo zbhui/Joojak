@@ -17,7 +17,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/cylinder_quad.msh
+  file = grids/cylinder.msh
   dim = 2
   
   block_id = 10

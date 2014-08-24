@@ -49,26 +49,54 @@ void EulerBndMaterial::computeQpProperties()
 
 	resizeQpProperty();
 
-	Real ul[10], ur[10];
+	Real ul[10], ur[10], ul_new[10], ur_new[10];
 	Real flux_new[10];
 
 	computeQpLeftValue(ul);
 	computeQpRightValue(ur);
 	fluxRiemann(&_flux[_qp][0], ul, ur);
 
+	Matrix5x5 jacobi_variable_en, jacobi_variable_ur_ul;
 	for (int q = 0; q < _n_equations; ++q)
 	{
-		ul[q] += _ds;
-//		(*_ul[q])[_qp] += _ds;
-//		computeQpLeftValue(ul);
-		computeQpRightValue(ur);
-		fluxRiemann(flux_new, ul, ur);
+//		ul[q] += _ds;
+		(*_ul[q])[_qp] += _ds;
+		computeQpLeftValue(ul);
+		computeQpRightValue(ur_new);
+		fluxRiemann(flux_new, ul, ur_new);
 		for (int p = 0; p < _n_equations; ++p)
 			_jacobi_variable[_qp][p][q] = (flux_new[p] - _flux[_qp][p])/_ds;
 
-		ul[q] -= _ds;
+//		ul[q] -= _ds;
+		(*_ul[q])[_qp] -= _ds;
+
+//		ur[q] += _ds;
+//		fluxRiemann(flux_new, ul, ur);
+//		for (int p = 0; p < _n_equations; ++p)
+//		{
+//			Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
+//			jacobi_variable_en(p,q) = tmp;
+//		}
+//		ur[q] -= _ds;
+//
+//		(*_ul[q])[_qp] += _ds;
+//		computeQpRightValue(ur_new);
+//		for (int p = 0; p < _n_equations; ++p)
+//		{
+//			Real tmp = (ur_new[p] - ur[p])/_ds;
+//			jacobi_variable_ur_ul(p,q) = tmp;
+//		}
 //		(*_ul[q])[_qp] -= _ds;
 	}
+//
+////	std::cout << jacobi_variable_en*jacobi_variable_ur_ul <<std::endl;
+//	for (int q = 0; q < _n_equations; ++q)
+//	{
+//		for (int p = 0; p < _n_equations; ++p)
+//		{
+//			_jacobi_variable[_qp][p][q] += (jacobi_variable_en*jacobi_variable_ur_ul)(p,q);
+//		}
+//	}
 }
 
 void EulerBndMaterial::computeQpLeftValue(Real* ul)

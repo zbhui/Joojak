@@ -33,6 +33,7 @@
 #include "IsoVortexBndMaterial.h"
 
 /// 时间步长增加策略
+#include "RatioTimeStepper.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -92,6 +93,9 @@ JoojakApp::registerObjects(Factory & factory)
 
 	///注册辅助kernel
 	registerAux(NSAuxVariable);
+
+	/// 注册时间步长
+	registerTimeStepper(RatioTimeStepper);
 }
 
 void

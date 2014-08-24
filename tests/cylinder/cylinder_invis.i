@@ -17,7 +17,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/cylinder_quad.msh
+  file = grids/cylinder.msh
   dim = 2
   
   block_id = 10
@@ -92,7 +92,7 @@
   type = Transient
   solve_type = newton
  	#scheme = 'bdf2'
-  num_steps = 1000
+  num_steps = 2
   
     # 线性迭代步的残差下降（相对）量级
  	l_tol = 1e-01
