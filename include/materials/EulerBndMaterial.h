@@ -27,17 +27,21 @@ public:
 	EulerBndMaterial(const std::string & name, InputParameters parameters);
 
 protected:
-	virtual void computeQpProperties();
-
+	MooseEnum _bc_type;
 	int _n_equations;
+
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _ul;
-
 	MaterialProperty<std::vector<Real> > & _flux;
 	MaterialProperty<std::vector<std::vector<Real> > > &_jacobi_variable;
 
+	virtual void computeQpProperties();
+	virtual void resizeQpProperty();
 	virtual void computeQpLeftValue(Real *ul);
 	virtual void computeQpRightValue(Real *ur);
 
 	void fluxRiemann(Real *flux, Real *ul, Real *ur);
+	void wall(Real *ur);
+	void farField(Real *ur);
+	void symmetric(Real *ur);
 };

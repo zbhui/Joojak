@@ -4,7 +4,7 @@
 template<>
 InputParameters validParams<CFDBC>()
 {
-	MooseEnum bc_types("wall, far-field, symmetric, pressure-out, isovortex, exact", "exact");  // 边界条件的类型，可以增加
+	MooseEnum bc_types("wall, far_field, symmetric, pressure_out, none", "none");  // 边界条件的类型，可以增加
 
 	InputParameters params = validParams<IntegratedBC>();
 	params += validParams<CFDBase>();

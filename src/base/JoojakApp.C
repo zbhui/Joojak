@@ -12,7 +12,7 @@
 
 /// 初始条件
 #include "IsoVortexIC.h"
-
+#include "CFDPassFlowIC.h"
 
 /// 边界条件
 #include "EulerBC.h"
@@ -70,6 +70,7 @@ JoojakApp::registerObjects(Factory & factory)
 {
 	/// 注册初始条件
 	registerInitialCondition(IsoVortexIC);
+	registerInitialCondition(CFDPassFlowIC);
 
 	/// 注册边界条件
 	registerBoundaryCondition(EulerBC);

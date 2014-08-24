@@ -20,7 +20,6 @@ public:
 protected:
 
 	 MooseEnum _bc_type;
-	 int _eq;
 };
 
 
