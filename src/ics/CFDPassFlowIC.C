@@ -5,14 +5,14 @@ template<>
 InputParameters validParams<CFDPassFlowIC>()
 {
 	InputParameters params = validParams<CFDInitialCondition>();
-	params += validParams<CFDBase>();
+	params += validParams<EulerBase>();
     params.addParam<Real>("velocity", 1.0, "均匀流速度");
     return params;
 }
 
 CFDPassFlowIC::CFDPassFlowIC(const std::string & name, InputParameters parameters) :
     CFDInitialCondition(name, parameters),
-    CFDBase(name, parameters),
+    EulerBase(name, parameters),
     _velocity(getParam<Real>("velocity"))
 {}
 

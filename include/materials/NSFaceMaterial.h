@@ -12,7 +12,7 @@
 #pragma once
 
 #include "Material.h"
-#include "EulerBase.h"
+#include "CFDBase.h"
 
 class EulerFaceMaterial;
 

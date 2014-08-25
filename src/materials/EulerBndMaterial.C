@@ -15,7 +15,7 @@ template<>
 InputParameters validParams<EulerBndMaterial>()
 {
   InputParameters params = validParams<Material>();
-  params += validParams<CFDBase>();
+  params += validParams<EulerBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
   MooseEnum bc_types("wall, far_field, symmetric, pressure_out, none", "none");  // 边界条件的类型，可以增加
@@ -26,7 +26,7 @@ InputParameters validParams<EulerBndMaterial>()
 
 EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
-		CFDBase(name, parameters),
+		EulerBase(name, parameters),
 		_bc_type(getParam<MooseEnum>("bc_type")),
 		_flux(declareProperty<std::vector<Real> >("flux")),
 		_jacobi_variable(declareProperty<std::vector<std::vector<Real> > >("bnd_jacobi_variable"))

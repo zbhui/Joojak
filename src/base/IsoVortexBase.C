@@ -4,13 +4,13 @@
 template<>
 InputParameters validParams<IsoVortexBase>()
 {
-  InputParameters params = validParams<CFDBase>();
+  InputParameters params = validParams<EulerBase>();
 
   return params;
 }
 
 IsoVortexBase::IsoVortexBase(const std::string & name, InputParameters parameters):
-		CFDBase(name, parameters)
+		EulerBase(name, parameters)
 {
 }
 

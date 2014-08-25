@@ -5,12 +5,14 @@ template<>
 InputParameters validParams<EulerBC>()
 {
 	InputParameters params = validParams<CFDBC>();
+	params += validParams<EulerBase>();
 
 	return params;
 }
 
 EulerBC::EulerBC(const std::string & name, InputParameters parameters):
 		CFDBC(name, parameters),
+		EulerBase(name, parameters),
 		_flux(getMaterialProperty<std::vector<Real> >("flux")),
 		_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("bnd_jacobi_variable"))
 {

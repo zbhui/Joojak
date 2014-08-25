@@ -5,13 +5,13 @@ template<>
 InputParameters validParams<CouetteFlowExact>()
 {
   InputParameters params = validParams<Function>();
-  params += validParams<CFDBase>();
+  params += validParams<NSBase>();
   return params;
 }
 
 CouetteFlowExact::CouetteFlowExact(const std::string & name, InputParameters parameters) :
     Function(name, parameters),
-    CFDBase(name, parameters)
+    NSBase(name, parameters)
 {}
 
 Real

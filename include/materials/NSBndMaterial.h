@@ -12,39 +12,36 @@
 #pragma once
 
 #include "Material.h"
-#include "EulerBase.h"
+#include "CFDBase.h"
 
-class EulerFaceMaterial;
+class EulerBndMaterial;
 
 template<>
-InputParameters validParams<EulerFaceMaterial>();
+InputParameters validParams<EulerBndMaterial>();
 
-/**
- * Euler流体的材料属性
- */
-class EulerFaceMaterial :
+class EulerBndMaterial :
 public Material,
 public EulerBase
 {
 public:
-	EulerFaceMaterial(const std::string & name, InputParameters parameters);
+	EulerBndMaterial(const std::string & name, InputParameters parameters);
 
 protected:
-	virtual void computeQpProperties();
-
+	MooseEnum _bc_type;
 	int _n_equations;
+
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _ul;
-	std::vector<VariableValue*> _ur;
-
 	MaterialProperty<std::vector<Real> > & _flux;
-	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_ee;
-	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_en;
-	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_ne;
-	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_nn;
+	MaterialProperty<std::vector<std::vector<Real> > > &_jacobi_variable;
 
+	virtual void computeQpProperties();
+	virtual void resizeQpProperty();
 	virtual void computeQpLeftValue(Real *ul);
 	virtual void computeQpRightValue(Real *ur);
 
 	void fluxRiemann(Real *flux, Real *ul, Real *ur);
+	void wall(Real *ur);
+	void farField(Real *ur);
+	void symmetric(Real *ur);
 };

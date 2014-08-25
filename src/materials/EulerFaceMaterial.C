@@ -15,7 +15,7 @@ template<>
 InputParameters validParams<EulerFaceMaterial>()
 {
   InputParameters params = validParams<Material>();
-  params += validParams<CFDBase>();
+  params += validParams<EulerBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
   return params;
@@ -23,7 +23,7 @@ InputParameters validParams<EulerFaceMaterial>()
 
 EulerFaceMaterial::EulerFaceMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
-		CFDBase(name, parameters),
+		EulerBase(name, parameters),
 		_flux(declareProperty<std::vector<Real> >("flux")),
 		_jacobi_variable_ee(declareProperty<std::vector<std::vector<Real> > >("face_jacobi_ee")),
 		_jacobi_variable_en(declareProperty<std::vector<std::vector<Real> > >("face_jacobi_en")),

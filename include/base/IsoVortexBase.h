@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "CFDBase.h"
+#include "EulerBase.h"
 
 class IsoVortexBase;
 
@@ -11,7 +11,7 @@ InputParameters validParams<IsoVortexBase>();
 /**
  * CFD base class.
  */
-class IsoVortexBase : public CFDBase
+class IsoVortexBase : public EulerBase
 {
 public:
 	IsoVortexBase(const std::string & name, InputParameters parameters);
