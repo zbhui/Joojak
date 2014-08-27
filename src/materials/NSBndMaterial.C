@@ -56,57 +56,70 @@ void NSBndMaterial::computeQpProperties()
 	resizeQpProperty();
 
 	Real ul[10], ur[10], ur_new[10];
-	RealGradient dul[10], dur[10], duh[10];
+	RealGradient dul[10], dur[10], dur_new[10];
 	Real flux_new[10];
+	RealVectorValue penalty_new[10];
 
-	computeQpLeftValue(ul);
-	computeQpRightValue(ur);
-	computeQpLeftGradValue(dul);
-	computeQpRightGradValue(dur);
+	computeQpLeftValue(ul, dul);
+	computeQpRightValue(ur, dur, ul, dul);
 
-	for (int eq = 0; eq < _n_equations; ++eq)
-		duh[eq] = (ul[eq]-ur[eq])*_normals[_qp];
+	penaltyTerm(&_penalty[_qp][0], ul, ur);
+	fluxTerm(&_flux[_qp][0], ul, ur, dul, dur);
 
-	viscousTerm(&_penalty[_qp][0], ul, duh);
-//	viscousTerm(&_penalty_neighbor[_qp][0], ur, duh);
+	for (int q = 0; q < _n_equations; ++q)
+	{
+		ul[q] += _ds;
+		computeQpRightValue(ur_new, dur_new, ul, dul);
+		penaltyTerm(penalty_new, ul, ur_new);
+		fluxTerm(flux_new, ul, ur_new, dul, dur_new);
+		for (int p = 0; p < _n_equations; ++p)
+		{
+			_flux_jacobi_variable[_qp][p][q] = (flux_new[p] - _flux[_qp][p])/_ds;
+			_penalty_jacobi_variable[_qp][p][q] = (penalty_new[p] - _penalty[_qp][p])/_ds;
+		}
+		ul[q] -= _ds;
+	}
 
-	fluxRiemann(&_flux[_qp][0], ul, ur, dul, dur);
-
-//	for (int q = 0; q < _n_equations; ++q)
-//	{
-//		(*_ul[q])[_qp] += _ds;
-//		computeQpLeftValue(ul);
-//		computeQpRightValue(ur_new);
-//		fluxRiemann(flux_new, ul, ur_new);
-//		for (int p = 0; p < _n_equations; ++p)
-//			_jacobi_variable[_qp][p][q] = (flux_new[p] - _flux[_qp][p])/_ds;
-//
-//		(*_ul[q])[_qp] -= _ds;
-//	}
+	for (int beta = 0; beta < 3; ++beta)
+	for (int q = 0; q < _n_equations; ++q)
+	{
+		dul[q](beta) += _ds;
+		computeQpRightValue(ur_new, dur_new, ul, dul);
+		penaltyTerm(penalty_new, ul, ur_new);
+		fluxTerm(flux_new, ul, ur_new, dul, dur_new);
+		for (int p = 0; p < _n_equations; ++p)
+		{
+			_flux_jacobi_grad_variable[_qp][p][q](beta) = (flux_new[p] - _flux[_qp][p])/_ds;
+		}
+		dul[q](beta) -= _ds;
+	}
 
 }
 
-void NSBndMaterial::computeQpLeftValue(Real* ul)
+void NSBndMaterial::computeQpLeftValue(Real* ul, RealGradient *dul)
 {
 	for (int eq = 0; eq < _n_equations; ++eq)
+	{
 		ul[eq] = (*_ul[eq])[_qp];
+		dul[eq] = (*_grad_ul[eq])[_qp];
+	}
 }
 
-void NSBndMaterial::computeQpRightValue(Real* ur)
+void NSBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
 	if(_bc_type == "wall")
 	{
-		wall(ur);
+		wall(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "far_field")
 	{
-		farField(ur);
+		farField(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "symmetric")
 	{
-		symmetric(ur);
+		symmetric(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "none")
@@ -120,19 +133,7 @@ void NSBndMaterial::computeQpRightValue(Real* ur)
 	mooseError(_bc_type<<"未定义的边界条件类型");
 }
 
-void NSBndMaterial::computeQpLeftGradValue(RealGradient *ul)
-{
-	for (int eq = 0; eq < _n_equations; ++eq)
-		ul[eq] = (*_grad_ul[eq])[_qp];
-}
-
-void NSBndMaterial::computeQpRightGradValue(RealGradient *ur)
-{
-	for (int eq = 0; eq < _n_equations; ++eq)
-		ur[eq] = (*_grad_ul[eq])[_qp];
-}
-
-void NSBndMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
+void NSBndMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
 {
 	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
 
@@ -143,13 +144,24 @@ void NSBndMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur, RealGradient *du
 
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
 	for (int eq = 0; eq < _n_equations; ++eq)
+	{
 		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
+	}
 }
 
-void NSBndMaterial::wall(Real* ur)
+void NSBndMaterial::penaltyTerm(RealVectorValue* penalty, Real* ul, Real *ur)
 {
-	Real ul[5];
-	computeQpLeftValue(ul);
+	RealGradient duh[10];
+	for (int eq = 0; eq < _n_equations; ++eq)
+		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
+
+	viscousTerm(penalty, ul, duh);
+}
+
+void NSBndMaterial::wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
+{
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
 
 	const Point &normal = _normals[_qp];
 	RealVectorValue momentum(ul[1], ul[2], ul[3]);
@@ -164,10 +176,10 @@ void NSBndMaterial::wall(Real* ur)
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 
-void NSBndMaterial::farField(Real* ur)
+void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
-	Real ul[5];
-	computeQpLeftValue(ul);
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
 
 	const Point &normal = _normals[_qp];
 
@@ -247,10 +259,11 @@ void NSBndMaterial::farField(Real* ur)
 	}
 }
 
-void NSBndMaterial::symmetric(Real* ur)
+
+void NSBndMaterial::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
-	Real ul[5];
-	computeQpLeftValue(ul);
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
 
 	const Point &normal = _normals[_qp];
 	RealVectorValue momentum(ul[1], ul[2], ul[3]);

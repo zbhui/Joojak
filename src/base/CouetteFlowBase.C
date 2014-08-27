@@ -40,67 +40,28 @@ Real CouetteFlowBase::value(Real t, const Point& p, int eq)
 
 Real CouetteFlowBase::density(Real t, const Point &p)
 {
-	Real x = p(0)-t;
-	Real y = p(1)-t;
-	Real z = p(2)-t;
-//
-//	Real pi = 3.1415926535;
-//	return std::sin(2*pi*(x+y+z));
+	Real x = p(0);
+	Real y = p(1);
+	Real z = p(2);
 
-	Real gam = 1.4, gamm1 = gam - 1, epi = 5.0;
-	Real xb, yb, r2;
-	Real rho,T;
+	Real tem = temperature(p);
+	Real pre = 1./(_gamma * _mach * _mach);
+	return pre * _gamma * _mach * _mach/tem;
 
-	Real PI = libMesh::pi;
-	xb = x+5;
-	yb = y+5;
-	r2 = xb * xb + yb * yb;
-
-	T = 1.0 - gamm1 * epi * epi / ( 8 * gam * PI* PI ) * exp( 1 - r2 );
-	rho = pow( T, 1 / gamm1 );
-	return rho;
 }
 
 Real CouetteFlowBase::x_momentum(Real t, const Point &p)
 {
-	Real x = p(0)-t;
-	Real y = p(1)-t;
-	Real z = p(2)-t;
-
-	Real gam=1.4, gamm1=gam-1, epi=5.;
-	Real xb, yb, r2;
-	Real rho, u, T;
-
-	Real PI = libMesh::pi;
-	xb = x+5;
-	yb = y+5;
-	r2=xb*xb+yb*yb;
-	u = 1.+epi/( 2.*PI ) * exp( 0.5 * ( 1.-r2 ) ) * (-yb );
-	T = 1. - gamm1*epi*epi/( 8*gam*PI*PI ) * exp( 1.-r2 );
-	rho = pow( T, 1/gamm1 );
-
-	return rho*u;
+	Real rho = density(t, p);
+	Real u = p(1)/2.0;
+	return rho * u;
 }
 
 Real CouetteFlowBase::y_momentum(Real t, const Point &p)
 {
-	Real x = p(0)-t;
-	Real y = p(1)-t;
-	Real z = p(2)-t;
-
-	Real gam=1.4, gamm1=gam-1, epi=5.;
-	Real xb, yb, r2;
-	Real rho, v,T;
-
-	Real PI = libMesh::pi;
-	xb = x+5;
-	yb = y+5;
-	r2=xb*xb+yb*yb;
-	v = 1.+epi/( 2.*PI ) * exp( 0.5 * ( 1.-r2 ) ) * xb;
-	T = 1. - gamm1*epi*epi/( 8*gam*PI*PI ) * exp( 1.-r2 );
-	rho = pow( T, 1/gamm1 );
-
-	return rho*v;
+	Real rho = density(t, p);
+	Real v = 0.;
+	return rho * v;
 }
 
 Real CouetteFlowBase::z_momentum(Real t, const Point &p)
@@ -108,26 +69,23 @@ Real CouetteFlowBase::z_momentum(Real t, const Point &p)
 	return 0.0;
 }
 
-
 Real CouetteFlowBase::total_energy(Real t, const Point &p)
 {
-	Real x = p(0)-t;
-	Real y = p(1)-t;
-	Real z = p(2)-t;
-
-	Real gam=1.4, gamm1=gam-1, epi=5.;
-	Real xb, yb, r2;
-	Real rho, u, v,T, pre;
-
-	Real PI = libMesh::pi;
-	xb = x+5;
-	yb = y+5;
-	r2=xb*xb+yb*yb;
-	u = 1.+epi/( 2.*PI ) * exp( 0.5 * ( 1.-r2 ) ) * (-yb );
-	v = 1.+epi/( 2.*PI ) * exp( 0.5 * ( 1.-r2 ) ) * xb;
-	T = 1. - gamm1*epi*epi/( 8*gam*PI*PI ) * exp( 1.-r2 );
-	rho = pow( T, 1/gamm1 );
-	pre=pow( rho, gam );
-
-	return pre/gamm1+0.5*rho * ( u*u+v*v );
+	Real rho = density(t, p);
+	Real tem = temperature(p);
+	Real pre = 1./(_gamma * _mach * _mach);
+	Real u = p(1)/2.0;
+	Real v = 0;
+	Real w = 0;
+	return pre/(_gamma-1)+0.5*rho * (u*u + v*v + w*w);
 }
+
+Real CouetteFlowBase::temperature(const Point& p)
+{
+	Real x = p(0);
+	Real y = p(1);
+	Real z = p(2);
+	Real T2=0.85,T1=0.8;
+	return T1 + ( T2 - T1 ) * y / 2 + 0.5 * _prandtl * (_gamma - 1) * _mach * _mach * y / 2 * ( 1 - y / 2 );
+}
+

@@ -41,13 +41,13 @@ protected:
 
 	virtual void computeQpProperties();
 	virtual void resizeQpProperty();
-	virtual void computeQpLeftValue(Real *ul);
-	virtual void computeQpRightValue(Real *ur);
-	virtual void computeQpLeftGradValue(RealGradient *dul);
-	virtual void computeQpRightGradValue(RealGradient *dur);
+	virtual void computeQpLeftValue(Real *ul, RealGradient *dul);
+	virtual void computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 
-	void fluxRiemann(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
-	void wall(Real *ur);
-	void farField(Real *ur);
-	void symmetric(Real *ur);
+	void fluxTerm(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
+	void penaltyTerm(RealVectorValue *penalty, Real *ul, Real *ur);
+
+	void wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
+	void farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
+	void symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 };

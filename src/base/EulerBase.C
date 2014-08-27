@@ -15,8 +15,8 @@ InputParameters validParams<EulerBase>()
 
 EulerBase::EulerBase(const std::string & name, InputParameters parameters)
 {
-	_gamma = (parameters.get<Real>("gamma"));
 	_mach = (parameters.get<Real>("mach"));
+	_gamma = (parameters.get<Real>("gamma"));
 
 	_attack = (parameters.get<Real>("attack"));
 	_slide = (parameters.get<Real>("slide"));

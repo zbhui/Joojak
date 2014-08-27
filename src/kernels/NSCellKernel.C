@@ -10,8 +10,8 @@ InputParameters validParams<NSCellKernel>()
 NSCellKernel::NSCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
 		_flux_term(getMaterialProperty<std::vector<RealVectorValue> >("flux_term")),
-		_jacobi_variable(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("jacobi_variable")),
-		_jacobi_grad_variable(getMaterialProperty<std::vector<std::vector<RealTensorValue> > >("jacobi_grad_variable"))
+		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("flux_term_jacobi_variable")),
+		_flux_jacobi_grad_variable(getMaterialProperty<std::vector<std::vector<RealTensorValue> > >("flux_term_jacobi_grad_variable"))
 {
 	std::string var_name = _var.name();
 
@@ -34,11 +34,9 @@ Real NSCellKernel::computeQpResidual()
 
 Real NSCellKernel::computeQpJacobian()
 {
-	return 0.;
-//	return -_jacobi[_qp][_eq][_eq]*_phi[_j][_qp]*_grad_test[_i][_qp];
+	return -(_flux_jacobi_variable[_qp][_eq][_eq]*_phi[_j][_qp]+_flux_jacobi_grad_variable[_qp][_eq][_eq]*_grad_phi[_j][_qp])*_grad_test[_i][_qp];
 }
 Real NSCellKernel::computeQpOffDiagJacobian(unsigned int jvar)
 {
-	return 0.;
-//	return -_jacobi[_qp][_eq][jvar]*_phi[_j][_qp]*_grad_test[_i][_qp];
+	return -(_flux_jacobi_variable[_qp][_eq][jvar]*_phi[_j][_qp]+_flux_jacobi_grad_variable[_qp][_eq][jvar]*_grad_phi[_j][_qp])*_grad_test[_i][_qp];
 }

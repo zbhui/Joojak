@@ -39,19 +39,32 @@ Real NSBC::computeQpResidual()
 	Real CIP = computeCIP();
 	Real flux = _flux[_qp][_eq] ;
 	flux += CIP*(_penalty[_qp][_eq] + _penalty[_qp][_eq])*_normals[_qp];
-	return  _flux[_qp][_eq] * _test[_i][_qp] + 0.5*_epsilon * _penalty[_qp][_eq]* _grad_test[_i][_qp];
+	return  flux * _test[_i][_qp] + _epsilon * _penalty[_qp][_eq]* _grad_test[_i][_qp];
 }
 
 Real NSBC::computeQpJacobian()
 {
-	return 0.;
-//	return _flux_jacobi_variable[_qp][_eq][_eq]*_phi[_j][_qp]*_test[_i][_qp];
+	Real r = 0;
+	Real CIP = computeCIP();
+	int p(_eq), q(_eq);
+	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
+	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
+	r += CIP*(_penalty_jacobi_variable[_qp][p][q] + _penalty_jacobi_variable[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
+	r += _epsilon*_penalty_jacobi_variable[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
+
+	return r;
 }
 
 Real NSBC::computeQpOffDiagJacobian(unsigned int jvar)
 {
-	return 0.;
-//	return _flux_jacobi_variable[_qp][_eq][jvar]*_phi[_j][_qp]*_test[_i][_qp];
+	Real r = 0;
+	Real CIP = computeCIP();
+	int p(_eq), q(jvar);
+	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
+	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
+	r += CIP*(_penalty_jacobi_variable[_qp][p][q] + _penalty_jacobi_variable[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
+	r += _epsilon*_penalty_jacobi_variable[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
+	return r;
 }
 
 Real NSBC::computeCIP()

@@ -38,8 +38,8 @@ protected:
 	std::vector<VariableValue*> _uh;
 	std::vector<VariableGradient*> _grad_uh;
 	MaterialProperty<std::vector<RealVectorValue> > & _flux_term;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _jacobi_variable;
-	MaterialProperty<std::vector<std::vector<RealTensorValue> > >& _jacobi_grad_variable;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _flux_jacobi_variable;
+	MaterialProperty<std::vector<std::vector<RealTensorValue> > >& _flux_jacobi_grad_variable;
 
 	void computeQpValue(Real *uh, RealGradient *duh);
 	void fluxTerm(RealVectorValue *flux_term, Real *uh, RealGradient *duh);

@@ -64,21 +64,73 @@ void NSFaceMaterial::computeQpProperties()
 		resizeQpProperty();
 
 		Real ul[10], ur[10], ur_new[10];
-		RealGradient dul[10], dur[10], duh[10];
+		RealGradient dul[10], dur[10];
 		Real flux_new[10];
+		RealVectorValue penalty_new[10], penalty_neighbor_new[10];
+		RealVectorValue vis_term_left[10], vis_term_right[10], vis_term_new[10];
 
 		computeQpLeftValue(ul);
 		computeQpRightValue(ur);
 		computeQpLeftGradValue(dul);
 		computeQpRightGradValue(dur);
 
-		for (int eq = 0; eq < _n_equations; ++eq)
-			duh[eq] = (ul[eq]-ur[eq])*_normals[_qp];
+		penaltyTerm(&_penalty[_qp][0], &_penalty_neighbor[_qp][0], ul, ur);
+		fluxTerm(&_flux[_qp][0], ul, ur, dul, dur);
 
-		viscousTerm(&_penalty[_qp][0], ul, duh);
-		viscousTerm(&_penalty_neighbor[_qp][0], ur, duh);
+		for (int q = 0; q < _n_equations; ++q)
+		{
+			ul[q] += _ds;
+			penaltyTerm(penalty_new, penalty_neighbor_new, ul, ur);
+			fluxTerm(flux_new, ul, ur, dul, dur);
+			for (int p = 0; p < _n_equations; ++p)
+			{
+				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
+				_flux_jacobi_variable_ee[_qp][p][q] = tmp;
+				_flux_jacobi_variable_ne[_qp][p][q] = -tmp;
 
-		fluxRiemann(&_flux[_qp][0], ul, ur, dul, dur);
+				_penalty_jacobi_variable_ee[_qp][p][q] = (penalty_new[p] - _penalty[_qp][p])/_ds;
+				_penalty_jacobi_variable_ne[_qp][p][q] = (penalty_neighbor_new[p] - _penalty_neighbor[_qp][p])/_ds;
+			}
+			ul[q] -= _ds;
+
+			ur[q] += _ds;
+			penaltyTerm(penalty_new, penalty_neighbor_new, ul, ur);
+			fluxTerm(flux_new, ul, ur, dul, dur);
+			for (int p = 0; p < _n_equations; ++p)
+			{
+				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
+				_flux_jacobi_variable_en[_qp][p][q] = tmp;
+				_flux_jacobi_variable_nn[_qp][p][q] = -tmp;
+
+				_penalty_jacobi_variable_en[_qp][p][q] = (penalty_new[p] - _penalty[_qp][p])/_ds;
+				_penalty_jacobi_variable_nn[_qp][p][q] = (penalty_neighbor_new[p] - _penalty_neighbor[_qp][p])/_ds;
+			}
+			ur[q] -= _ds;
+
+			for (int beta = 0; beta < 3; ++beta)
+			for (int q = 0; q < _n_equations; ++q)
+			{
+				dul[q](beta) += _ds;
+				fluxTerm(flux_new, ul, ur, dul, dur);
+				for (int p = 0; p < _n_equations; ++p)
+				{
+					Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
+					_flux_jacobi_grad_variable_ee[_qp][p][q](beta) = tmp;
+					_flux_jacobi_grad_variable_ne[_qp][p][q](beta) = -tmp;
+				}
+				dul[q](beta) -= _ds;
+
+				dur[q](beta) += _ds;
+				fluxTerm(flux_new, ul, ur, dul, dur);
+				for (int p = 0; p < _n_equations; ++p)
+				{
+					Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
+					_flux_jacobi_grad_variable_en[_qp][p][q](beta) = tmp;
+					_flux_jacobi_grad_variable_nn[_qp][p][q](beta) = -tmp;
+				}
+				dur[q](beta) -= _ds;
+			}
+		}
 
 	}
 }
@@ -107,7 +159,7 @@ void NSFaceMaterial::computeQpRightGradValue(RealGradient *ur)
 		ur[eq] = (*_grad_ur[eq])[_qp];
 }
 
-void NSFaceMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
+void NSFaceMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
 {
 	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
 
@@ -118,7 +170,19 @@ void NSFaceMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur, RealGradient *d
 
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
 	for (int eq = 0; eq < _n_equations; ++eq)
+	{
 		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
+	}
+}
+
+void NSFaceMaterial::penaltyTerm(RealVectorValue* penalty, RealVectorValue* penalty_neighbor, Real* ul, Real* ur)
+{
+	RealGradient duh[10];
+	for (int eq = 0; eq < _n_equations; ++eq)
+		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
+
+	viscousTerm(penalty, ul, duh);
+	viscousTerm(penalty_neighbor, ur, duh);
 }
 
 void NSFaceMaterial::resizeQpProperty()
@@ -157,3 +221,5 @@ void NSFaceMaterial::resizeQpProperty()
 		_penalty_jacobi_variable_nn[_qp][p].resize(_n_equations);
 	}
 }
+
+

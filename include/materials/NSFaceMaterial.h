@@ -62,5 +62,6 @@ protected:
 	virtual void computeQpLeftGradValue(RealGradient *dul);
 	virtual void computeQpRightGradValue(RealGradient *dur);
 
-	void fluxRiemann(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
+	void fluxTerm(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
+	void penaltyTerm(RealVectorValue *penalty, RealVectorValue *penalty_neighbor, Real *ul, Real *ur);
 };

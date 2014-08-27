@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Function.h"
-#include "NSBase.h"
+#include "CouetteFlowBase.h"
 
 class CouetteFlowExact;
 
@@ -11,7 +11,7 @@ InputParameters validParams<CouetteFlowExact>();
 
 class CouetteFlowExact :
 public Function,
-public NSBase
+public CouetteFlowBase
 {
 public:
   CouetteFlowExact(const std::string & name, InputParameters parameters);

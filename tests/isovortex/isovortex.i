@@ -67,12 +67,12 @@
 
   [./velocity_y]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_y
   [../]
 
   [./velocity_z]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_z
   [../]
 []
 

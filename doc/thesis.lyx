@@ -1,0 +1,1283 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass scrbook
+\use_default_options true
+\begin_modules
+theorems-ams
+eqs-within-sections
+figs-within-sections
+\end_modules
+\maintain_unincluded_children false
+\language chinese-simplified
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\font_cjk gbsn
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+DG
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Chapter
+前言
+\end_layout
+
+\begin_layout Section
+FD
+\end_layout
+
+\begin_layout Section
+FV
+\end_layout
+
+\begin_layout Section
+FE
+\end_layout
+
+\begin_layout Chapter
+控制方程
+\end_layout
+
+\begin_layout Section
+流体力学控制方程
+\end_layout
+
+\begin_layout Subsection
+Euler/N-S方程
+\end_layout
+
+\begin_layout Subsection
+RANS方程
+\end_layout
+
+\begin_layout Subsection
+无量纲化
+\end_layout
+
+\begin_layout Section
+弹性力学控制方程
+\end_layout
+
+\begin_layout Chapter
+DG空间离散
+\end_layout
+
+\begin_layout Section
+局部坐标系下的N-S方程
+\end_layout
+
+\begin_layout Standard
+N-S方程
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\partial_{t}\boldsymbol{u}+\nabla\cdot\mathcal{F}^{c}(\boldsymbol{u})-\nabla\cdot\mathcal{F}^{v}(\boldsymbol{u},\nabla\boldsymbol{u})=0\label{eq:spacial1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+局部坐标系
+\begin_inset Formula $\boldsymbol{\xi}$
+\end_inset
+
+下，写为
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\partial_{t}(J\boldsymbol{u})+\nabla^{\xi}\cdot\left(J\boldsymbol{J}^{-1}(\mathcal{F}^{c}-\mathcal{F}^{v}-\boldsymbol{u}\boldsymbol{v}_{g})\right)=0\label{eq:spacial2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中
+\begin_inset Formula $\nabla^{\xi}$
+\end_inset
+
+为坐标系
+\begin_inset Formula $\boldsymbol{\xi}$
+\end_inset
+
+下的Hamilton算符，且有
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\nabla=\boldsymbol{J}^{-1}\nabla^{\xi}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+则
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:spacial2"
+
+\end_inset
+
+式可写为
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\partial_{t}(J\boldsymbol{u})+\nabla\cdot\left(J(\mathcal{F}^{c}-\mathcal{F}^{v}-\boldsymbol{u}\boldsymbol{v}_{g})\right)=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+单元的坐标变换
+\end_layout
+
+\begin_layout Section
+单项式基函数（阶谱基函数）
+\end_layout
+
+\begin_layout Standard
+局部坐标系下的阶谱基函数（单项式基函数）
+\end_layout
+
+\begin_layout Description
+一维
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\varPhi=\{1,\xi,\xi^{2},\xi^{3},\cdots\}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+二维
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\varPhi=\{1,\xi,\text{\eta},\xi^{2},\xi\eta,\eta^{2},\xi^{3},\xi^{2}\eta,\xi\eta^{2},\eta^{3}\cdots\}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+三维
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\varPhi=\{1,\xi,\text{\eta},\zeta,\xi^{2},\eta^{2},\zeta^{2},\xi\eta,\xi\zeta,\eta\zeta\cdots\}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+上述基函数能够满足
+\end_layout
+
+\begin_layout Itemize
+任意形状
+\end_layout
+
+\begin_layout Itemize
+高阶单元
+\end_layout
+
+\begin_layout Itemize
+动网格
+\end_layout
+
+\begin_layout Section
+IP离散N-S方程
+\end_layout
+
+\begin_layout Standard
+N-S方程的粘性项满足
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathcal{F}^{v}(\boldsymbol{u},\nabla\boldsymbol{u})=\mathscr{G}:\nabla\boldsymbol{u}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+或写成
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{p\alpha}^{v}=g_{\alpha\beta}^{pq}\partial_{\beta}u_{q}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中
+\begin_inset Formula $\mathscr{G}$
+\end_inset
+
+为四阶张量，
+\begin_inset Formula $:$
+\end_inset
+
+表示张量的缩并，
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\underbar{\tau}:\underbar{\sigma}=\text{\sigma}_{i\alpha}\tau_{i\alpha}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+将粘性项定义为中间变量
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathcal{G}=\mathscr{G}(\boldsymbol{u}):\nabla\boldsymbol{u}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\partial_{t}(J\boldsymbol{u})+\nabla\cdot\left(J(\mathcal{F}^{c}-\mathcal{G}-\boldsymbol{u}\boldsymbol{v}_{g})\right)=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+第一式乘以
+\begin_inset Formula $\mathcal{T}$
+\end_inset
+
+，分部积分
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\int_{\kappa}\mathcal{G}:\mathcal{T}\text{d}V & = & \int_{\kappa}(\mathscr{G}:\nabla\boldsymbol{u}):\mathcal{T}\text{d}V\\
+ & = & \int_{\kappa}\nabla\boldsymbol{u}:(\mathscr{G}^{\mathit{T}}:\mathcal{T})\text{d}V\\
+ & = & \int_{\kappa}\boldsymbol{u}:\nabla\cdot(\mathscr{G}^{\mathit{T}}:\mathcal{T})\text{d}V-\int_{\partial\kappa}\boldsymbol{u}\otimes\boldsymbol{n}:(\mathscr{G}^{\mathit{T}}:\mathcal{T})\text{d}S
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\otimes$
+\end_inset
+
+表示张量的并矢，
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}\otimes\boldsymbol{v}=u_{\alpha}v_{\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+由于在单元边界，变量是间断的，定义通量:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{u}}=\boldsymbol{u}(\boldsymbol{u}^{+},\boldsymbol{u}^{-})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+在分部积分得
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\int_{\kappa}\mathcal{G}:\mathcal{T}\text{d}V & = & \int_{\kappa}(\mathscr{G}:\nabla\boldsymbol{u}):\mathcal{T}\text{d}V+\int_{\partial\kappa}(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n}:(\mathscr{G}^{\mathit{T}}:\mathcal{T})\text{d}S\\
+ & = & \int_{\kappa}\mathcal{F}^{v}:\mathcal{T}\text{d}V+\int_{\partial\kappa}\mathscr{G}:(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n}:\mathcal{T}\text{d}S\\
+ & = & \int_{\kappa}\mathcal{F}^{v}:\mathcal{T}\text{d}V+\int_{\partial\kappa}\mathcal{F}^{v}(\boldsymbol{u},(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n}):\mathcal{T}\text{d}S
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+第二式乘以
+\begin_inset Formula $\boldsymbol{\varphi}$
+\end_inset
+
+，分部积分
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{\kappa}\text{\ensuremath{\partial}}_{t}\boldsymbol{u}\cdot\boldsymbol{\varphi}\text{d}V+\int_{\partial\kappa}(\hat{\mathcal{F}^{c}}-\hat{\mathcal{F}^{v}})\cdot\boldsymbol{\varphi}\text{d}S-\int_{\kappa}\mathcal{F}^{c}:\nabla\boldsymbol{\phi}\text{d}V+\int_{\kappa}\mathcal{G}:\nabla\boldsymbol{\varphi}\text{d}V=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\hat{\mathcal{F}^{c}}$
+\end_inset
+
+和
+\begin_inset Formula $\hat{\mathcal{F}^{v}}$
+\end_inset
+
+分别为无粘通量和粘性通量。
+\end_layout
+
+\begin_layout Standard
+为了消去中间变量
+\begin_inset Formula $\mathcal{G}$
+\end_inset
+
+，令
+\begin_inset Formula $\mathcal{T}=\nabla\boldsymbol{\varphi}$
+\end_inset
+
+，得
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{\kappa}\text{\ensuremath{\partial}}_{t}\boldsymbol{u}\cdot\boldsymbol{\varphi}\text{d}V+\int_{\partial\kappa}(\hat{\mathcal{F}^{c}}-\hat{\mathcal{F}^{v}}\boldsymbol{n})\cdot\boldsymbol{\varphi}\text{d}S-\int_{\kappa}(\mathcal{F}^{c}-\mathcal{F}^{v}):\nabla\boldsymbol{\varphi}\text{d}V+\int_{\partial\kappa}\mathcal{F}^{v}(\boldsymbol{u},(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n}):\nabla\boldsymbol{\varphi}\text{d}S=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+上式还有三个通量
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\boldsymbol{u}}=\{\boldsymbol{u}\}=\frac{1}{2}(\boldsymbol{u}^{+}+\boldsymbol{u}^{-})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+则
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n}=\frac{1}{2}(\boldsymbol{u}^{+}-\boldsymbol{u}^{-})\otimes\boldsymbol{n}=-\frac{1}{2}[\boldsymbol{u}]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+记惩罚项
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathcal{P}=\mathcal{F}^{v}(\boldsymbol{u},(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n})=\mathcal{F}^{v}(\boldsymbol{u},\frac{1}{2}[\boldsymbol{u}])
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathcal{P}^{+}(\boldsymbol{u}^{+},\boldsymbol{u}^{-})=\mathcal{F}^{v}(\boldsymbol{u}^{+},(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n})=\mathcal{F}^{v}(\boldsymbol{u}^{+},\frac{1}{2}[\boldsymbol{u}])
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathcal{P}^{-}(\boldsymbol{u}^{+},\boldsymbol{u}^{-})=\mathcal{F}^{v}(\boldsymbol{u}^{-},(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n})=\mathcal{F}^{v}(\boldsymbol{u}^{-},\frac{1}{2}[\boldsymbol{u}])
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+粘性通量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\begin{eqnarray*}
+\hat{\mathcal{F}^{v}} & = & \frac{1}{2}(\mathcal{F}^{v}(\boldsymbol{u}^{+},\nabla\boldsymbol{u}^{+})+\mathcal{F}^{v}(\boldsymbol{u}^{-},\nabla\boldsymbol{u}^{-}))-C_{IP}\frac{p^{2}}{h_{f}}\mathscr{G}(\{\boldsymbol{u}\})[\boldsymbol{u}]\\
+ & = & \frac{1}{2}(\mathcal{F}^{v+}+\mathcal{F}^{v-})-C_{IP}\frac{p^{2}}{h_{f}}(\mathcal{P}^{+}+\mathcal{P}^{-})
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+无粘通量取Lax-Friedrichs通量。
+\end_layout
+
+\begin_layout Section
+数值积分
+\end_layout
+
+\begin_layout Section
+边界条件
+\end_layout
+
+\begin_layout Section
+人工粘性限制器
+\end_layout
+
+\begin_layout Chapter
+时间推进
+\end_layout
+
+\begin_layout Section
+时间积分
+\end_layout
+
+\begin_layout Subsection
+线性多步法
+\end_layout
+
+\begin_layout Subsection
+显式Runge-Kutta
+\end_layout
+
+\begin_layout Subsection
+隐式Runge-Kutta
+\end_layout
+
+\begin_layout Section
+Newton迭代
+\end_layout
+
+\begin_layout Section
+Krylov迭代
+\end_layout
+
+\begin_layout Section
+预处理矩阵计算
+\end_layout
+
+\begin_layout Standard
+N-S方程的离散形式
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{\kappa}\text{\ensuremath{\partial}}_{t}\boldsymbol{u}\cdot\boldsymbol{\varphi}\text{d}V+\int_{\partial\kappa}(\hat{\mathcal{F}^{c}}-\hat{\mathcal{F}^{v}}\boldsymbol{n})\cdot\boldsymbol{\varphi}\text{d}S-\int_{\kappa}(\mathcal{F}^{c}-\mathcal{F}^{v}):\nabla\boldsymbol{\varphi}\text{d}V+\int_{\partial\kappa}\mathcal{F}^{v}(\boldsymbol{u},(\hat{\boldsymbol{u}}-\boldsymbol{u})\otimes\boldsymbol{n}):\nabla\boldsymbol{\varphi}\text{d}S=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+边界条件按照弱的Dirichlet条件给定
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}_{b}=\boldsymbol{u}_{b}(\boldsymbol{u}_{l})\qquad\text{on}\,\partial\Omega
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+指标约定：
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $p,q$
+\end_inset
+
+为变量索引
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $i$
+\end_inset
+
+为检验函数索引，
+\begin_inset Formula $j$
+\end_inset
+
+为基函数索引
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\alpha,\beta$
+\end_inset
+
+为方向索引
+\end_layout
+
+\begin_layout Subsection
+时间积分的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+时间BDF1离散
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\int_{\kappa}\text{\ensuremath{\partial}}_{t}\boldsymbol{u}\cdot\boldsymbol{\varphi}\text{d}\Omega\approx\int_{\kappa}\frac{u_{p}-u_{p}^{t}}{\Delta t}\varphi_{i}\text{d}\Omega
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\text{d}}{\text{d}u_{qj}}\int_{\kappa}\frac{u_{p}-u_{p}^{t}}{\Delta t}\varphi_{i}\text{d}\Omega=\frac{1}{\Delta t}\int_{\kappa}\frac{\partial u_{p}}{\partial u_{qj}}\phi_{i}\text{d}\Omega=\frac{1}{\Delta t}\int_{\kappa}\delta_{pq}\phi_{j}\varphi_{i}\text{d}\Omega
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+上式用到
+\end_layout
+
+\begin_layout Standard
+由于
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+u_{q}=u_{qj}\phi_{j}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial u_{p}}{\partial u_{qj}}=\delta_{pq}\phi_{j}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+体积分的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+体积分
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+-\int_{\kappa}(\mathcal{F}^{c}-\mathcal{F}^{v}):\nabla\boldsymbol{\varphi}\text{d}\Omega=-\int_{\kappa}f_{p\alpha}\partial_{\alpha}\varphi_{i}\text{d}\Omega
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+对变量自由度的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\text{d}}{\text{d}u_{qj}}\int_{\kappa}f_{p\alpha}\partial_{\alpha}\varphi_{i}\text{d}\Omega=\int_{\kappa}\frac{\text{d}f_{p\alpha}}{\text{d}u_{qj}}\partial_{\alpha}\varphi_{i}\text{d}\Omega=\int_{\kappa}\left(\frac{\partial f_{p\alpha}}{\partial u_{q}}\frac{\partial u_{q}}{\partial u_{qj}}+\frac{\partial f_{p\alpha}}{\partial(\partial_{\beta}u_{q})}\frac{\partial(\partial_{\beta}u_{q})}{\partial u_{qj}}\right)\partial_{\alpha}\varphi_{i}\text{d}\Omega
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+注意到
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial u_{q}}{\partial u_{qj}}=\phi_{j}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial(\partial_{\beta}u_{q})}{\partial u_{qj}}=\partial_{\beta}\phi_{j}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+则
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\text{d}}{\text{d}u_{qj}}\int_{\kappa}f_{p\alpha}\partial_{\alpha}\varphi_{i}\text{d}\Omega=\int_{\kappa}\left(\frac{\partial f_{p\alpha}}{\partial u_{q}}\phi_{j}+\frac{\partial f_{p\alpha}}{\partial(\partial_{\beta}u_{q})}\partial_{\beta}\phi_{j}\right)\partial_{\alpha}\varphi_{i}\text{d}\Omega
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+用有限差分方法计算
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial f_{p,\alpha}}{\partial u_{q}}\approx\frac{f_{p\alpha}(u_{q}+\varepsilon,\partial_{\beta}u_{q})-f_{p\alpha}(u_{q},\partial_{\beta}u_{q})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial f_{p,\alpha}}{\partial(\partial_{\beta}u_{q})}\approx\frac{f_{p\alpha}(u_{q},\partial_{\beta}u_{q}+\varepsilon)-f_{p\alpha}(u_{q},\partial_{\beta}u_{q})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+通量积分的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+面上有正、负通量，依赖与左、右值。Jacobian矩阵有四种组合.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{\partial\kappa}(\hat{\mathcal{F}^{c}}-\hat{\mathcal{F}^{v}}\boldsymbol{n})\cdot\boldsymbol{\varphi}^{+}\text{d}S=\int_{\partial\kappa}h_{p}\varphi_{i}^{+}\text{d}s
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+面的负通量
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\int_{\partial\kappa}(\hat{\mathcal{F}^{c}}-\hat{\mathcal{F}^{v}}\boldsymbol{n})\cdot\boldsymbol{\varphi}^{-}\text{d}S=\int_{\partial\kappa}h_{p}\varphi_{i}^{-}\text{d}s
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+正通量对左值，ElementElement(+, +)的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\text{d}}{\text{d}u_{qj}^{+}}\int_{\partial\kappa}h_{p}\varphi_{i}^{+}\text{d}s & = & \int_{\partial\kappa}\frac{\text{d}h_{p}}{\text{d}u_{qj}^{+}}\varphi_{i}^{+}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{+}}\frac{\partial u_{q}^{+}}{\partial u_{qj}^{+}}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{+})}\frac{\partial(\partial_{\beta}u_{q}^{+})}{\partial u_{qj}^{+}}\right)\varphi_{i}^{+}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{+}}\phi_{j}^{+}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{+})}\partial_{\beta}\phi_{j}^{+}\right)\varphi_{i}^{+}\text{d}s
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+正通量对右值，ElementNeighbor(+, -)的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\text{d}}{\text{d}u_{qj}^{-}}\int_{\partial\kappa}h_{p}\varphi_{i}^{+}\text{d}s & = & \int_{\partial\kappa}\frac{\text{d}h_{p}}{\text{d}u_{qj}^{-}}\varphi_{i}^{+}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{-}}\frac{\partial u_{q}^{-}}{\partial u_{qj}^{-}}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{-})}\frac{\partial(\partial_{\beta}u_{q}^{-})}{\partial u_{qj}^{-}}\right)\varphi_{i}^{+}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{-}}\phi_{j}^{-}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{-})}\partial_{\beta}\phi_{j}^{-}\right)\varphi_{i}^{+}\text{d}s
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+负通量对左值，NeighborElement(-, +)的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+-\frac{\text{d}}{\text{d}u_{qj}^{+}}\int_{\partial\kappa}h_{p}\varphi_{i}^{-}\text{d}s & = & -\int_{\partial\kappa}\frac{\text{d}h_{p}}{\text{d}u_{qj}^{+}}\varphi_{i}^{-}\text{d}s\\
+ & = & -\int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{+}}\frac{\partial u_{q}^{+}}{\partial u_{qj}^{+}}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{+})}\frac{\partial(\partial_{\beta}u_{q}^{+})}{\partial u_{qj}^{+}}\right)\varphi_{i}^{-}\text{d}s\\
+ & =- & \int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{+}}\phi_{j}^{+}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{+})}\partial_{\beta}\phi_{j}^{+}\right)\varphi_{i}^{-}\text{d}s
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+负通量对右值，NeighborNeighbor(-, -)的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+-\frac{\text{d}}{\text{d}u_{qj}^{-}}\int_{\partial\kappa}h_{p}\varphi_{i}^{-}\text{d}s & = & \int_{\partial\kappa}\frac{\text{d}h_{p}}{\text{d}u_{qj}^{-}}\varphi_{i}^{-}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{-}}\frac{\partial u_{q}^{-}}{\partial u_{qj}^{-}}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{-})}\frac{\partial(\partial_{\beta}u_{q}^{-})}{\partial u_{qj}^{-}}\right)\varphi_{i}^{-}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\partial h_{p}}{\partial u_{q}^{-}}\phi_{j}^{-}+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{-})}\partial_{\beta}\phi_{j}^{-}\right)\varphi_{i}^{-}\text{d}s
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+有限差分计算Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial h_{p}}{\partial u_{q}^{+}}\approx\frac{h_{p}(u_{q}^{+}+\varepsilon,u_{q}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})-h_{p}(u_{q}^{+},u_{q}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{+})}\approx\frac{h_{p}(u_{q}^{+},u_{q}^{-},\partial_{\beta}u_{q}^{+}+\varepsilon,\partial_{\beta}u_{q}^{-})-h_{p}(u_{q}^{+},u_{q}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial h_{p}}{\partial u_{q}^{-}}\approx\frac{h_{p}(u_{q}^{+},u_{q}^{-}+\varepsilon,\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})-h_{p}(u_{q}^{+},u_{q}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial h_{p}}{\partial(\partial_{\beta}u_{q}^{-})}\approx\frac{h_{p}(u_{q}^{+},u_{q}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-}+\varepsilon)-h_{p}(u_{q}^{+},u_{q}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+罚积分的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+正罚积分
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{\partial\kappa}\mathcal{F}^{v}(\boldsymbol{u}^{+},\frac{1}{2}[\boldsymbol{u}]):\nabla\boldsymbol{\varphi}\text{d}s=\int_{\partial\kappa}\mathcal{F}^{v}(\boldsymbol{u}^{+},\frac{1}{2}[\boldsymbol{u}]):\nabla\boldsymbol{\varphi}^{+}\text{d}s
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\text{d}}{\text{d}u_{qj}^{+}}\int_{\partial\kappa}f_{p\alpha}^{v}(\boldsymbol{u}^{+},\frac{1}{2}[\boldsymbol{u}])\partial_{\alpha}\varphi_{i}^{+}\text{d}s & = & \int_{\partial\kappa}\frac{\text{d}f_{p\alpha}^{v}(\boldsymbol{u}^{+},\frac{1}{2}[\boldsymbol{u}])}{\text{d}u_{qj}^{+}}\varphi_{i}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\partial f_{p\alpha}^{v}(\boldsymbol{u}^{+},\frac{1}{2}[\boldsymbol{u}])}{\partial u_{q}^{+}}\frac{\partial u_{q}^{+}}{\partial u_{qj}^{+}}\right)\varphi_{i}\text{d}s\\
+ & = & \int_{\partial\kappa}\frac{\partial f_{p\alpha}^{v}(\boldsymbol{u}^{+},\frac{1}{2}[\boldsymbol{u}])}{\partial u_{q}^{+}}\phi_{j}^{+}\varphi_{i}^{-}\text{d}s
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+边界条件的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+设边界条件：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}^{-}=\boldsymbol{u}^{-}(\boldsymbol{u}^{+})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\nabla\boldsymbol{u}^{-}=\nabla\boldsymbol{u}^{-}(\nabla\boldsymbol{u}^{+})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+边界条件只是在面积分中体现。
+\end_layout
+
+\begin_layout Subsubsection
+边界通量积分的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\text{d}}{\text{d}u_{q,j}^{+}}\int_{\partial\kappa}h_{p}\phi_{i}^{+}\text{d}s & = & \int_{\partial\kappa}\frac{\text{d}h_{p}}{\text{d}u_{q,j}^{+}}\phi_{i}^{+}\text{d}s=\int_{\partial\kappa}\left(\frac{\text{d}h_{p}}{\text{d}u_{q}^{+}}\frac{\partial u_{q}^{+}}{\partial u_{q,j}^{+}}+\frac{\text{d}h_{p}}{\text{d}(\partial_{\beta}u_{q}^{+})}\frac{\partial(\partial_{\beta}u_{q}^{+})}{\partial u_{q,j}^{+}}\right)\phi_{i}^{+}\text{d}s\\
+ & = & \int_{\partial\kappa}\left(\frac{\text{d}h_{p}}{\text{d}u_{q}^{+}}\psi_{j}^{+}+\frac{\text{d}h_{p}}{\text{d}(\partial_{\beta}u_{q}^{+})}\partial_{\beta}\psi_{j}^{+}\right)\phi_{i}^{+}\text{d}s
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+全微分：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\text{d}h_{p}}{\text{d}u_{q}^{+}}\approx\frac{h_{p}(u_{q}^{+}+\varepsilon,\boldsymbol{u}^{-}(u_{q}^{+}+\varepsilon),\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})-h_{p}(u_{q}^{+},\boldsymbol{u}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\text{d}h_{p}}{\text{d}(\partial_{\beta}u_{q}^{+})}\approx\frac{h_{p}(u_{q}^{+},\boldsymbol{u}^{-}(u_{q}^{+}),\partial_{\beta}u_{q}^{+}+\varepsilon,\nabla\boldsymbol{u}^{-}(\partial_{\beta}u_{q}^{+}+\varepsilon))-h_{p}(u_{q}^{+},\boldsymbol{u}^{-},\partial_{\beta}u_{q}^{+},\partial_{\beta}u_{q}^{-})}{\varepsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+边界罚积分的Jacobian矩阵
+\end_layout
+
+\begin_layout Section
+预处理方法
+\end_layout
+
+\begin_layout Section
+多重网格
+\end_layout
+
+\begin_layout Section
+矩阵重排序
+\end_layout
+
+\begin_layout Chapter
+自适应网格
+\end_layout
+
+\begin_layout Section
+自适应侦测因子
+\end_layout
+
+\begin_layout Subsection
+伴随算子
+\end_layout
+
+\begin_layout Section
+自适应判据
+\end_layout
+
+\begin_layout Section
+h-自适应
+\end_layout
+
+\begin_layout Section
+p-自适应
+\end_layout
+
+\begin_layout Chapter
+运动网格
+\end_layout
+
+\begin_layout Section
+ALE下的DG离散方法
+\end_layout
+
+\begin_layout Subsection
+Reynolds输运方程
+\end_layout
+
+\begin_layout Subsection
+通量计算
+\end_layout
+
+\begin_layout Section
+网格运动方式
+\end_layout
+
+\begin_layout Subsection
+线弹性力学
+\end_layout
+
+\begin_layout Section
+网格速度和几何守恒率
+\end_layout
+
+\begin_layout Chapter
+曲边网格
+\end_layout
+
+\begin_layout Chapter*
+附录
+\end_layout
+
+\begin_layout Standard
+主要符号表
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $p,q$
+\end_inset
+
+ 变量指标
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $i$
+\end_inset
+
+ 检验函数指标，
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $j$
+\end_inset
+
+ 基函数指标
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\alpha,\beta$
+\end_inset
+
+ 三维向量分量指标
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\phi_{j}$
+\end_inset
+
+ 基函数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\varphi_{i}$
+\end_inset
+
+ 检验函数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ 全局坐标系
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\boldsymbol{\xi}$
+\end_inset
+
+ 局部坐标系
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\delta_{pq}$
+\end_inset
+
+ Kronecker符号
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\nabla$
+\end_inset
+
+ Hamilton算子
+\end_layout
+
+\end_body
+\end_document
