@@ -1,45 +1,22 @@
-/** ***********************************************************
-*  @file
-*  @brief
-*  @author	刘  伟
-*
-*  Program:   Joojak
-*  Copyright (c) 刘伟，张来平，2014，空气动力学国家重点实验室(SKLA)
-*  All rights reserved.
-*  ************************************************************
-**/
 
 #pragma once
 
-#include "Material.h"
+#include "DGKernel.h"
 #include "NSBase.h"
 
-class NSFaceMaterial;
+class NSFaceKernel;
 
 template<>
-InputParameters validParams<NSFaceMaterial>();
+InputParameters validParams<NSFaceKernel>();
 
-/**
- * Euler流体的材料属性
- */
-class NSFaceMaterial :
-public Material,
+class NSFaceKernel :
+public DGKernel,
 public NSBase
 {
 public:
-	NSFaceMaterial(const std::string & name, InputParameters parameters);
+	NSFaceKernel(const std::string &name, InputParameters parameters);
 
 protected:
-	virtual void resizeQpProperty();
-	virtual void computeQpProperties();
-
-	int _n_equations;
-	/// 积分点上的变量值
-	std::vector<VariableValue*> _ul;
-	std::vector<VariableValue*> _ur;
-	std::vector<VariableGradient*> _grad_ul;
-	std::vector<VariableGradient*> _grad_ur;
-
 	MaterialProperty<std::vector<Real> > & _flux;
 	MaterialProperty<std::vector<std::vector<Real> > > & _flux_jacobi_variable_ee;
 	MaterialProperty<std::vector<std::vector<Real> > > & _flux_jacobi_variable_en;
@@ -57,10 +34,11 @@ protected:
 	MaterialProperty<std::vector<std::vector<RealVectorValue> > > & _penalty_jacobi_variable_ne;
 	MaterialProperty<std::vector<std::vector<RealVectorValue> > > & _penalty_jacobi_variable_nn;
 
-	virtual void computeQpLeftValue(Real *ul);
-	virtual void computeQpRightValue(Real *ur);
-	virtual void computeQpLeftGradValue(RealGradient *dul);
-	virtual void computeQpRightGradValue(RealGradient *dur);
+	virtual Real computeQpResidual(Moose::DGResidualType type);
+	virtual Real computeQpJacobian(Moose::DGJacobianType type);
+	virtual Real computeQpOffDiagJacobian(Moose::DGJacobianType type, unsigned int jvar);
 
-	void fluxRiemann(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
+	Real computeCIP();
+
+	int _eq;
 };

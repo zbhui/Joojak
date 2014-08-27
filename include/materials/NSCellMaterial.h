@@ -12,31 +12,36 @@
 #pragma once
 
 #include "Material.h"
-#include "CFDBase.h"
+#include "NSBase.h"
 
-class EulerCellMaterial;
+class NSCellMaterial;
 
 template<>
-InputParameters validParams<EulerCellMaterial>();
+InputParameters validParams<NSCellMaterial>();
 
 /**
  * Euler流体的材料属性
  */
-class EulerCellMaterial :
+class NSCellMaterial :
 public Material,
-public EulerBase
+public NSBase
 {
 public:
-	EulerCellMaterial(const std::string & name, InputParameters parameters);
+	NSCellMaterial(const std::string & name, InputParameters parameters);
 
 protected:
+	virtual void resizeQpProperty();
 	virtual void computeQpProperties();
 
 	int _n_equations;
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _uh;
-	MaterialProperty<std::vector<RealVectorValue> > & _invis_term;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _jacobi;
+	std::vector<VariableGradient*> _grad_uh;
+	MaterialProperty<std::vector<RealVectorValue> > & _flux_term;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _jacobi_variable;
+	MaterialProperty<std::vector<std::vector<RealTensorValue> > >& _jacobi_grad_variable;
 
-	void computeQpValue(Real *uh);
+	void computeQpValue(Real *uh, RealGradient *duh);
+	void fluxTerm(RealVectorValue *flux_term, Real *uh, RealGradient *duh);
+
 };
