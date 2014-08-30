@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CFDBC.h"
+#include "EulerBase.h"
 
 class EulerBC;
 
@@ -9,7 +10,8 @@ template<>
 InputParameters validParams<EulerBC>();
 
 class EulerBC :
-public CFDBC
+public CFDBC,
+public EulerBase
 {
 public:
 	  EulerBC(const std::string & name, InputParameters params);

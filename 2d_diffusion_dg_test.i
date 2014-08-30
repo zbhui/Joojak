@@ -116,7 +116,7 @@
 
 [Preconditioning]
 	[./SMP]
-		type = FDP
+		type = SMP
 		full = true
 
 	  petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
@@ -131,7 +131,7 @@
   type = Transient
 
   # Preconditioned JFNK (default)
-  solve_type = 'PJFNK'
+  solve_type = 'NEWTON'
 #  petsc_options = '-snes_mf'
 #  petsc_options_iname = '-pc_type -pc_hypre_type'
 #  petsc_options_value = 'hypre    boomeramg'

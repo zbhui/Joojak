@@ -9,13 +9,13 @@
 *  ************************************************************
 **/
 
-#include "EulerBndMaterial.h"
+#include "NSBndMaterial.h"
 
 template<>
-InputParameters validParams<EulerBndMaterial>()
+InputParameters validParams<NSBndMaterial>()
 {
   InputParameters params = validParams<Material>();
-  params += validParams<EulerBase>();
+  params += validParams<NSBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
   MooseEnum bc_types("wall, far_field, symmetric, pressure_out, none", "none");  // 边界条件的类型，可以增加
@@ -24,22 +24,28 @@ InputParameters validParams<EulerBndMaterial>()
   return params;
 }
 
-EulerBndMaterial::EulerBndMaterial(const std::string & name, InputParameters parameters):
+NSBndMaterial::NSBndMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
-		EulerBase(name, parameters),
+		NSBase(name, parameters),
 		_bc_type(getParam<MooseEnum>("bc_type")),
 		_flux(declareProperty<std::vector<Real> >("flux")),
-		_jacobi_variable(declareProperty<std::vector<std::vector<Real> > >("bnd_jacobi_variable"))
+		_flux_jacobi_variable(declareProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable")),
+		_flux_jacobi_grad_variable(declareProperty<std::vector<std::vector<RealGradient> > >("flux_jacobi_grad_variable")),
+
+		_penalty(declareProperty<std::vector<RealVectorValue> >("penalty")),
+		_penalty_jacobi_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable"))
+//		_penalty_neighbor(declareProperty<std::vector<RealVectorValue> >("penalty_neighbor")),
 {
 	_n_equations = coupledComponents("variables");
 	for (size_t eq = 0; eq < _n_equations; ++eq)
 	{
 		MooseVariable &val = *getVar("variables", eq);
 		_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
+		_grad_ul.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
 	}
 }
 
-void EulerBndMaterial::computeQpProperties()
+void NSBndMaterial::computeQpProperties()
 {
 	if(!_bnd)
 	{
@@ -49,77 +55,71 @@ void EulerBndMaterial::computeQpProperties()
 
 	resizeQpProperty();
 
-	Real ul[10], ur[10], ul_new[10], ur_new[10];
+	Real ul[10], ur[10], ur_new[10];
+	RealGradient dul[10], dur[10], dur_new[10];
 	Real flux_new[10];
+	RealVectorValue penalty_new[10];
 
-	computeQpLeftValue(ul);
-	computeQpRightValue(ur);
-	fluxRiemann(&_flux[_qp][0], ul, ur);
+	computeQpLeftValue(ul, dul);
+	computeQpRightValue(ur, dur, ul, dul);
 
-	Matrix5x5 jacobi_variable_en, jacobi_variable_ur_ul;
+	penaltyTerm(&_penalty[_qp][0], ul, ur);
+	fluxTerm(&_flux[_qp][0], ul, ur, dul, dur);
+
 	for (int q = 0; q < _n_equations; ++q)
 	{
-//		ul[q] += _ds;
-		(*_ul[q])[_qp] += _ds;
-		computeQpLeftValue(ul);
-		computeQpRightValue(ur_new);
-		fluxRiemann(flux_new, ul, ur_new);
+		ul[q] += _ds;
+		computeQpRightValue(ur_new, dur_new, ul, dul);
+		penaltyTerm(penalty_new, ul, ur_new);
+		fluxTerm(flux_new, ul, ur_new, dul, dur_new);
 		for (int p = 0; p < _n_equations; ++p)
-			_jacobi_variable[_qp][p][q] = (flux_new[p] - _flux[_qp][p])/_ds;
-
-//		ul[q] -= _ds;
-		(*_ul[q])[_qp] -= _ds;
-
-//		ur[q] += _ds;
-//		fluxRiemann(flux_new, ul, ur);
-//		for (int p = 0; p < _n_equations; ++p)
-//		{
-//			Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
-//			jacobi_variable_en(p,q) = tmp;
-//		}
-//		ur[q] -= _ds;
-//
-//		(*_ul[q])[_qp] += _ds;
-//		computeQpRightValue(ur_new);
-//		for (int p = 0; p < _n_equations; ++p)
-//		{
-//			Real tmp = (ur_new[p] - ur[p])/_ds;
-//			jacobi_variable_ur_ul(p,q) = tmp;
-//		}
-//		(*_ul[q])[_qp] -= _ds;
+		{
+			_flux_jacobi_variable[_qp][p][q] = (flux_new[p] - _flux[_qp][p])/_ds;
+			_penalty_jacobi_variable[_qp][p][q] = (penalty_new[p] - _penalty[_qp][p])/_ds;
+		}
+		ul[q] -= _ds;
 	}
-//
-////	std::cout << jacobi_variable_en*jacobi_variable_ur_ul <<std::endl;
-//	for (int q = 0; q < _n_equations; ++q)
-//	{
-//		for (int p = 0; p < _n_equations; ++p)
-//		{
-//			_jacobi_variable[_qp][p][q] += (jacobi_variable_en*jacobi_variable_ur_ul)(p,q);
-//		}
-//	}
+
+	for (int beta = 0; beta < 3; ++beta)
+	for (int q = 0; q < _n_equations; ++q)
+	{
+		dul[q](beta) += _ds;
+		computeQpRightValue(ur_new, dur_new, ul, dul);
+		penaltyTerm(penalty_new, ul, ur_new);
+		fluxTerm(flux_new, ul, ur_new, dul, dur_new);
+		for (int p = 0; p < _n_equations; ++p)
+		{
+			_flux_jacobi_grad_variable[_qp][p][q](beta) = (flux_new[p] - _flux[_qp][p])/_ds;
+		}
+		dul[q](beta) -= _ds;
+	}
+
 }
 
-void EulerBndMaterial::computeQpLeftValue(Real* ul)
+void NSBndMaterial::computeQpLeftValue(Real* ul, RealGradient *dul)
 {
 	for (int eq = 0; eq < _n_equations; ++eq)
+	{
 		ul[eq] = (*_ul[eq])[_qp];
+		dul[eq] = (*_grad_ul[eq])[_qp];
+	}
 }
 
-void EulerBndMaterial::computeQpRightValue(Real* ur)
+void NSBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
 	if(_bc_type == "wall")
 	{
-		wall(ur);
+		wall(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "far_field")
 	{
-		farField(ur);
+		farField(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "symmetric")
 	{
-		symmetric(ur);
+		symmetric(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "none")
@@ -133,40 +133,53 @@ void EulerBndMaterial::computeQpRightValue(Real* ur)
 	mooseError(_bc_type<<"未定义的边界条件类型");
 }
 
-void EulerBndMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur)
+void NSBndMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
 {
-	const Point &normal = _normals[_qp];
-	RealVectorValue fl[10], fr[10];
-	inviscousTerm(fl, ul);
-	inviscousTerm(fr, ur);
+	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
+
+	inviscousTerm(ifl, ul);
+	inviscousTerm(ifr, ur);
+	viscousTerm(vfl, ul, dul);
+	viscousTerm(vfr, ur, dur);
 
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
-//	lam = 1.;
 	for (int eq = 0; eq < _n_equations; ++eq)
-		flux[eq] = 0.5*(fl[eq] + fr[eq])*normal + lam*(ul[eq] - ur[eq]);
+	{
+		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
+	}
 }
 
-void EulerBndMaterial::wall(Real* ur)
+void NSBndMaterial::penaltyTerm(RealVectorValue* penalty, Real* ul, Real *ur)
 {
-	Real ul[5];
-	computeQpLeftValue(ul);
+	RealGradient duh[10];
+	for (int eq = 0; eq < _n_equations; ++eq)
+		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
+
+	viscousTerm(penalty, ul, duh);
+}
+
+void NSBndMaterial::wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
+{
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
 
 	const Point &normal = _normals[_qp];
 	RealVectorValue momentum(ul[1], ul[2], ul[3]);
     Real vn = momentum*normal;
     Real pre = pressure(ul);
+    Real twall = 1.;
 
-    ur[0] = ul[0];
-    ur[1] = ul[1] - 2.0 * vn * normal(0);
-    ur[2] = ul[2] - 2.0 * vn * normal(1);
-    ur[3] = ul[3] - 2.0 * vn * normal(2);
+    ur[0] = _gamma*_mach*_mach*pre/twall;
+    ur[1] = 0.;
+    ur[2] = 0.;
+    ur[3] = 0.;
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 
-void EulerBndMaterial::farField(Real* ur)
+void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
-	Real ul[5];
-	computeQpLeftValue(ul);
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
 
 	const Point &normal = _normals[_qp];
 
@@ -246,16 +259,37 @@ void EulerBndMaterial::farField(Real* ur)
 	}
 }
 
-void EulerBndMaterial::symmetric(Real* ur)
+
+void NSBndMaterial::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
-	wall(ur);
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
+
+	const Point &normal = _normals[_qp];
+	RealVectorValue momentum(ul[1], ul[2], ul[3]);
+    Real vn = momentum*normal;
+    Real pre = pressure(ul);
+
+    ur[0] = ul[0];
+    ur[1] = ul[1] - 2.0 * vn * normal(0);
+    ur[2] = ul[2] - 2.0 * vn * normal(1);
+    ur[3] = ul[3] - 2.0 * vn * normal(2);
+    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 
-void EulerBndMaterial::resizeQpProperty()
+void NSBndMaterial::resizeQpProperty()
 {
 	_flux[_qp].resize(_n_equations);
+	_flux_jacobi_variable[_qp].resize(_n_equations);
+	_flux_jacobi_grad_variable[_qp].resize(_n_equations);
+	_penalty[_qp].resize(_n_equations);
+	_penalty_jacobi_variable[_qp].resize(_n_equations);
 
-	_jacobi_variable[_qp].resize(_n_equations);
+//	_penalty_neighbor[_qp].resize(_n_equations);
 	for (int p = 0; p < _n_equations; ++p)
-		_jacobi_variable[_qp][p].resize(_n_equations);
+	{
+		_flux_jacobi_variable[_qp][p].resize(_n_equations);
+		_flux_jacobi_grad_variable[_qp][p].resize(_n_equations);
+		_penalty_jacobi_variable[_qp][p].resize(_n_equations);
+	}
 }

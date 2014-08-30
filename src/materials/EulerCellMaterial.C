@@ -15,7 +15,7 @@ template<>
 InputParameters validParams<EulerCellMaterial>()
 {
   InputParameters params = validParams<Material>();
-  params += validParams<CFDBase>();
+  params += validParams<EulerBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
   return params;
@@ -23,7 +23,7 @@ InputParameters validParams<EulerCellMaterial>()
 
 EulerCellMaterial::EulerCellMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
-		CFDBase(name, parameters),
+		EulerBase(name, parameters),
 		_invis_term(declareProperty<std::vector<RealVectorValue> >("cell_material")),
 		_jacobi(declareProperty<std::vector<std::vector<RealVectorValue> > >("cell_jacobi_variable"))
 {

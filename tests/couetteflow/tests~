@@ -1,0 +1,12 @@
+[Tests]
+  [./test_couetteflow]
+    type = 'Exodiff'
+    input = 'couetteflow.i'
+    exodiff = 'couetteflow_exodus.e'
+  [../]
+  [./test_couetteflow]
+    type = 'Exodiff'
+    input = 'couetteflow.i'
+    exodiff = 'couetteflow_exodus.e'
+  [../]
+[]

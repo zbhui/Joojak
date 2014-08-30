@@ -2,7 +2,7 @@
 #pragma once
 
 #include "CFDInitialCondition.h"
-#include "CFDBase.h"
+#include "EulerBase.h"
 
 class CFDPassFlowIC;
 
@@ -11,7 +11,7 @@ InputParameters validParams<CFDPassFlowIC>();
 
 class CFDPassFlowIC :
 public CFDInitialCondition,
-public CFDBase
+public EulerBase
 {
 public:
 

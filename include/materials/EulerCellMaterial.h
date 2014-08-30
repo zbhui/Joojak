@@ -12,7 +12,7 @@
 #pragma once
 
 #include "Material.h"
-#include "CFDBase.h"
+#include "EulerBase.h"
 
 class EulerCellMaterial;
 
@@ -24,7 +24,7 @@ InputParameters validParams<EulerCellMaterial>();
  */
 class EulerCellMaterial :
 public Material,
-public CFDBase
+public EulerBase
 {
 public:
 	EulerCellMaterial(const std::string & name, InputParameters parameters);
