@@ -37,7 +37,9 @@ protected:
 	MaterialProperty<std::vector<std::vector<Real> > > &_flux_jacobi_variable;
 	MaterialProperty<std::vector<std::vector<RealGradient> > > &_flux_jacobi_grad_variable;
 	MaterialProperty<std::vector<RealVectorValue> > & _penalty;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > > &_penalty_jacobi_variable;
+	MaterialProperty<std::vector<RealVectorValue> > & _penalty_neighbor;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > > &_penalty_jacobi_variable_ee;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > > &_penalty_jacobi_variable_ne;
 
 	virtual void computeQpProperties();
 	virtual void resizeQpProperty();
@@ -45,7 +47,7 @@ protected:
 	virtual void computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 
 	void fluxTerm(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
-	void penaltyTerm(RealVectorValue *penalty, Real *ul, Real *ur);
+	void penaltyTerm(RealVectorValue* penalty, RealVectorValue* penalty_neighbor, Real* ul, Real* ur);
 
 	void wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 	void farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);

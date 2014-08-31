@@ -33,8 +33,9 @@ NSBndMaterial::NSBndMaterial(const std::string & name, InputParameters parameter
 		_flux_jacobi_grad_variable(declareProperty<std::vector<std::vector<RealGradient> > >("flux_jacobi_grad_variable")),
 
 		_penalty(declareProperty<std::vector<RealVectorValue> >("penalty")),
-		_penalty_jacobi_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable"))
-//		_penalty_neighbor(declareProperty<std::vector<RealVectorValue> >("penalty_neighbor")),
+		_penalty_neighbor(declareProperty<std::vector<RealVectorValue> >("penalty_neighbor")),
+		_penalty_jacobi_variable_ee(declareProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_ee")),
+		_penalty_jacobi_variable_ne(declareProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_ne"))
 {
 	_n_equations = coupledComponents("variables");
 	for (size_t eq = 0; eq < _n_equations; ++eq)
@@ -58,24 +59,25 @@ void NSBndMaterial::computeQpProperties()
 	Real ul[10], ur[10], ur_new[10];
 	RealGradient dul[10], dur[10], dur_new[10];
 	Real flux_new[10];
-	RealVectorValue penalty_new[10];
+	RealVectorValue penalty_new[10], penalty_neighbor_new[10];
 
 	computeQpLeftValue(ul, dul);
 	computeQpRightValue(ur, dur, ul, dul);
 
-	penaltyTerm(&_penalty[_qp][0], ul, ur);
+	penaltyTerm(&_penalty[_qp][0], &_penalty_neighbor[_qp][0], ul, ur);
 	fluxTerm(&_flux[_qp][0], ul, ur, dul, dur);
 
 	for (int q = 0; q < _n_equations; ++q)
 	{
 		ul[q] += _ds;
 		computeQpRightValue(ur_new, dur_new, ul, dul);
-		penaltyTerm(penalty_new, ul, ur_new);
+		penaltyTerm(penalty_new, penalty_neighbor_new, ul, ur_new);
 		fluxTerm(flux_new, ul, ur_new, dul, dur_new);
 		for (int p = 0; p < _n_equations; ++p)
 		{
 			_flux_jacobi_variable[_qp][p][q] = (flux_new[p] - _flux[_qp][p])/_ds;
-			_penalty_jacobi_variable[_qp][p][q] = (penalty_new[p] - _penalty[_qp][p])/_ds;
+			_penalty_jacobi_variable_ee[_qp][p][q] = (penalty_new[p] - _penalty[_qp][p])/_ds;
+			_penalty_jacobi_variable_ne[_qp][p][q] = (penalty_neighbor_new[p] - _penalty_neighbor[_qp][p])/_ds;
 		}
 		ul[q] -= _ds;
 	}
@@ -85,7 +87,6 @@ void NSBndMaterial::computeQpProperties()
 	{
 		dul[q](beta) += _ds;
 		computeQpRightValue(ur_new, dur_new, ul, dul);
-		penaltyTerm(penalty_new, ul, ur_new);
 		fluxTerm(flux_new, ul, ur_new, dul, dur_new);
 		for (int p = 0; p < _n_equations; ++p)
 		{
@@ -149,13 +150,14 @@ void NSBndMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, 
 	}
 }
 
-void NSBndMaterial::penaltyTerm(RealVectorValue* penalty, Real* ul, Real *ur)
+void NSBndMaterial::penaltyTerm(RealVectorValue* penalty, RealVectorValue* penalty_neighbor, Real* ul, Real* ur)
 {
 	RealGradient duh[10];
 	for (int eq = 0; eq < _n_equations; ++eq)
 		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
 
 	viscousTerm(penalty, ul, duh);
+	viscousTerm(penalty_neighbor, ur, duh);
 }
 
 void NSBndMaterial::wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
@@ -283,13 +285,14 @@ void NSBndMaterial::resizeQpProperty()
 	_flux_jacobi_variable[_qp].resize(_n_equations);
 	_flux_jacobi_grad_variable[_qp].resize(_n_equations);
 	_penalty[_qp].resize(_n_equations);
-	_penalty_jacobi_variable[_qp].resize(_n_equations);
-
-//	_penalty_neighbor[_qp].resize(_n_equations);
+	_penalty_neighbor[_qp].resize(_n_equations);
+	_penalty_jacobi_variable_ee[_qp].resize(_n_equations);
+	_penalty_jacobi_variable_ne[_qp].resize(_n_equations);
 	for (int p = 0; p < _n_equations; ++p)
 	{
 		_flux_jacobi_variable[_qp][p].resize(_n_equations);
 		_flux_jacobi_grad_variable[_qp][p].resize(_n_equations);
-		_penalty_jacobi_variable[_qp][p].resize(_n_equations);
+		_penalty_jacobi_variable_ee[_qp][p].resize(_n_equations);
+		_penalty_jacobi_variable_ne[_qp][p].resize(_n_equations);
 	}
 }

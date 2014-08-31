@@ -1,0 +1,192 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\begin_modules
+theorems-ams
+eqs-within-sections
+figs-within-sections
+\end_modules
+\maintain_unincluded_children false
+\language chinese-simplified
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\font_cjk gbsn
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 1
+\tocdepth 1
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+git常用命令
+\end_layout
+
+\begin_layout Section
+git init 
+\end_layout
+
+\begin_layout Standard
+创建一个空的Git库．在当前目录中产生一个.git 的子目录．
+\end_layout
+
+\begin_layout Section
+git add 
+\end_layout
+
+\begin_layout Standard
+将当前工作目录中更改或者新增的文件加入到Git的索引中．
+\end_layout
+
+\begin_layout Standard
+可以递归添加，即如果后面跟的是一个目录作为参数，则会递归添加整个目录中的所有子目录和文件．
+\end_layout
+
+\begin_layout Standard
+git add dir1 （ 添加dir1这个目录，目录下的所有文件都被加入 ）
+\end_layout
+
+\begin_layout Standard
+Git add f1 f2 （ 添加f1，f2文件） 
+\end_layout
+
+\begin_layout Standard
+git add .
+ ( 添加当前目录下的所有文件和子目录 ) 
+\end_layout
+
+\begin_layout Section
+git rm
+\end_layout
+
+\begin_layout Standard
+从当前的工作目录中和索引中删除文件．可以递归删除，即如果后面跟的是一个目录做为参数，则会递归删除整个目录中的所有子目录和文件．
+\end_layout
+
+\begin_layout Standard
+git rm f1 (删除文件f1，包含本地目录和index中的此文件记录) 
+\end_layout
+
+\begin_layout Standard
+git rm --cached f1 (删除文件f1，不删除本地目录文件，只删除index中的文件记录；将已经git add的文件remove到cache中，这
+样commit的时候不会提交这个文件，适用于一下子添加了很多文件, 却又想排除其中个别几个文件的情况．) 
+\end_layout
+
+\begin_layout Section
+git commit
+\end_layout
+
+\begin_layout Standard
+提交当前工作目录的修改内容．
+\end_layout
+
+\begin_layout Standard
+git commit -a -m 可以将那些没有通过git add标识的变化一并强行提交
+\end_layout
+
+\begin_layout Standard
+git commit --amend -m '' （在一个commit id上不断修改提交的内容） 
+\end_layout
+
+\begin_layout Section
+git status
+\end_layout
+
+\begin_layout Standard
+查看版本库的状态．可以得知哪些文件发生了变化，哪些文件还没有添加到git库中等等． 建议每次commit前都要通过该命令确认库状态．
+\end_layout
+
+\begin_layout Section
+git log
+\end_layout
+
+\begin_layout Standard
+查看历史日志，包含每次的版本变化．每次版本变化对应一个commit id．
+\end_layout
+
+\begin_layout Standard
+git log -1 -1的意思是只显示一个commit，如果想显示5个，就-5．不指定的话，git log会从该commit一直往后显示．
+\end_layout
+
+\begin_layout Standard
+git show
+\end_layout
+
+\begin_layout Standard
+git log --stat --summary
+\end_layout
+
+\begin_layout Standard
+git log -p
+\end_layout
+
+\begin_layout Section
+git merge
+\end_layout
+
+\begin_layout Standard
+把服务器上下载下来的代码和本地代码合并，或者进行分支合并．
+\end_layout
+
+\begin_layout Section
+git diff
+\end_layout
+
+\begin_layout Standard
+比较工作目录和Index中的代码
+\end_layout
+
+\begin_layout Section
+git checkout
+\end_layout
+
+\end_body
+\end_document

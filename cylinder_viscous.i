@@ -1,36 +1,32 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = THIRD
  	family = MONOMIAL
   	
   gamma = 1.4
-  mach = 0.1
-  reynolds = 10.0
+  mach = 0.2
+  reynolds = 40.0
   prandtl = 0.72
   	
   attack = 0
   slide = 0
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
-	lumping = false
 []
 
 # 网格
 [Mesh]
-  type = GeneratedMesh
+  type = FileMesh
+  file = grids/cylinder_fine.msh
   dim = 2
   
-  nx = 2
-  ny = 1
-  
-  xmin = 0
-  xmax = 4
-
-  ymin = 0
-  ymax = 2
-  
-  block_id = '0'
+  block_id = 10
   block_name = 'fluid'
+  
+  boundary_id = '8 9'
+  boundary_name = 'far_field wall'
+	
+	uniform_refine = 0 
 []
 
 [AuxVariables]
@@ -85,8 +81,9 @@
 	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
     #petsc_options_iname = '-pc_type -snes_type'
   	#petsc_options_value = 'lu test'
-    petsc_options_iname = '-pc_type '
-  	petsc_options_value = 'lu'
+		#petsc_options = '-pc_sor_symmetric'
+    petsc_options_iname = '-ksp_type  -pc_type'
+  	petsc_options_value = 'bcgs 				bjacobi'
 	[../]
 
 []
@@ -94,49 +91,49 @@
 [Executioner]
   type = Transient
   solve_type = NEWTON
-  dt = 1
+ 	#scheme = 'bdf2'
   num_steps = 1000
   
-	#line_search = cp
     # 线性迭代步的残差下降（相对）量级
  	l_tol = 1e-01
  # l_abs_step_tol = -1e-04
    # 最大线性迭代步	
- 	l_max_its = 10
+ 	l_max_its = 50
  	
  	# 最大非线性迭代步
- 	nl_max_its = 10
+ 	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-01
+  	nl_rel_tol = 1e-4
   	# 非线性迭代绝对残值
-  	#nl_abs_tol = 1e-05
+  	#nl_abs_tol = 1e-010
 
   	
-	 abort_on_solve_fail = true	
+	 #abort_on_solve_fail = true	
   #end_time = 0.1
   
-  	[./Adaptivity]
-  	
- 	[../]
+	[./TimeStepper]
+		type = RatioTimeStepper
+		dt = 10000
+		ratio = 2
+		step = 2
+		max_dt = 10000
+	[../]
 []
 
-[Functions]
-  [./exact_rho]
-    type = CouetteFlowExact
-  [../]
-[]
 
 [Postprocessors]
-  [./l2_err]
-    type = ElementL2Error
-    variable = rho
-    function = exact_rho
-  [../]
 
-  [./residuals]
-    type = Residual
-  [../]
 
+	[./residuals]
+  	type = Residual
+	[../]
+  
+
+	[./run_time]
+  	type = RunTime
+		time_type = alive
+	[../]
+ 
 []
 
 # 输出和后处理
@@ -147,7 +144,7 @@
 		
 		interval = 1 					#间隔
 		oversample = true
-		refinements = 0
+		refinements = 1
 	[../]
 	
 	[./console]
@@ -163,7 +160,7 @@
 	[./debug]
 	    type = DebugOutput
   		#show_var_residual_norms = true
- 		  show_actions = true
+ 		# show_actions = true
   		#show_top_residuals = 5
 	[../]
 []
@@ -276,27 +273,27 @@
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = 'left right bottom top'
+		boundary = '8 9'
 		type =NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = 'left right bottom top'
+		boundary = '8 9'
 		type =NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = 'left right bottom top'
+		boundary = '8 9'
 		type =NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = 'left right bottom top'
+		boundary = '8 9'
 		type =NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = 'left right bottom top'
+		boundary = '8 9'
 		type =NSBC
 		variable = rhoe
 	[../]
@@ -304,19 +301,27 @@
 
 # 材料属性
 [Materials]
-  [./cell_materical]
-		block = 0
+  [./cell_material]
+		block = 10
     type = NSCellMaterial
   [../]
 
-  [./face_materical]
-		block = 0
+  [./face_material]
+		block = 10
     type = NSFaceMaterial
   [../]
 
-  [./bnd_materical]
-		boundary = 'left right bottom top'
-    type = CouetteFlowBndMaterial
+ 	[./far_field_material]
+		boundary = far_field
+		bc_type = far_field
+    type = NSBndMaterial
   [../]
+
+  [./wall_material]
+		boundary = wall
+		bc_type = wall
+    type = NSBndMaterial
+  [../]
+
 []
 

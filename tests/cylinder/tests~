@@ -1,8 +1,7 @@
 [Tests]
-
   [./test_cylinder_invis]
     type = 'Exodiff'
     input = 'cylinder_invis.i'
-    exodiff = 'cylinder_quad.e'
-  [../]    
+    exodiff = 'cylinder_invis_exodus.e'
+  [../] 
 []
