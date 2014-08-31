@@ -1,8 +1,12 @@
 [Tests]
-
   [./test_cylinder_invis]
     type = 'Exodiff'
     input = 'cylinder_invis.i'
     exodiff = 'cylinder_invis_exodus.e'
-  [../]    
+  [../] 
+  [./test_cylinder_viscous]
+    type = 'Exodiff'
+    input = 'cylinder_viscous.i'
+    exodiff = 'cylinder_viscous_exodus.e'
+  [../]  
 []
