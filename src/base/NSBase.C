@@ -79,3 +79,25 @@ void NSBase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *
 	viscous_term[component](2) = vel_tau(2);
 
 }
+
+void NSBase::stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh)
+{
+	Real rho = uh[0];
+	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
+	RealGradient grad_rho(duh[0]);
+	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
+	RealTensor temp;
+	for (int alpha = 0; alpha < 3; ++alpha) {
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			temp(alpha,beta) = velocity(alpha)*grad_rho(beta);
+		}
+	}
+	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
+	tau = velocity_tensor + velocity_tensor.transpose();
+	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
+	Real lamdiv = 2./3. * div;
+	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
+	Real mu = physicalViscosity(uh);
+	tau *= mu/_reynolds;
+}
