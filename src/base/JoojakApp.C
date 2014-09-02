@@ -44,6 +44,11 @@
 /// 时间步长增加策略
 #include "RatioTimeStepper.h"
 
+/// PostProcessor
+#include "CFDResidual.h"
+#include "ElementExtremeTimeDerivative.h"
+#include "CFDForcePostprocessor.h"
+
 template<>
 InputParameters validParams<JoojakApp>()
 {
@@ -113,6 +118,11 @@ JoojakApp::registerObjects(Factory & factory)
 
 	/// 注册时间步长
 	registerTimeStepper(RatioTimeStepper);
+
+	/// 注册后处理
+	registerPostprocessor(CFDResidual);
+	registerPostprocessor(ElementExtremeTimeDerivative);
+	registerPostprocessor(CFDForcePostprocessor);
 }
 
 void

@@ -20,8 +20,8 @@
   type = GeneratedMesh
   dim = 2
   
-  nx = 2
-  ny = 1
+  nx = 10
+  ny = 5
   
   xmin = 0
   xmax = 4
@@ -94,7 +94,7 @@
 [Executioner]
   type = Transient
   solve_type = NEWTON
-  dt = 1
+  dt = 100
   num_steps = 1000
   
 	#line_search = cp
@@ -107,9 +107,9 @@
  	# 最大非线性迭代步
  	nl_max_its = 10
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-01
+  	#nl_rel_tol = 1e-10
   	# 非线性迭代绝对残值
-  	#nl_abs_tol = 1e-05
+  	nl_abs_tol = 1e-010
 
   	
 	 abort_on_solve_fail = true	
@@ -134,13 +134,35 @@
   [../]
 
   [./residuals]
-    type = Residual
+    type = CFDResidual
+		execute_on = TIMESTEP
+  [../]
+
+  [./elementMaxTimeDerivative]
+    type = ElementExtremeTimeDerivative
+    variable = rho
+	 	execute_on = TIMESTEP_BEGIN
+  [../]
+
+  [./area]
+    type = AreaPostprocessor
+		boundary = left
   [../]
 
 []
 
+[VectorPostprocessors]
+  [./point_sample]
+    type = PointValueSampler
+    variable = 'rho rhoe'
+    points = '0.1 0.1 0  0.23 0.4 0  0.78 0.2 0'
+    sort_by = id
+  [../]
+[]
+
 # 输出和后处理
 [Outputs]
+	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
