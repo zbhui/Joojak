@@ -1,22 +1,34 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = THIRD
  	family = MONOMIAL
   	
-  mach = 0.2
-  reynolds = 10000.0
+  mach = 0.1
+  reynolds = 10.0
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
 # 网格
 [Mesh]
-  type = FileMesh
-  file = grids/plate2d.msh
-  dim = 2
+  type = GeneratedMesh
+  dim = 3
+  
+  nx = 10
+  ny = 5
+	nz = 5
+  
+  xmin = 0
+  xmax = 4
 
-  boundary_id = '9'
-  boundary_name = 'wall'
+  ymin = 0
+  ymax = 2
+
+  zmin = 0
+  zmax = 2
+  
+  block_id = '0'
+  block_name = 'fluid'
 []
 
 [AuxVariables]
@@ -54,12 +66,12 @@
 
   [./velocity_y]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_y
   [../]
 
   [./velocity_z]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_z
   [../]
 []
 
@@ -68,8 +80,11 @@
 		type = SMP
 		full = true
 
+	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+  	#petsc_options_value = 'lu test'
     petsc_options_iname = '-pc_type '
-  	petsc_options_value = 'bjacobi'
+  	petsc_options_value = 'ilu'
 	[../]
 
 []
@@ -77,91 +92,61 @@
 [Executioner]
   type = Transient
   solve_type = NEWTON
-  num_steps = 100000
+  dt = 1E+10
+  num_steps = 1000
   
+	#line_search = cp
     # 线性迭代步的残差下降（相对）量级
- 	l_tol = 1e-02
+ 	l_tol = 1e-01
  # l_abs_step_tol = -1e-04
    # 最大线性迭代步	
- 	l_max_its = 100
+ 	l_max_its = 10
  	
  	# 最大非线性迭代步
- 	nl_max_its = 100
+ 	nl_max_its = 10
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-4
+  	#nl_rel_tol = 1e-10
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
   	
-	 #abort_on_solve_fail = true	
-  #end_time = 0.1
-  
-	[./TimeStepper]
-		type = RatioTimeStepper
-		dt = 1E+12
-		ratio = 2
-		step = 2
-		max_dt = 1E+12
-	[../]
+	 abort_on_solve_fail = true	
 []
 
+[Functions]
+  [./exact_rho]
+    type = CouetteFlowExact
+  [../]
+[]
 
 [Postprocessors]
+  [./l2_err]
+    type = ElementL2Error
+    variable = rho
+    function = exact_rho
+  [../]
 
+  [./residuals]
+    type = CFDResidual
+		execute_on = TIMESTEP
+  [../]
 
-	[./residual_final]
-  	type = Residual
-	[../]
-  
-	[./residual_initial]
-  	type = CFDResidual
-	[../]
+  [./elementMaxTimeDerivative]
+    type = ElementExtremeTimeDerivative
+    variable = rho
+	 	execute_on = TIMESTEP_BEGIN
+  [../]
 
-	[./run_time]
-  	type = RunTime
-		time_type = alive
-	[../]
+  [./area]
+    type = AreaPostprocessor
+		boundary = left
+  [../]
 
-	[./force_form-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = friction
-		boundary  = wall
-	[../]
-	[./force_total-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = total
-		boundary  = wall
-	[../]
-	[./force_form-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = friction
-		boundary  = wall
-	[../]
-	[./force_total-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = total
-		boundary  = wall
-	[../]
- 
 []
+
 # 输出和后处理
 [Outputs]
+	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
@@ -180,12 +165,6 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
-	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
 	[../]
 []
 
@@ -270,6 +249,7 @@
 	[../]
 []
 
+
 [DGKernels]
 	[./mass_dg]
 		type = NSFaceKernel
@@ -292,61 +272,51 @@
 		variable = rhoe
 	[../]
 []
+
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '8 9 10 11 12'
-		type = NSBC
+		boundary = 'left right bottom top front back'
+		type =NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '8 9 10 11 12'
-		type = NSBC
+		boundary = 'left right bottom top front back'
+		type =NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '8 9 10 11 12'
-		type = NSBC
+		boundary = 'left right bottom top front back'
+		type =NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '8 9 10 11 12'
-		type = NSBC
+		boundary = 'left right bottom top front back'
+		type =NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '8 9 10 11 12'
-		type = NSBC
+		boundary = 'left right bottom top front back'
+		type =NSBC
 		variable = rhoe
 	[../]
 []
 
 # 材料属性
 [Materials]
-  [./cell_material]
-		block = 13
+  [./cell_materical]
+		block = 0
     type = NSCellMaterial
   [../]
 
-  [./face_material]
-		block = 13
+  [./face_materical]
+		block = 0
     type = NSFaceMaterial
   [../]
 
-  [./wall_material]
-		boundary = 9
-		bc_type = wall
-    type = NSBndMaterial
-  [../]
-  [./far_field_material]
-		boundary = '10 11 12'
-		bc_type = far_field
-    type = NSBndMaterial
-  [../]
-  [./symmetric_material]
-		boundary = 8
-		bc_type = symmetric
-    type = NSBndMaterial
+  [./bnd_materical]
+		boundary = 'left right bottom top front back'
+    type = CouetteFlowBndMaterial
   [../]
 []
 
