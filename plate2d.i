@@ -3,8 +3,8 @@
  	order = SECOND
  	family = MONOMIAL
   	
-  mach = 0.2
-  reynolds = 10000.0
+  mach = 0.5
+  reynolds = 1E+05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -12,11 +12,14 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/plate2d.msh
+  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
   dim = 2
 
-  boundary_id = '9'
+  boundary_id = '2'
   boundary_name = 'wall'
+
+  block_id = '0'
+  block_name = 'fluid'
 []
 
 [AuxVariables]
@@ -54,12 +57,12 @@
 
   [./velocity_y]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_y
   [../]
 
   [./velocity_z]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_z
   [../]
 []
 
@@ -68,15 +71,15 @@
 		type = SMP
 		full = true
 
-    petsc_options_iname = '-pc_type '
-  	petsc_options_value = 'bjacobi'
+    petsc_options_iname = 'ksp_type -pc_type '
+  	petsc_options_value = 'bcgs bjacobi'
 	[../]
 
 []
 # 非线性系统求解
 [Executioner]
   type = Transient
-  solve_type = NEWTON
+  solve_type = PJFNK
   num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
@@ -88,7 +91,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-4
+  	nl_rel_tol = 1e-3
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -98,10 +101,10 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+12
+		dt = 1E-02
 		ratio = 2
 		step = 2
-		max_dt = 1E+12
+		max_dt = 1E+08
 	[../]
 []
 
@@ -295,27 +298,27 @@
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '8 9 10 11 12'
+		boundary = '1 2 3 4 5'
 		type = NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '8 9 10 11 12'
+		boundary = '1 2 3 4 5'
 		type = NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '8 9 10 11 12'
+		boundary = '1 2 3 4 5'
 		type = NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '8 9 10 11 12'
+		boundary = '1 2 3 4 5'
 		type = NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '8 9 10 11 12'
+		boundary = '1 2 3 4 5'
 		type = NSBC
 		variable = rhoe
 	[../]
@@ -324,29 +327,31 @@
 # 材料属性
 [Materials]
   [./cell_material]
-		block = 13
+		block = fluid
     type = NSCellMaterial
   [../]
 
   [./face_material]
-		block = 13
+		block = fluid
     type = NSFaceMaterial
   [../]
 
   [./wall_material]
-		boundary = 9
+		boundary = 2
 		bc_type = wall
     type = NSBndMaterial
   [../]
   [./far_field_material]
-		boundary = '10 11 12'
+		boundary = '3 4 5'
 		bc_type = far_field
     type = NSBndMaterial
   [../]
   [./symmetric_material]
-		boundary = 8
+		boundary = 1
 		bc_type = symmetric
     type = NSBndMaterial
   [../]
+
+
 []
 

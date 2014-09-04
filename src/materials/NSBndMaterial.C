@@ -123,6 +123,11 @@ void NSBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, R
 		symmetric(ur, dur, ul, dul);
 		return;
 	}
+	if(_bc_type == "pressure_out")
+	{
+		symmetric(ur, dur, ul, dul);
+		return;
+	}
 	if(_bc_type == "none")
 	{
 		for (int eq = 0; eq < _n_equations; ++eq)
@@ -172,6 +177,7 @@ void NSBndMaterial::wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *du
     Real twall = 1.;
 
     ur[0] = _gamma*_mach*_mach*pre/twall;
+//    ur[0] = ul[0];
     ur[1] = 0.;
     ur[2] = 0.;
     ur[3] = 0.;
@@ -276,6 +282,23 @@ void NSBndMaterial::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradien
     ur[1] = ul[1] - 2.0 * vn * normal(0);
     ur[2] = ul[2] - 2.0 * vn * normal(1);
     ur[3] = ul[3] - 2.0 * vn * normal(2);
+    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
+}
+
+void NSBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
+{
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
+
+	const Point &normal = _normals[_qp];
+	RealVectorValue momentum(ul[1], ul[2], ul[3]);
+    Real vn = momentum*normal;
+    Real pre = 1 / _gamma /_mach / _mach;
+
+    ur[0] = ul[0];
+    ur[1] = ul[1];
+    ur[2] = ul[2];
+    ur[3] = ul[3];
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 

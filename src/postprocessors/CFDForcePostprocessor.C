@@ -44,10 +44,11 @@ Real CFDForcePostprocessor::computeQpIntegral()
 	Real pre = pressure(uh);
 	RealVectorValue form_force, friciton_force, total_force;
 	RealTensorValue tau;
-	stressTerm(tau, uh, duh);
+	Point normal = -_normals[_qp]; // 物面的外法向量和网格外向量相反
 
-	form_force = -pre*_normals[_qp]*2;
-	friciton_force = tau*_normals[_qp]*2;
+	stressTerm(tau, uh, duh);
+	form_force = -pre*normal*2;
+	friciton_force = tau*normal*2;
 	total_force = form_force + friciton_force;
 
 	switch (_force_type)
