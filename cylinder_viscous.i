@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = THIRD
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -91,19 +91,18 @@
 [Executioner]
   type = Transient
   solve_type = NEWTON
- 	#scheme = 'bdf2'
-  num_steps = 1000
+  num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
  	l_tol = 1e-02
  # l_abs_step_tol = -1e-04
    # 最大线性迭代步	
- 	l_max_its = 400
+ 	l_max_its = 100
  	
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-5
+  	nl_rel_tol = 1e-4
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -113,10 +112,10 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 100
+		dt = 1E+08
 		ratio = 2
 		step = 2
-		max_dt = 100
+		max_dt = 1e+08
 	[../]
 []
 
@@ -178,6 +177,7 @@
 
 # 输出和后处理
 [Outputs]
+	file_base = cylinder_viscous
 	[./exodus]
 		type = Exodus
 		output_initial = true
@@ -196,6 +196,10 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
+	[../]
+	[./checkpoint]
+		type  = Checkpoint
+		interval = 1 					#间隔
 	[../]
 	[./debug]
 	    type = DebugOutput

@@ -52,4 +52,5 @@ protected:
 	void wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 	void farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 	void symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
+	void pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 };

@@ -48,6 +48,7 @@
 #include "CFDResidual.h"
 #include "ElementExtremeTimeDerivative.h"
 #include "CFDForcePostprocessor.h"
+#include "BumpElementL2Error.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -123,6 +124,7 @@ JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(CFDResidual);
 	registerPostprocessor(ElementExtremeTimeDerivative);
 	registerPostprocessor(CFDForcePostprocessor);
+	registerPostprocessor(BumpElementL2Error);
 }
 
 void

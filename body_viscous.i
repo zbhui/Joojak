@@ -4,7 +4,9 @@
  	family = MONOMIAL
   	
   mach = 0.5
-  reynolds = 1E+05
+  reynolds = 5000
+	attack = 1.0
+	ref_area = 0.05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -12,10 +14,10 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
-  dim = 2
+  file = ../high-order-workshop/C2.3_body/btc0-NLR-E1.v2.msh
+  dim = 3
 
-  boundary_id = '2'
+  boundary_id = '1'
   boundary_name = 'wall'
 
   block_id = '0'
@@ -79,7 +81,7 @@
 # 非线性系统求解
 [Executioner]
   type = Transient
-  solve_type = PJFNK
+  solve_type = NEWTON
   num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
@@ -101,10 +103,10 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E-02
+		dt = 1E+02
 		ratio = 2
 		step = 2
-		max_dt = 1E+08
+		max_dt = 1E+02
 	[../]
 []
 
@@ -125,34 +127,11 @@
 		time_type = alive
 	[../]
 
-	[./force_form-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = friction
-		boundary  = wall
-	[../]
+
 	[./force_total-x]
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = total
-		boundary  = wall
-	[../]
-	[./force_form-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = friction
 		boundary  = wall
 	[../]
 	[./force_total-y]
@@ -161,10 +140,17 @@
 		force_type = total
 		boundary  = wall
 	[../]
+	[./force_total-z]
+  	type = CFDForcePostprocessor
+		direction_by = z
+		force_type = total
+		boundary  = wall
+	[../]
  
 []
 # 输出和后处理
 [Outputs]
+	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
@@ -298,27 +284,27 @@
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3'
 		type = NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3'
 		type = NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3 '
 		type = NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3 '
 		type = NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3'
 		type = NSBC
 		variable = rhoe
 	[../]
@@ -337,17 +323,17 @@
   [../]
 
   [./wall_material]
-		boundary = 2
+		boundary = wall
 		bc_type = wall
     type = NSBndMaterial
   [../]
   [./far_field_material]
-		boundary = '3 4 5'
+		boundary = '3'
 		bc_type = far_field
     type = NSBndMaterial
   [../]
   [./symmetric_material]
-		boundary = 1
+		boundary = 2
 		bc_type = symmetric
     type = NSBndMaterial
   [../]
