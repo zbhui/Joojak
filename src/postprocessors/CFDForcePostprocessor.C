@@ -47,8 +47,8 @@ Real CFDForcePostprocessor::computeQpIntegral()
 	Point normal = -_normals[_qp]; // 物面的外法向量和网格外向量相反
 
 	stressTerm(tau, uh, duh);
-	form_force = -pre*normal*2;
-	friciton_force = tau*normal*2;
+	form_force = -pre*normal/(0.5*_ref_area);
+	friciton_force = tau*normal/(0.5*_ref_area);
 	total_force = form_force + friciton_force;
 
 	switch (_force_type)

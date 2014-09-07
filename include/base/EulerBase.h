@@ -37,6 +37,8 @@ protected:
 
   Real _attack;
   Real _slide;
+  Real _ref_length;
+  Real _ref_area;
 
   Real _ds;
 };

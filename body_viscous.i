@@ -1,15 +1,12 @@
 # 全局变量
 [GlobalParams]
- 	order = THIRD
+ 	order = SECOND
  	family = MONOMIAL
   	
-  gamma = 1.4
-  mach = 0.1
-  reynolds = 40.0
-  prandtl = 0.72
-  	
-  attack = 0
-  slide = 0
+  mach = 0.5
+  reynolds = 5000
+	attack = 1.0
+	ref_area = 0.05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -17,16 +14,14 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/cylinder_fine.msh
-  dim = 2
-  
-  block_id = 10
+  file = ../high-order-workshop/C2.3_body/btc0-NLR-E1.v2.msh
+  dim = 3
+
+  boundary_id = '1'
+  boundary_name = 'wall'
+
+  block_id = '0'
   block_name = 'fluid'
-  
-  boundary_id = '8 9'
-  boundary_name = 'far_field wall'
-	
-	uniform_refine = 0 
 []
 
 [AuxVariables]
@@ -78,12 +73,8 @@
 		type = SMP
 		full = true
 
-	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
-    #petsc_options_iname = '-pc_type -snes_type'
-  	#petsc_options_value = 'lu test'
-		#petsc_options = '-pc_sor_symmetric'
-    petsc_options_iname = '-ksp_type  -pc_type '
-  	petsc_options_value = 'gmres 				bjacobi  '
+    petsc_options_iname = 'ksp_type -pc_type '
+  	petsc_options_value = 'bcgs bjacobi'
 	[../]
 
 []
@@ -102,7 +93,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-4
+  	nl_rel_tol = 1e-3
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -112,10 +103,10 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+08
+		dt = 1E+02
 		ratio = 2
 		step = 2
-		max_dt = 1e+08
+		max_dt = 1E+02
 	[../]
 []
 
@@ -136,34 +127,11 @@
 		time_type = alive
 	[../]
 
-	[./force_form-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = friction
-		boundary  = wall
-	[../]
+
 	[./force_total-x]
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = total
-		boundary  = wall
-	[../]
-	[./force_form-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = friction
 		boundary  = wall
 	[../]
 	[./force_total-y]
@@ -172,19 +140,24 @@
 		force_type = total
 		boundary  = wall
 	[../]
+	[./force_total-z]
+  	type = CFDForcePostprocessor
+		direction_by = z
+		force_type = total
+		boundary  = wall
+	[../]
  
 []
-
 # 输出和后处理
 [Outputs]
-	file_base = cylinder_viscous
+	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
 		
 		interval = 1 					#间隔
 		oversample = true
-		refinements = 1
+		refinements = 0
 	[../]
 	
 	[./console]
@@ -196,10 +169,6 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
-	[../]
-	[./checkpoint]
-		type  = Checkpoint
-		interval = 1 					#间隔
 	[../]
 	[./debug]
 	    type = DebugOutput
@@ -290,7 +259,6 @@
 	[../]
 []
 
-
 [DGKernels]
 	[./mass_dg]
 		type = NSFaceKernel
@@ -313,32 +281,31 @@
 		variable = rhoe
 	[../]
 []
-
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3'
+		type = NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3'
+		type = NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3 '
+		type = NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3 '
+		type = NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3'
+		type = NSBC
 		variable = rhoe
 	[../]
 []
@@ -346,19 +313,13 @@
 # 材料属性
 [Materials]
   [./cell_material]
-		block = 10
+		block = fluid
     type = NSCellMaterial
   [../]
 
   [./face_material]
-		block = 10
+		block = fluid
     type = NSFaceMaterial
-  [../]
-
- 	[./far_field_material]
-		boundary = far_field
-		bc_type = far_field
-    type = NSBndMaterial
   [../]
 
   [./wall_material]
@@ -366,6 +327,17 @@
 		bc_type = wall
     type = NSBndMaterial
   [../]
+  [./far_field_material]
+		boundary = '3'
+		bc_type = far_field
+    type = NSBndMaterial
+  [../]
+  [./symmetric_material]
+		boundary = 2
+		bc_type = symmetric
+    type = NSBndMaterial
+  [../]
+
 
 []
 

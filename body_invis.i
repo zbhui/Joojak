@@ -1,15 +1,12 @@
 # 全局变量
 [GlobalParams]
- 	order = THIRD
+ 	order = SECOND
  	family = MONOMIAL
   	
-  gamma = 1.4
-  mach = 0.1
-  reynolds = 40.0
-  prandtl = 0.72
-  	
-  attack = 0
-  slide = 0
+  mach = 0.5
+	reynolds = 10
+	attack = 1.0
+	ref_area = 0.05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -17,16 +14,14 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/cylinder_fine.msh
-  dim = 2
-  
-  block_id = 10
+  file = ../high-order-workshop/C2.3_body/btc0-NLR-E1.v2.msh
+  dim = 3
+
+  boundary_id = '1'
+  boundary_name = 'wall'
+
+  block_id = '0'
   block_name = 'fluid'
-  
-  boundary_id = '8 9'
-  boundary_name = 'far_field wall'
-	
-	uniform_refine = 0 
 []
 
 [AuxVariables]
@@ -78,12 +73,8 @@
 		type = SMP
 		full = true
 
-	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
-    #petsc_options_iname = '-pc_type -snes_type'
-  	#petsc_options_value = 'lu test'
-		#petsc_options = '-pc_sor_symmetric'
-    petsc_options_iname = '-ksp_type  -pc_type '
-  	petsc_options_value = 'gmres 				bjacobi  '
+    petsc_options_iname = 'ksp_type -pc_type '
+  	petsc_options_value = 'bcgs bjacobi'
 	[../]
 
 []
@@ -112,10 +103,10 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+08
+		dt = 1E+03
 		ratio = 2
 		step = 2
-		max_dt = 1e+08
+		max_dt = 1E+03
 	[../]
 []
 
@@ -142,49 +133,29 @@
 		force_type = form
 		boundary  = wall
 	[../]
-	[./force_friction-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = friction
-		boundary  = wall
-	[../]
-	[./force_total-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = total
-		boundary  = wall
-	[../]
 	[./force_form-y]
   	type = CFDForcePostprocessor
 		direction_by = y
 		force_type = form
 		boundary  = wall
 	[../]
-	[./force_friction-y]
+	[./force_form-z]
   	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = friction
-		boundary  = wall
-	[../]
-	[./force_total-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = total
+		direction_by = z
+		force_type = form
 		boundary  = wall
 	[../]
  
 []
-
 # 输出和后处理
 [Outputs]
-	file_base = cylinder_viscous
 	[./exodus]
 		type = Exodus
 		output_initial = true
 		
 		interval = 1 					#间隔
 		oversample = true
-		refinements = 1
+		refinements = 0
 	[../]
 	
 	[./console]
@@ -196,10 +167,6 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
-	[../]
-	[./checkpoint]
-		type  = Checkpoint
-		interval = 1 					#间隔
 	[../]
 	[./debug]
 	    type = DebugOutput
@@ -269,76 +236,74 @@
 	[../]
 
 	[./mass_space]
-		type = NSCellKernel
+		type = EulerCellKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_space]
-		type = NSCellKernel
+		type = EulerCellKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_space]
-		type = NSCellKernel
+		type = EulerCellKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_space]
-		type = NSCellKernel
+		type = EulerCellKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_space]
-		type = NSCellKernel
+		type = EulerCellKernel
 		variable = rhoe
 	[../]
 []
-
 
 [DGKernels]
 	[./mass_dg]
-		type = NSFaceKernel
+		type = EulerFaceKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_dg]
-		type = NSFaceKernel
+		type = EulerFaceKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_dg]
-		type = NSFaceKernel
+		type = EulerFaceKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_dg]
-		type = NSFaceKernel
+		type = EulerFaceKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_dg]
-		type = NSFaceKernel
+		type = EulerFaceKernel
 		variable = rhoe
 	[../]
 []
-
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3'
+		type = EulerBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3'
+		type = EulerBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3 '
+		type = EulerBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3 '
+		type = EulerBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '8 9'
-		type =NSBC
+		boundary = '1 2 3'
+		type = EulerBC
 		variable = rhoe
 	[../]
 []
@@ -346,26 +311,31 @@
 # 材料属性
 [Materials]
   [./cell_material]
-		block = 10
-    type = NSCellMaterial
+		block = fluid
+    type = EulerCellMaterial
   [../]
 
   [./face_material]
-		block = 10
-    type = NSFaceMaterial
-  [../]
-
- 	[./far_field_material]
-		boundary = far_field
-		bc_type = far_field
-    type = NSBndMaterial
+		block = fluid
+    type = EulerFaceMaterial
   [../]
 
   [./wall_material]
 		boundary = wall
 		bc_type = wall
-    type = NSBndMaterial
+    type = EulerBndMaterial
   [../]
+  [./far_field_material]
+		boundary = '3'
+		bc_type = far_field
+    type = EulerBndMaterial
+  [../]
+  [./symmetric_material]
+		boundary = 2
+		bc_type = symmetric
+    type = EulerBndMaterial
+  [../]
+
 
 []
 

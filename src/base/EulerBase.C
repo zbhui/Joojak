@@ -9,6 +9,8 @@ InputParameters validParams<EulerBase>()
   params.addParam<Real>("gamma", 1.4, "比热比");
   params.addParam<Real>("attack", 0, "攻角");
   params.addParam<Real>("slide", 0, "侧滑角");
+  params.addParam<Real>("ref_length", 1, "参考长度");
+  params.addParam<Real>("ref_area", 1, "参考面积");
   params.addParam<Real>("ds", 1.490116119384766e-08, "微扰量");
   return params;
 }
@@ -20,6 +22,11 @@ EulerBase::EulerBase(const std::string & name, InputParameters parameters)
 
 	_attack = (parameters.get<Real>("attack"));
 	_slide = (parameters.get<Real>("slide"));
+	_attack /= 180.*libMesh::pi;
+	_slide /= 180.*libMesh::pi;
+
+	_ref_length = (parameters.get<Real>("ref_length"));
+	_ref_area = (parameters.get<Real>("ref_area"));
 
 	_ds = (parameters.get<Real>("ds"));
 }
