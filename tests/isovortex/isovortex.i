@@ -3,13 +3,8 @@
  	order = SECOND
  	family = MONOMIAL
   	
-  gamma = 1.4
   mach = 0.1
   reynolds = 10.0
-  prandtl = 0.72
-  	
-  attack = 0
-  slide = 0
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []

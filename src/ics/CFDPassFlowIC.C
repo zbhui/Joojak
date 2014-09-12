@@ -23,27 +23,27 @@ Real CFDPassFlowIC::density(const Point &p)
 
 Real CFDPassFlowIC::x_momentum(const Point &p)
 {
-	Real u = _velocity * cos(_attack) * cos(_slide);
-	Real v = _velocity * sin(_attack) * cos(_slide);
-	Real w = _velocity * sin(_slide);
+	Real u = _velocity * cos(_attack) * cos(_sideslip);
+	Real v = _velocity * sin(_attack) * cos(_sideslip);
+	Real w = _velocity * sin(_sideslip);
 
 	return density(p)*u;
 }
 
 Real CFDPassFlowIC::y_momentum(const Point &p)
 {
-	Real u = _velocity * cos(_attack) * cos(_slide);
-	Real v = _velocity * sin(_attack) * cos(_slide);
-	Real w = _velocity * sin(_slide);
+	Real u = _velocity * cos(_attack) * cos(_sideslip);
+	Real v = _velocity * sin(_attack) * cos(_sideslip);
+	Real w = _velocity * sin(_sideslip);
 
 	return density(p)*v;
 }
 
 Real CFDPassFlowIC::z_momentum(const Point &p)
 {
-	Real u = _velocity * cos(_attack) * cos(_slide);
-	Real v = _velocity * sin(_attack) * cos(_slide);
-	Real w = _velocity * sin(_slide);
+	Real u = _velocity * cos(_attack) * cos(_sideslip);
+	Real v = _velocity * sin(_attack) * cos(_sideslip);
+	Real w = _velocity * sin(_sideslip);
 
 	return density(p)*w;
 }

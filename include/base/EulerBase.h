@@ -30,13 +30,23 @@ protected:
 
   virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
   virtual void inviscousTerm(std::vector<RealVectorValue> &inviscous_term, Real *uh);
+  virtual RealTensorValue bodyToWind();
+  virtual RealTensorValue windToBody();
+  virtual RealTensorValue earthTobody();
+  virtual RealTensorValue bodyToEarth();
+  virtual RealTensorValue earthToWind();
+  virtual RealTensorValue windToEarth();
 protected:
 
   Real _gamma;
   Real _mach;
 
-  Real _attack;
-  Real _slide;
+  Real _attack;			/// 攻角
+  Real _sideslip;		///侧滑角
+  Real _pitch;			///俯仰角
+  Real _yaw;			///偏航角
+  Real _roll;			///滚转角
+
   Real _ref_length;
   Real _ref_area;
 

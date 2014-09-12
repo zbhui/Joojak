@@ -3,6 +3,15 @@
 \begin_document
 \begin_header
 \textclass scrbook
+\begin_preamble
+%\usepackage{fontspec}
+%\setromanfont{AR PL ShanHeiSun Uni}%字体来自Adobe Reader 8.0 OpenType，可以选用任何系统已有的字体
+%中文断行 
+%\XeTeXlinebreaklocale "zh"
+%\XeTeXlinebreakskip = 0pt plus 1pt 
+\usepackage{CJK}
+\usepackage{indentfirst}
+\end_preamble
 \use_default_options true
 \begin_modules
 theorems-ams
@@ -30,11 +39,12 @@ figs-within-sections
 \output_sync 0
 \bibtex_command default
 \index_command default
+\float_placement h
 \paperfontsize default
 \spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_amsmath 1
 \use_esint 1
 \use_mhchem 1
@@ -49,8 +59,8 @@ figs-within-sections
 \shortcut idx
 \color #008000
 \end_index
-\secnumdepth 3
-\tocdepth 3
+\secnumdepth 2
+\tocdepth 2
 \paragraph_separation indent
 \paragraph_indentation default
 \quotes_language english
@@ -65,6 +75,22 @@ figs-within-sections
 \end_header
 
 \begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+CJKindent
+\end_layout
+
+\end_inset
+
+
+\end_layout
 
 \begin_layout Title
 DG
@@ -589,6 +615,265 @@ f_{p\alpha}^{v}=g_{\alpha\beta}^{pq}\partial_{\beta}u_{q}
 边界条件
 \end_layout
 
+\begin_layout Subsection
+Euler方程边界
+\end_layout
+
+\begin_layout Standard
+远场的法向量的特征矩阵
+\begin_inset Formula $A(\boldsymbol{u},\boldsymbol{n})=\frac{\partial f_{p\alpha}^{c}}{\partial u_{q}}n_{\alpha}$
+\end_inset
+
+的特征值
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\lambda_{1}=\boldsymbol{v}\cdot\boldsymbol{n}-c,\ \lambda_{2,3,4}=\boldsymbol{v}\cdot\boldsymbol{n},\ \lambda_{5}=\boldsymbol{v}\cdot\boldsymbol{n}-c
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $c=\sqrt{\gamma p/\rho}$
+\end_inset
+
+表示声速．跟不
+\begin_inset Formula $\lambda_{i}$
+\end_inset
+
+的符号，远场可建立四种边界条件：
+\end_layout
+
+\begin_layout Itemize
+超声速入口：
+\begin_inset Formula $\lambda_{i}<0,i=1,\cdots,5$
+\end_inset
+
+，
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}^{-}(\boldsymbol{u}^{+})=\boldsymbol{u}_{\infty}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+亚声速入口：
+\begin_inset Formula $\lambda_{i}<0,i=1,\cdots,4,\lambda_{5}>0$
+\end_inset
+
+，
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\rho^{-} & = & \rho_{\infty}\\
+(\rho\boldsymbol{v})^{-} & = & (\rho\boldsymbol{v})_{\infty}\\
+p^{-} & = & p^{+}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+亚声速出口：
+\begin_inset Formula $\lambda_{\text{１}}<0,\lambda_{i}\text{＞}0,i=\text{２},\cdots,5$
+\end_inset
+
+，
+\end_layout
+
+\begin_layout Standard
+亚声速出口指定出口压强，其他值由流场插值而来．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\rho^{-} & = & \rho^{+}\\
+(\rho\boldsymbol{v})^{-} & = & (\rho\boldsymbol{v})^{+}\\
+p^{-} & = & p_{\text{out}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $p_{\text{out}}=p_{\infty}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+超声速出口：
+\begin_inset Formula $\lambda_{i}\text{＞}0,i=1,\cdots,5$
+\end_inset
+
+．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{u}^{-}(\boldsymbol{u}^{+})=\boldsymbol{u}^{+}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+无粘物面边界的速度为无穿透条件，数学提法为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{v}\cdot\boldsymbol{n}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+几何描述如图。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{v}^{-}=\boldsymbol{v}^{+}-2\boldsymbol{v}_{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+而
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{v}_{n}=(\boldsymbol{v}\cdot\boldsymbol{n})\boldsymbol{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+即
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{v}^{-}=\boldsymbol{v}^{+}-2(\boldsymbol{v}\cdot\boldsymbol{n})\boldsymbol{n}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+缺少的另外两个边界补充为
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\rho^{-} & = & \rho^{+}\\
+p^{-} & = & p^{+}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+可压缩Navier-Stokes方程边界
+\end_layout
+
+\begin_layout Standard
+远场边界和Euler方程一致，物面分为等温和绝热两种情况．
+\end_layout
+
+\begin_layout Itemize
+等温壁面
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\rho^{-} & = & \rho^{+}\\
+(\rho\boldsymbol{v})^{-} & = & 0\\
+T^{-} & = & T_{\text{wall}}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+无量纲壁面温度
+\begin_inset Formula $T_{\text{wall}}$
+\end_inset
+
+给定，一般取为
+\begin_inset Formula $T_{\text{wall}}=1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+绝热壁面
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\rho^{-} & = & \rho^{+}\\
+(\rho\boldsymbol{v})^{-} & = & 0\\
+(\rho e)^{-} & = & (\rho e)^{+}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+RANS方程边界
+\end_layout
+
 \begin_layout Section
 人工粘性限制器
 \end_layout
@@ -647,7 +932,7 @@ N-S方程的离散形式
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\boldsymbol{u}_{b}=\boldsymbol{u}_{b}(\boldsymbol{u}_{l})\qquad\text{on}\,\partial\Omega
+\boldsymbol{u}^{-}=\boldsymbol{u}^{-}(\boldsymbol{u}^{+})\qquad\text{on}\,\partial\Omega
 \]
 
 \end_inset
@@ -2160,7 +2445,7 @@ Ref
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename cylinder_viscous_dg1_pressure.png
+	filename /home/lw4992/projects/Joojak/doc/cylinder_viscous_dg1_pressure.png
 	lyxscale 50
 	width 8cm
 
@@ -2168,7 +2453,7 @@ Ref
 
 
 \begin_inset Graphics
-	filename cylinder_viscous_dg3_pressure.png
+	filename /home/lw4992/projects/Joojak/doc/cylinder_viscous_dg3_pressure.png
 	lyxscale 50
 	width 8cm
 
@@ -2640,8 +2925,9 @@ Euler方程计算结果
 \end_layout
 
 \begin_layout Standard
+\align center
 \begin_inset Graphics
-	filename body_inviscous_dg1.png
+	filename /home/lw4992/projects/Joojak/doc/body_inviscous_dg1.png
 	lyxscale 50
 	width 16cm
 
@@ -2874,8 +3160,9 @@ NS方程计算结果
 \end_layout
 
 \begin_layout Standard
+\align center
 \begin_inset Graphics
-	filename body_viscous_dg1.png
+	filename /home/lw4992/projects/Joojak/doc/body_viscous_dg1.png
 	lyxscale 50
 	width 16cm
 
@@ -2887,7 +3174,7 @@ NS方程计算结果
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename residual_dg1_body_e1.png
+	filename /home/lw4992/projects/Joojak/doc/residual_dg1_body_e1.png
 	lyxscale 50
 	width 8cm
 
@@ -3176,7 +3463,7 @@ Ref
 
 \end_layout
 
-\begin_layout Chapter*
+\begin_layout Chapter
 附录
 \end_layout
 
@@ -3252,6 +3539,838 @@ Ref
 \end_inset
 
  Hamilton算子
+\end_layout
+
+\begin_layout Section
+常用坐标系的定义
+\end_layout
+
+\begin_layout Standard
+对于在大气层内飞行的一般飞行器，其飞行高度有限，为了简化所研究的问题，有必要进行一下合理假设：
+\end_layout
+
+\begin_layout Enumerate
+忽略地球曲率，即＂平板地球假设＂
+\end_layout
+
+\begin_layout Enumerate
+认为地面坐标系为惯性坐标系
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Plane.svg.png
+	lyxscale 50
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Euler角（摘自wiki）
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+定义分别为绕
+\begin_inset Formula $Z$
+\end_inset
+
+轴、
+\begin_inset Formula $Y$
+\end_inset
+
+轴、
+\begin_inset Formula $X$
+\end_inset
+
+轴的旋转角度，如果用Tait-Bryan angle表示，分别为偏航角
+\begin_inset Formula $\psi$
+\end_inset
+
+、俯仰角
+\begin_inset Formula $\theta$
+\end_inset
+
+、滚转角
+\begin_inset Formula $\phi$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+地面坐标系（Earth-surface inertial reference frame）
+\begin_inset Formula $\boldsymbol{S}{}_{\text{g}}-O_{\text{g}}x_{\text{g}}y_{\text{g}}z_{\text{g}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+地面坐标系也称为惯性坐标系，定义如下：
+\end_layout
+
+\begin_layout Enumerate
+在地面取一点
+\begin_inset Formula $O_{\text{g}}$
+\end_inset
+
+；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $x_{\text{g}}$
+\end_inset
+
+轴位于地平面指向某一方向；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $z_{\text{g}}$
+\end_inset
+
+轴垂直于地面指向地心；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $y_{\text{g}}$
+\end_inset
+
+轴位于也地平面并垂直与
+\begin_inset Formula $x_{\text{g}}$
+\end_inset
+
+，方向由右手定则给定．
+\end_layout
+
+\begin_layout Standard
+网格坐标
+\begin_inset Formula $(x,y,z)$
+\end_inset
+
+即是在地面坐标系下定义的．
+\end_layout
+
+\begin_layout Subsection
+机体坐标系（aircraft-body coordinate frame）
+\begin_inset Formula $\boldsymbol{S}{}_{\text{b}}-O_{\text{b}}x_{\text{b}}y_{\text{b}}z_{\text{b}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+定义如下：
+\end_layout
+
+\begin_layout Enumerate
+原点
+\begin_inset Formula $O_{\text{b}}$
+\end_inset
+
+位于质心处，坐标系与飞行器固连；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $x_{\text{b}}$
+\end_inset
+
+轴在飞行器的对称面内，平行于飞行器的纵轴并指向机头；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $y_{\text{b}}$
+\end_inset
+
+轴垂直于飞行器对称面，指向机身右方；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $z_{\text{b}}$
+\end_inset
+
+轴在飞行器对称面内，于
+\begin_inset Formula $x_{\text{b}}$
+\end_inset
+
+轴垂直指向机身下方．
+\end_layout
+
+\begin_layout Subsection
+气流坐标系（wind coordinate frame）
+\begin_inset Formula $\boldsymbol{S}{}_{\text{a}}-O_{\text{a}}x_{\text{a}}y_{\text{a}}z_{\text{a}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+定义如下：
+\end_layout
+
+\begin_layout Enumerate
+原点
+\begin_inset Formula $O_{\text{a}}$
+\end_inset
+
+位于质心处，坐标系与飞行器固连；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $x_{\text{a}}$
+\end_inset
+
+与空速
+\begin_inset Formula $\boldsymbol{V}$
+\end_inset
+
+重合；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $z_{\text{a}}$
+\end_inset
+
+轴在飞行器对称面内，与
+\begin_inset Formula $x_{\text{a}}$
+\end_inset
+
+轴垂直指向机身下方；
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $y_{\text{a}}$
+\end_inset
+
+轴垂直于
+\begin_inset Formula $O_{\text{a}}x_{\text{a}}z_{\text{a}}$
+\end_inset
+
+，方向按右手定则给定．
+\end_layout
+
+\begin_layout Section
+飞行器的运动参数
+\end_layout
+
+\begin_layout Subsection
+姿态角
+\end_layout
+
+\begin_layout Subsection
+气流角
+\end_layout
+
+\begin_layout Section
+四元数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename hamilton.jpg
+	width 6cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Hamilton
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Shadowbox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+哈密顿，W.R.(Hamilton，William Rowan) 1805年8月4日生于爱尔兰都柏林；1865年9月2日卒于爱尔兰都柏林
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+四元数的定义
+\end_layout
+
+\begin_layout Standard
+四元数（Quaternions）是由爱尔兰数学家哈密顿(William Rowan Hamilton,1805-1865）在1843年发明的数学概念。四元数的乘
+法不符合交换律（commutative law），故它似乎破坏了科学知识中一个最基本的原则。
+\end_layout
+
+\begin_layout Standard
+明确地说，四元数是复数的不可交换延伸。如把四元数的集合考虑成多维实数空间的话，四元数就代表着一个四维空间，相对于复数为二维空间。 四元数是除环(除法环）的一个例
+子。除了没有乘法的交换律外，除法环与域是相类的。特别地，乘法的结合律仍旧存在、非零元素仍有唯一的逆元素。 四元数形成一个在实数上的四维结合代数（事实上是除法代数
+），并包括复数，但不与复数组成结合代数。四元数（以及实数和复数）都只是有限维的实数结合除法代数。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q=w+\text{i}x+\text{j}y+\text{k}z
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+或
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q=w+\boldsymbol{v}:=[w,\boldsymbol{v}]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+四元数的运算
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+p & = & [t,\boldsymbol{u}]\\
+q & = & [w,\boldsymbol{v}]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+加法
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p+q=[t+w,\boldsymbol{u}+\boldsymbol{v}]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+乘法
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+pq=[t+w,\boldsymbol{u}+\boldsymbol{v}]=tw-\boldsymbol{u}\cdot\boldsymbol{v}+t\boldsymbol{v}+w\boldsymbol{u}+\boldsymbol{u}\times\boldsymbol{v}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+共轭
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q^{*}=[w,-\boldsymbol{v}]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+模
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left|q\right|=\sqrt{q^{*}q}=\sqrt{w^{2}+x^{2}+y^{2}+z^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+逆
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q^{-1}=\frac{q^{*}}{q^{*}q}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+四元数表述坐标旋转
+\end_layout
+
+\begin_layout Subsection
+Euler旋转定理
+\end_layout
+
+\begin_layout Standard
+在三维空间里，假设一个刚体在做一个位移的时候，刚体内部至少有一点固定不动，则此位移等价于一个绕着包含那固定点的固定轴的旋转。
+\end_layout
+
+\begin_layout Standard
+用数学术语，在三维空间内，任何共原点的两个座标系之间的关系，是一个绕着包含原点的固定轴的旋转。
+\end_layout
+
+\begin_layout Subsection
+用方向余弦矩阵表述坐标变换
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Direction_Cosine.svg.png
+	width 6cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+方向余弦
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+方向余弦矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A=(a_{ij})=(\boldsymbol{e}_{i}\cdot\boldsymbol{x}_{j})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+也就是坐标变换矩阵．
+\end_layout
+
+\begin_layout Subsection
+用Euler角表述坐标变换
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Eulerangles.svg.png
+	lyxscale 50
+	width 6cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+方向余弦
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+用单位四元数表述坐标变换
+\end_layout
+
+\begin_layout Standard
+一向量
+\begin_inset Formula $p$
+\end_inset
+
+绕轴
+\begin_inset Formula $\boldsymbol{n}$
+\end_inset
+
+旋转
+\begin_inset Formula $\theta$
+\end_inset
+
+角度后得到的向量为：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p^{\prime}=qpq^{*}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中四元数
+\begin_inset Formula $q$
+\end_inset
+
+如下定义，（望向向量
+\begin_inset Formula $p$
+\end_inset
+
+按逆时针旋转角度为正）
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q=[\cos\frac{\theta}{2},\boldsymbol{n}\sin\frac{\theta}{2}]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename quaternion.jpg
+	lyxscale 50
+	width 6cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+四元数表述绕轴旋转
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+方向余弦矩阵，Euler角和四元数的相互转化
+\end_layout
+
+\begin_layout Standard
+待补充...
+\end_layout
+
+\begin_layout Subsection
+Eigen库对四元数的支持
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Doublebox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status collapsed
+
+\begin_layout Plain Layout
+Eigen's Geometry module provides two different kinds of geometric transformation
+s:
+\end_layout
+
+\begin_layout Itemize
+Abstract transformations, such as rotations (represented by angle and axis
+ or by a quaternion), translations, scalings.
+ These transformations are NOT represented as matrices, but you can nevertheless
+ mix them with matrices and vectors in expressions, and convert them to
+ matrices if you wish.
+ 
+\end_layout
+
+\begin_layout Itemize
+Projective or affine transformation matrices: see the Transform class.
+ These are really matrices.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Box Doublebox
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\emph on
+template<typename Scalar, int Options = AutoAlign> class Eigen::Quaternion<
+ Scalar, Options >
+\end_layout
+
+\begin_layout Plain Layout
+The quaternion class used to represent 3D orientations and rotations.
+\end_layout
+
+\begin_layout Plain Layout
+Compared to other representations like Euler angles or 3x3 matrices, quaternions
+ offer the following advantages:
+\end_layout
+
+\begin_layout Itemize
+compact storage (4 scalars) 
+\end_layout
+
+\begin_layout Itemize
+efficient to compose (28 flops),
+\end_layout
+
+\begin_layout Itemize
+stable spherical interpolation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+四元数的应用
+\end_layout
+
+\begin_layout Subsection
+风轴系到体轴系的转换
+\end_layout
+
+\begin_layout Standard
+经过两次旋转
+\end_layout
+
+\begin_layout Itemize
+绕
+\begin_inset Formula $z_{w}$
+\end_inset
+
+轴逆时针旋转
+\begin_inset Formula $2\pi-\beta$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q_{\beta}=\left[\cos\frac{2\pi-\beta}{2},\sin\frac{2\pi-\beta}{2}\boldsymbol{e_{z}})\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+绕
+\begin_inset Formula $y_{w}$
+\end_inset
+
+轴逆时针旋转
+\begin_inset Formula $\alpha$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q_{\alpha}=\left[\cos\frac{\alpha}{2},\sin\frac{\alpha}{2}\boldsymbol{e_{w}})\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+则
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q_{\alpha\beta}=q_{\alpha}q_{\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+clearpage
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body

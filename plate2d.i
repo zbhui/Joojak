@@ -79,7 +79,7 @@
 # 非线性系统求解
 [Executioner]
   type = Transient
-  solve_type = PJFNK
+  solve_type = NEWTON
   num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
@@ -101,7 +101,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E-02
+		dt = 1E+00
 		ratio = 2
 		step = 2
 		max_dt = 1E+08
@@ -338,7 +338,7 @@
 
   [./wall_material]
 		boundary = 2
-		bc_type = wall
+		bc_type = adiabatic_wall
     type = NSBndMaterial
   [../]
   [./far_field_material]

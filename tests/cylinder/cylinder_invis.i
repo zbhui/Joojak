@@ -3,14 +3,7 @@
  	order = SECOND
  	family = MONOMIAL
   	
-  gamma = 1.4
   mach = 0.38
-  reynolds = 10.0
-  prandtl = 0.72
-  	
-  attack = 0
-  slide = 0
-  	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
@@ -64,12 +57,12 @@
 
   [./velocity_y]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_y
   [../]
 
   [./velocity_z]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_z
   [../]
 []
 

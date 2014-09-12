@@ -177,9 +177,9 @@ void EulerBndMaterial::farField(Real* ur)
 	Real vel, s;
 	Real Rp, Rm;
 
-	uR = 1.0 * cos(_attack) * cos(_slide);
-	vR = 1.0 * sin(_attack) * cos(_slide);
-	wR = 1.0 * sin(_slide);
+	uR = 1.0 * cos(_attack) * cos(_sideslip);
+	vR = 1.0 * sin(_attack) * cos(_sideslip);
+	wR = 1.0 * sin(_sideslip);
 	rhoR = 1.0;
 
 	pR = 1 / _gamma /_mach / _mach;

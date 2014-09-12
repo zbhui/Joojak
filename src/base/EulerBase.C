@@ -8,7 +8,11 @@ InputParameters validParams<EulerBase>()
   params.addRequiredParam<Real>("mach",     "马赫数");
   params.addParam<Real>("gamma", 1.4, "比热比");
   params.addParam<Real>("attack", 0, "攻角");
-  params.addParam<Real>("slide", 0, "侧滑角");
+  params.addParam<Real>("sideslip", 0, "侧滑角");
+  params.addParam<Real>("pitch", 180, "俯仰角");
+  params.addParam<Real>("yaw", 180, "偏航角");
+  params.addParam<Real>("roll", 90, "滚转角");
+
   params.addParam<Real>("ref_length", 1, "参考长度");
   params.addParam<Real>("ref_area", 1, "参考面积");
   params.addParam<Real>("ds", 1.490116119384766e-08, "微扰量");
@@ -21,9 +25,16 @@ EulerBase::EulerBase(const std::string & name, InputParameters parameters)
 	_gamma = (parameters.get<Real>("gamma"));
 
 	_attack = (parameters.get<Real>("attack"));
-	_slide = (parameters.get<Real>("slide"));
-	_attack /= 180.*libMesh::pi;
-	_slide /= 180.*libMesh::pi;
+	_sideslip = (parameters.get<Real>("sideslip"));
+	_pitch = (parameters.get<Real>("pitch"));
+	_yaw = (parameters.get<Real>("yaw"));
+	_roll = (parameters.get<Real>("roll"));
+
+	_attack *= libMesh::pi/180;
+	_sideslip *= libMesh::pi/180;
+	_pitch *= libMesh::pi/180;
+	_yaw *= libMesh::pi/180;
+	_roll *= libMesh::pi/180;
 
 	_ref_length = (parameters.get<Real>("ref_length"));
 	_ref_area = (parameters.get<Real>("ref_area"));
@@ -106,3 +117,98 @@ void EulerBase::inviscousTerm(std::vector<RealVectorValue>& inviscous_term, Real
 	inviscousTerm(&inviscous_term[0], uh);
 }
 
+RealTensorValue EulerBase::bodyToWind()
+{
+	Real ca = cos(_attack);
+	Real cb = cos(_sideslip);
+	Real sa = sin(_attack);
+	Real sb = sin(_sideslip);
+	RealTensorValue trans
+	(
+	ca*cb, sb, sa*cb,
+	-ca*sb, cb, -sa*sb,
+	-sa, 0, ca
+	) ;
+
+	return trans;
+}
+
+RealTensorValue EulerBase::windToBody()
+{
+	Real ca = cos(_attack);
+	Real cb = cos(_sideslip);
+	Real sa = sin(_attack);
+	Real sb = sin(_sideslip);
+	RealTensorValue trans
+	(
+	ca*cb, sb, sa*cb,
+	-ca*sb, cb, -sa*sb,
+	-sa, 0, ca
+	) ;
+
+	return trans.transpose();
+}
+
+RealTensorValue EulerBase::earthTobody()
+{
+	Real ca = cos(_attack);
+	Real cb = cos(_sideslip);
+	Real sa = sin(_attack);
+	Real sb = sin(_sideslip);
+	RealTensorValue trans
+	(
+	ca*cb, sb, sa*cb,
+	-sa*sb, cb, -sa*sb,
+	-sa, 0, ca
+	) ;
+
+	return trans;
+}
+
+RealTensorValue EulerBase::bodyToEarth()
+{
+	Real ca = cos(_attack);
+	Real cb = cos(_sideslip);
+	Real sa = sin(_attack);
+	Real sb = sin(_sideslip);
+	RealTensorValue trans
+	(
+	ca*cb, sb, sa*cb,
+	-sa*sb, cb, -sa*sb,
+	-sa, 0, ca
+	) ;
+
+	return trans;
+}
+
+RealTensorValue EulerBase::earthToWind()
+{
+	Real ca = cos(_attack);
+	Real cb = cos(_sideslip);
+	Real sa = sin(_attack);
+	Real sb = sin(_sideslip);
+	RealTensorValue trans
+	(
+	ca*cb, sb, sa*cb,
+	-ca*sb, cb, -sa*sb,
+	-sa, 0, ca
+	) ;
+
+	return trans;
+}
+
+RealTensorValue EulerBase::windToEarth()
+{
+	Real ca = cos(_attack);
+	Real cb = cos(_sideslip);
+	Real sa = sin(_attack);
+	Real sb = sin(_sideslip);
+	RealTensorValue trans
+	(
+	ca*cb, sb, sa*cb,
+	-ca*sb, cb, -sa*sb,
+	-sa, 0, ca
+	) ;
+
+	return trans.transpose();
+}

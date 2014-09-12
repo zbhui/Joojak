@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = THIRD
+ 	order = SECOND
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -8,8 +8,7 @@
   reynolds = 40.0
   prandtl = 0.72
   	
-  attack = 0
-  slide = 0
+  attack = 45
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -363,7 +362,7 @@
 
   [./wall_material]
 		boundary = wall
-		bc_type = wall
+		bc_type = adiabatic_wall
     type = NSBndMaterial
   [../]
 

@@ -3,14 +3,8 @@
  	order = SECOND
  	family = MONOMIAL
   	
-  gamma = 1.4
   mach = 0.38
-  reynolds = 10.0
-  prandtl = 0.72
-  	
-  attack = 0
-  slide = 0
-  	
+	attack = 90
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
@@ -64,12 +58,12 @@
 
   [./velocity_y]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_y
   [../]
 
   [./velocity_z]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_z
   [../]
 []
 
@@ -92,7 +86,7 @@
   type = Transient
   solve_type = newton
  	#scheme = 'bdf2'
-  num_steps = 1000
+  num_steps = 2
   
     # 线性迭代步的残差下降（相对）量级
  	l_tol = 1e-01

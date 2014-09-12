@@ -49,8 +49,13 @@ protected:
 	void fluxTerm(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
 	void penaltyTerm(RealVectorValue* penalty, RealVectorValue* penalty_neighbor, Real* ul, Real* ur);
 
-	void wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
+	void isothermalWall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
+	void adiabaticWall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 	void farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
+	void farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 	void symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
 	void pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
+
+
+	virtual void viscousTerm(RealVectorValue *viscous_term, Real *uh, RealGradient *duh);
 };
