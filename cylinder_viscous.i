@@ -111,7 +111,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+08
+		dt = 1e+08
 		ratio = 2
 		step = 2
 		max_dt = 1e+08
@@ -153,21 +153,21 @@
 		force_type = total
 		boundary  = wall
 	[../]
-	[./force_form-y]
+	[./force_form-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = form
 		boundary  = wall
 	[../]
-	[./force_friction-y]
+	[./force_friction-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = friction
 		boundary  = wall
 	[../]
-	[./force_total-y]
+	[./force_total-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = total
 		boundary  = wall
 	[../]

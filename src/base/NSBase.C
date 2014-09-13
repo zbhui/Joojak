@@ -101,3 +101,15 @@ void NSBase::stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh)
 	Real mu = physicalViscosity(uh);
 	tau *= mu/_reynolds;
 }
+
+void NSBase::stressTerm(Matrix3d &tau, Real* uh, RealGradient* duh)
+{
+	RealTensorValue tmp;
+	stressTerm(tmp, uh, duh);
+	for (int alpha = 0; alpha < 3; ++alpha) {
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			tau(alpha,beta) = tmp(alpha, beta);
+		}
+	}
+}

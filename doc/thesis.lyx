@@ -630,7 +630,7 @@ Euler方程边界
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\lambda_{1}=\boldsymbol{v}\cdot\boldsymbol{n}-c,\ \lambda_{2,3,4}=\boldsymbol{v}\cdot\boldsymbol{n},\ \lambda_{5}=\boldsymbol{v}\cdot\boldsymbol{n}-c
+\lambda_{1}=\boldsymbol{v}\cdot\boldsymbol{n}-c,\ \lambda_{2,3,4}=\boldsymbol{v}\cdot\boldsymbol{n},\ \lambda_{5}=\boldsymbol{v}\cdot\boldsymbol{n}+c
 \]
 
 \end_inset
@@ -4302,7 +4302,7 @@ stable spherical interpolation
 \end_inset
 
 轴逆时针旋转
-\begin_inset Formula $2\pi-\beta$
+\begin_inset Formula $\pi-\beta$
 \end_inset
 
 
@@ -4311,7 +4311,7 @@ stable spherical interpolation
 \begin_layout Standard
 \begin_inset Formula 
 \[
-q_{\beta}=\left[\cos\frac{2\pi-\beta}{2},\sin\frac{2\pi-\beta}{2}\boldsymbol{e_{z}})\right]
+q_{\beta}=\left[\cos\frac{\pi-\beta}{2},\sin\frac{\pi-\beta}{2}\boldsymbol{e}_{z})\right]
 \]
 
 \end_inset
@@ -4334,7 +4334,7 @@ q_{\beta}=\left[\cos\frac{2\pi-\beta}{2},\sin\frac{2\pi-\beta}{2}\boldsymbol{e_{
 \begin_layout Standard
 \begin_inset Formula 
 \[
-q_{\alpha}=\left[\cos\frac{\alpha}{2},\sin\frac{\alpha}{2}\boldsymbol{e_{w}})\right]
+q_{\alpha}=\left[\cos\frac{\alpha}{2},\sin\frac{\alpha}{2}\boldsymbol{e}_{y})\right]
 \]
 
 \end_inset
@@ -4355,6 +4355,264 @@ q_{\alpha\beta}=q_{\alpha}q_{\beta}
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+体轴系到惯性系的转换
+\end_layout
+
+\begin_layout Standard
+俯仰四元数
+\begin_inset Formula $q_{\theta}$
+\end_inset
+
+（绕
+\begin_inset Formula $y$
+\end_inset
+
+轴），偏航四元数
+\begin_inset Formula $q_{\psi}$
+\end_inset
+
+（绕
+\begin_inset Formula $z$
+\end_inset
+
+轴），滚转四元数
+\begin_inset Formula $q_{\phi}$
+\end_inset
+
+（绕
+\begin_inset Formula $x$
+\end_inset
+
+轴），分别为
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+q_{\theta} & = & \left[\cos\frac{\alpha}{2},\sin\frac{\alpha}{2}\boldsymbol{e}_{y})\right]\\
+q_{\psi} & = & \left[\cos\frac{\psi}{2},\sin\frac{\psi}{2}\boldsymbol{e}_{z})\right]\\
+q_{\phi} & = & \left[\cos\frac{\phi}{2},\sin\frac{\phi}{2}\boldsymbol{e}_{x})\right]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+旋转方式按（3,2,1）形式，即偏航-俯仰－滚转形式，得合成的四元数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q_{\theta\psi\phi}=q_{\phi}q_{\theta}q_{\psi}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+初始时刻的三个Euler角和数模坐标系（惯性坐标系）有关，需要观察数模才能确定．
+\end_layout
+
+\begin_layout Standard
+二维时：
+\begin_inset Formula $\theta=0^{\circ},\psi=180^{\circ},\phi=-90^{\circ}$
+\end_inset
+
+．
+\end_layout
+
+\begin_layout Standard
+三维时惯性系和体轴系一般重合，
+\begin_inset Formula $\theta=0^{\circ},\psi=0^{\circ},\phi=-0^{\circ}$
+\end_inset
+
+．
+\end_layout
+
+\begin_layout Subsection
+风轴系到惯性系的转换
+\end_layout
+
+\begin_layout Standard
+先从风轴系转到体轴系，再从体轴系转到惯性系．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+q_{\text{gw}}=q_{\theta\psi\phi}q_{\alpha\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+均匀初场的设定
+\end_layout
+
+\begin_layout Standard
+外流模拟时，给定初始流场由风轴系到惯性系转换而来．初始风速
+\begin_inset Formula $\boldsymbol{v}_{\text{w}}=(1,0,0)^{\textrm{T}}$
+\end_inset
+
+，转换到惯性系下
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{v}_{\text{g}}=q_{\theta\psi\phi}q_{\alpha\beta}\boldsymbol{v}_{\text{w}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+远场边界条件的设定
+\end_layout
+
+\begin_layout Standard
+在设置远场边界时，也需要惯性下的远场风速．风轴系下的远场风速
+\begin_inset Formula $\boldsymbol{v}_{\text{w}}=(1,0,0)^{\textrm{T}}$
+\end_inset
+
+，转换到惯性系下
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{v}_{\text{g}}=q_{\theta\psi\phi}q_{\alpha\beta}\boldsymbol{v}_{\text{w}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+气动系数的计算
+\end_layout
+
+\begin_layout Standard
+物面气动力由下式计算
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{F}_{\text{g}}=\int_{\text{wall}}(-p\boldsymbol{I}+\tau)\boldsymbol{n}_{\text{wall}}\text{d}s
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\boldsymbol{n}_{\text{wall}}$
+\end_inset
+
+为屋面的法向量，指向流体，与网格的法向量方向相反．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\boldsymbol{F}_{\text{g}}$
+\end_inset
+
+是惯性系下力矢量，气动系数是定义在风轴系下的，需要把
+\begin_inset Formula $\boldsymbol{F}_{\text{g}}$
+\end_inset
+
+转化成
+\begin_inset Formula $\boldsymbol{F}_{\text{w}}$
+\end_inset
+
+．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{F}_{\text{w}}=\left(q_{\theta\psi\phi}q_{\alpha\beta}\right)^{-1}\boldsymbol{F}_{\text{g}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+阻力系数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+C_{d}=\frac{F_{\text{w}}^{x}}{1/2\rho_{\infty}\left|\boldsymbol{v}_{\text{w}}\right|^{2}S_{\text{ref}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+升力系数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+C_{l}=\frac{F_{\text{w}}^{z}}{1/2\rho_{\infty}\left|\boldsymbol{v}_{\text{w}}\right|^{2}S_{\text{ref}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+侧向力系数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+C_{y}=\frac{F_{\text{w}}^{y}}{1/2\rho_{\infty}\left|\boldsymbol{v}_{\text{w}}\right|^{2}S_{\text{ref}}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中
+\begin_inset Formula $S_{\text{ref}}$
+\end_inset
+
+为参考面积．
+\end_layout
+
+\begin_layout Subsection
+气动力/力距与六自由度方程
+\end_layout
+
+\begin_layout Standard
+待补充...
 \end_layout
 
 \begin_layout Standard

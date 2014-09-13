@@ -177,9 +177,13 @@ void EulerBndMaterial::farField(Real* ur)
 	Real vel, s;
 	Real Rp, Rm;
 
-	uR = 1.0 * cos(_attack) * cos(_sideslip);
-	vR = 1.0 * sin(_attack) * cos(_sideslip);
-	wR = 1.0 * sin(_sideslip);
+	Vector3d velocity = earthFromWind()*Vector3d::UnitX();
+	uR = velocity(0);
+	vR = velocity(1);
+	wR = velocity(2);
+//	uR = 1.0 * cos(_attack) * cos(_sideslip);
+//	vR = 1.0 * sin(_attack) * cos(_sideslip);
+//	wR = 1.0 * sin(_sideslip);
 	rhoR = 1.0;
 
 	pR = 1 / _gamma /_mach / _mach;

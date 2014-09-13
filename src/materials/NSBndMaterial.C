@@ -120,7 +120,8 @@ void NSBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, R
 	}
 	if(_bc_type == "far_field")
 	{
-		farFieldRiemann(ur, dur, ul, dul);
+//		farFieldRiemann(ur, dur, ul, dul);
+		farField(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "symmetric")
@@ -204,33 +205,40 @@ void NSBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 
 	const Point &normal = _normals[_qp];
 
-	Real rhoR, uR, vR, wR, pR;
-	Real rhoL, uL, vL, wL, pL;
-	Real cR, cL, cb;
-	Real vnR, vnL, vnb;
-	Real vel, s;
-	Real Rp, Rm;
+	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+	if(_current_elem->dim() == 2)
+		vel_inf(2) = 0.;
 
-	uR = 1.0 * cos(_attack) * cos(_sideslip);
-	vR = 1.0 * sin(_attack) * cos(_sideslip);
-	wR = 1.0 * sin(_sideslip);
-	rhoR = 1.0;
+	Real rho_inf = 1.;
+	Real p_inf = 1/_gamma/_mach/_mach;
+	Real pl = pressure(ul);
+	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
+	Real vel = vel_left.norm();
+	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
+	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
 
-	pR = 1 / _gamma /_mach / _mach;
-	cR = sqrt(fabs(_gamma * pR / rhoR));
-	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
-
-	rhoL = ul[0];
-	uL = ul[1] / rhoL;
-	vL = ul[2] / rhoL;
-	wL = ul[3] / rhoL;
-	vel = sqrt(uL * uL + vL * vL + wL * wL);
-	pL = pressure(ul);
-	cL = sqrt(fabs(_gamma * pL / rhoL));
-	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
-
-	if (vel >= cL) {	//超声速
-		if (vnL >= 0.0) //exit
+	if(vn < 0)  // 入口
+	{
+		if (vel > cl) //超音速
+		{
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+		}
+		else	//亚音速
+		{
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+		}
+	}
+	else  //出口
+	{
+		if (vel > cl) //超音速
 		{
 			ur[0] = ul[0];
 			ur[1] = ul[1];
@@ -238,44 +246,13 @@ void NSBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 			ur[3] = ul[3];
 			ur[4] = ul[4];
 		}
-		else //inlet
+		else	//亚音速
 		{
-			ur[0] = rhoR;
-			ur[1] = rhoR * uR;
-			ur[2] = rhoR * vR;
-			ur[3] = rhoR * wR;
-			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
-		}
-	}
-	else
-	{ 	//  亚声速
-		if (vnL >= 0.0)
-		{			//exit
-			s = pL / pow(rhoL, _gamma);
-			Rp = vnL + 2 * cL / (_gamma - 1);
-			Rm = vnR - 2 * cR / (_gamma - 1);
-			vnb = (Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
-			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
-			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-		}
-		else
-		{
-			s = pR / pow(rhoR, _gamma);
-			Rp = -vnR + 2.0 * cR / (_gamma - 1);
-			Rm = -vnL - 2.0 * cL / (_gamma - 1);
-			vnb = -(Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
-			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
-			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
 		}
 	}
 }
@@ -294,9 +271,16 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 	Real vel, s;
 	Real Rp, Rm;
 
-	uR = 1.0 * cos(_attack) * cos(_sideslip);
-	vR = 1.0 * sin(_attack) * cos(_sideslip);
-	wR = 1.0 * sin(_sideslip);
+	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+	if(_current_elem->dim() == 2)
+		vel_inf(2) = 0.;
+	uR = vel_inf(0);
+	vR = vel_inf(1);
+	wR = vel_inf(2);
+
+	Real lam[3];
+	eigenValue(lam, ul, normal);
+
 	rhoR = 1.0;
 
 	pR = 1 / _gamma /_mach / _mach;
@@ -312,16 +296,9 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 	cL = sqrt(fabs(_gamma * pL / rhoL));
 	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
 
-	if (vel >= cL) {	//超声速
-		if (vnL >= 0.0) //exit
-		{
-			ur[0] = ul[0];
-			ur[1] = ul[1];
-			ur[2] = ul[2];
-			ur[3] = ul[3];
-			ur[4] = ul[4];
-		}
-		else //inlet
+	if(lam[1] < 0)  // 入口
+	{
+		if (vel > cL) //超音速
 		{
 			ur[0] = rhoR;
 			ur[1] = rhoR * uR;
@@ -329,24 +306,7 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[3] = rhoR * wR;
 			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
 		}
-	}
-	else
-	{ 	//  亚声速
-		if (vnL >= 0.0)
-		{			//exit
-			s = pL / pow(rhoL, _gamma);
-			Rp = vnL + 2 * cL / (_gamma - 1);
-			Rm = vnR - 2 * cR / (_gamma - 1);
-			vnb = (Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
-			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
-			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-		}
-		else
+		else	//亚音速
 		{
 			s = pR / pow(rhoR, _gamma);
 			Rp = -vnR + 2.0 * cR / (_gamma - 1);
@@ -358,6 +318,31 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
 			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
 			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
+			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+		}
+	}
+	else  //出口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = ul[4];
+		}
+		else	//亚音速
+		{
+			s = pL / pow(rhoL, _gamma);
+			Rp = vnL + 2 * cL / (_gamma - 1);
+			Rm = vnR - 2 * cR / (_gamma - 1);
+			vnb = (Rp + Rm) / 2.0;
+			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+
+			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
+			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
+			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
 			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
 		}
 	}
@@ -386,16 +371,13 @@ void NSBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradi
 	for (int eq = 0; eq < _n_equations; ++eq)
 		dur[eq] = dul[eq];
 
-	const Point &normal = _normals[_qp];
-	RealVectorValue momentum(ul[1], ul[2], ul[3]);
-    Real vn = momentum*normal;
-    Real pre = 1 / _gamma /_mach / _mach;
-
-    ur[0] = ul[0];
-    ur[1] = ul[1];
-    ur[2] = ul[2];
-    ur[3] = ul[3];
-    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
+	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
+	Real p_inf = 1/_gamma/_mach/_mach;
+	ur[0] = ul[0];
+	ur[1] = ul[1];
+	ur[2] = ul[2];
+	ur[3] = ul[3];
+	ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
 }
 
 void NSBndMaterial::resizeQpProperty()

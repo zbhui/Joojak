@@ -7,11 +7,11 @@ InputParameters validParams<EulerBase>()
   InputParameters params = validParams<MooseObject>();
   params.addRequiredParam<Real>("mach",     "马赫数");
   params.addParam<Real>("gamma", 1.4, "比热比");
-  params.addParam<Real>("attack", 0, "攻角");
-  params.addParam<Real>("sideslip", 0, "侧滑角");
-  params.addParam<Real>("pitch", 180, "俯仰角");
-  params.addParam<Real>("yaw", 180, "偏航角");
-  params.addParam<Real>("roll", 90, "滚转角");
+  params.addParam<Real>("attack", 0., "攻角");
+  params.addParam<Real>("sideslip", 0., "侧滑角");
+  params.addParam<Real>("pitch", 0., "俯仰角");
+  params.addParam<Real>("yaw", 180., "偏航角");
+  params.addParam<Real>("roll", -90., "滚转角");
 
   params.addParam<Real>("ref_length", 1, "参考长度");
   params.addParam<Real>("ref_area", 1, "参考面积");
@@ -73,6 +73,15 @@ Real EulerBase::maxEigenValue(Real *uh, const Point &normal)
 	return std::fabs(vel*normal)+c;
 }
 
+void EulerBase::eigenValue(Real *lam, Real *uh, const Point &normal)
+{
+	RealVectorValue vel(uh[1]/uh[0], uh[2]/uh[0], uh[3]/uh[0]);
+	Real c = std::sqrt(_gamma*pressure(uh)/uh[0]);
+	lam[0] = vel*normal-c;
+	lam[1] = vel*normal;
+	lam[2] = vel*normal+c;
+}
+
 void EulerBase::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 {
 	Real rho, p, h;
@@ -117,98 +126,22 @@ void EulerBase::inviscousTerm(std::vector<RealVectorValue>& inviscous_term, Real
 	inviscousTerm(&inviscous_term[0], uh);
 }
 
-RealTensorValue EulerBase::bodyToWind()
+Quaterniond EulerBase::bodyFromWind()
 {
-	Real ca = cos(_attack);
-	Real cb = cos(_sideslip);
-	Real sa = sin(_attack);
-	Real sb = sin(_sideslip);
-	RealTensorValue trans
-	(
-	ca*cb, sb, sa*cb,
-	-ca*sb, cb, -sa*sb,
-	-sa, 0, ca
-	) ;
-
-	return trans;
+	Quaterniond q_attack(AngleAxisd(_attack, Vector3d::UnitY()));
+	Quaterniond q_sideslip (AngleAxisd(pi-_sideslip,  Vector3d::UnitZ()));
+	return q_attack*q_sideslip;
 }
 
-RealTensorValue EulerBase::windToBody()
+Quaterniond EulerBase::earthFromBody()
 {
-	Real ca = cos(_attack);
-	Real cb = cos(_sideslip);
-	Real sa = sin(_attack);
-	Real sb = sin(_sideslip);
-	RealTensorValue trans
-	(
-	ca*cb, sb, sa*cb,
-	-ca*sb, cb, -sa*sb,
-	-sa, 0, ca
-	) ;
-
-	return trans.transpose();
+	Quaterniond q_pitch(AngleAxisd(_pitch, Vector3d::UnitY()));
+	Quaterniond q_yaw(AngleAxisd(_yaw, Vector3d::UnitZ()));
+	Quaterniond q_roll(AngleAxisd(_roll, Vector3d::UnitX()));
+	return q_roll*q_pitch*q_yaw;
 }
 
-RealTensorValue EulerBase::earthTobody()
+Quaterniond EulerBase::earthFromWind()
 {
-	Real ca = cos(_attack);
-	Real cb = cos(_sideslip);
-	Real sa = sin(_attack);
-	Real sb = sin(_sideslip);
-	RealTensorValue trans
-	(
-	ca*cb, sb, sa*cb,
-	-sa*sb, cb, -sa*sb,
-	-sa, 0, ca
-	) ;
-
-	return trans;
-}
-
-RealTensorValue EulerBase::bodyToEarth()
-{
-	Real ca = cos(_attack);
-	Real cb = cos(_sideslip);
-	Real sa = sin(_attack);
-	Real sb = sin(_sideslip);
-	RealTensorValue trans
-	(
-	ca*cb, sb, sa*cb,
-	-sa*sb, cb, -sa*sb,
-	-sa, 0, ca
-	) ;
-
-	return trans;
-}
-
-RealTensorValue EulerBase::earthToWind()
-{
-	Real ca = cos(_attack);
-	Real cb = cos(_sideslip);
-	Real sa = sin(_attack);
-	Real sb = sin(_sideslip);
-	RealTensorValue trans
-	(
-	ca*cb, sb, sa*cb,
-	-ca*sb, cb, -sa*sb,
-	-sa, 0, ca
-	) ;
-
-	return trans;
-}
-
-RealTensorValue EulerBase::windToEarth()
-{
-	Real ca = cos(_attack);
-	Real cb = cos(_sideslip);
-	Real sa = sin(_attack);
-	Real sb = sin(_sideslip);
-	RealTensorValue trans
-	(
-	ca*cb, sb, sa*cb,
-	-ca*sb, cb, -sa*sb,
-	-sa, 0, ca
-	) ;
-
-	return trans.transpose();
+	return earthFromBody()*bodyFromWind();
 }

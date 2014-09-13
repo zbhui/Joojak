@@ -4,6 +4,8 @@
 #include "MooseVariableBase.h"
 #include "MooseObject.h"
 #include "Eigen/Dense"
+#include "Eigen/Geometry"
+using namespace Eigen;
 typedef Eigen::Matrix<Real, 5, 5> Matrix5x5;
 
 class EulerBase;
@@ -27,15 +29,12 @@ protected:
   Real mach_local(Real *uh);
   Real acous(Real *uh);
   Real maxEigenValue(Real *uh, const Point &normal);
-
+  void eigenValue(Real *lam, Real *uh, const Point &normal);
   virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
   virtual void inviscousTerm(std::vector<RealVectorValue> &inviscous_term, Real *uh);
-  virtual RealTensorValue bodyToWind();
-  virtual RealTensorValue windToBody();
-  virtual RealTensorValue earthTobody();
-  virtual RealTensorValue bodyToEarth();
-  virtual RealTensorValue earthToWind();
-  virtual RealTensorValue windToEarth();
+  virtual Quaterniond bodyFromWind();
+  virtual Quaterniond earthFromBody();
+  virtual Quaterniond earthFromWind();
 protected:
 
   Real _gamma;

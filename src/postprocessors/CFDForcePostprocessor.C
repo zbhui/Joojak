@@ -42,14 +42,23 @@ Real CFDForcePostprocessor::computeQpIntegral()
 	computeQpValue(uh, duh);
 
 	Real pre = pressure(uh);
-	RealVectorValue form_force, friciton_force, total_force;
-	RealTensorValue tau;
-	Point normal = -_normals[_qp]; // 物面的外法向量和网格外向量相反
+	Matrix3d tau;
+//	Point normal = -_normals[_qp]; // 物面的外法向量和网格外向量相反
 
+	Vector3d normal;
 	stressTerm(tau, uh, duh);
+	for (int alpha = 0; alpha < 3; ++alpha)
+		normal(alpha) = -_normals[_qp](alpha);
+
+	Vector3d form_force, friciton_force, total_force;
 	form_force = -pre*normal/(0.5*_ref_area);
 	friciton_force = tau*normal/(0.5*_ref_area);
 	total_force = form_force + friciton_force;
+
+	Quaterniond q = earthFromWind().inverse();
+	form_force = q*form_force;
+	friciton_force = q*friciton_force;
+	total_force = q*total_force;
 
 	switch (_force_type)
 	{

@@ -15,8 +15,8 @@
   file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
   dim = 2
 
-  boundary_id = '2'
-  boundary_name = 'wall'
+  boundary_id = '1 2 3 4 5' 
+  boundary_name = 'symmetric wall right top left'
 
   block_id = '0'
   block_name = 'fluid'
@@ -72,7 +72,7 @@
 		full = true
 
     petsc_options_iname = 'ksp_type -pc_type '
-  	petsc_options_value = 'bcgs bjacobi'
+  	petsc_options_value = 'gmres lu'
 	[../]
 
 []
@@ -101,7 +101,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+00
+		dt = 1E+01
 		ratio = 2
 		step = 2
 		max_dt = 1E+08
@@ -338,7 +338,7 @@
 
   [./wall_material]
 		boundary = 2
-		bc_type = adiabatic_wall
+		bc_type = isothermal_wall
     type = NSBndMaterial
   [../]
   [./far_field_material]
