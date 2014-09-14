@@ -18,7 +18,7 @@ InputParameters validParams<NSBndMaterial>()
   params += validParams<NSBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
-  MooseEnum bc_types("wall, far_field, symmetric, pressure_out, none", "none");  // 边界条件的类型，可以增加
+  MooseEnum bc_types("isothermal_wall, adiabatic_wall, far_field, symmetric, pressure_out, none", "none");  // 边界条件的类型，可以增加
   params.addRequiredParam<MooseEnum>("bc_type", bc_types, "边界条件");
 
   return params;
@@ -108,13 +108,19 @@ void NSBndMaterial::computeQpLeftValue(Real* ul, RealGradient *dul)
 
 void NSBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
-	if(_bc_type == "wall")
+	if(_bc_type == "isothermal_wall")
 	{
-		wall(ur, dur, ul, dul);
+		isothermalWall(ur, dur, ul, dul);
+		return;
+	}
+	if(_bc_type == "adiabatic_wall")
+	{
+		adiabaticWall(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "far_field")
 	{
+//		farFieldRiemann(ur, dur, ul, dul);
 		farField(ur, dur, ul, dul);
 		return;
 	}
@@ -151,7 +157,7 @@ void NSBndMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, 
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
-		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
+		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfl[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
 	}
 }
 
@@ -162,26 +168,93 @@ void NSBndMaterial::penaltyTerm(RealVectorValue* penalty, RealVectorValue* penal
 		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
 
 	viscousTerm(penalty, ul, duh);
-	viscousTerm(penalty_neighbor, ur, duh);
+	viscousTerm(penalty_neighbor, ul, duh);
 }
 
-void NSBndMaterial::wall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
+void NSBndMaterial::isothermalWall(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
+{
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
+
+    Real twall = 1.;
+    Real pre = pressure(ul);
+
+    ur[0] = ul[0];
+    ur[1] = 0.;
+    ur[2] = 0.;
+    ur[3] = 0.;
+    ur[4] = ul[0]*twall/_gamma/(_gamma-1)/_mach/_mach;
+}
+
+void NSBndMaterial::adiabaticWall(Real* ur, RealGradient* dur, Real* ul, RealGradient* dul)
+{
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
+
+    ur[0] = ul[0];
+    ur[1] = 0.;
+    ur[2] = 0.;
+    ur[3] = 0.;
+    ur[4] = ul[4];
+}
+
+void NSBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 {
 	for (int eq = 0; eq < _n_equations; ++eq)
 		dur[eq] = dul[eq];
 
 	const Point &normal = _normals[_qp];
-	RealVectorValue momentum(ul[1], ul[2], ul[3]);
-    Real vn = momentum*normal;
-    Real pre = pressure(ul);
-    Real twall = 1.;
 
-    ur[0] = _gamma*_mach*_mach*pre/twall;
-//    ur[0] = ul[0];
-    ur[1] = 0.;
-    ur[2] = 0.;
-    ur[3] = 0.;
-    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
+	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+	if(_current_elem->dim() == 2)
+		vel_inf(2) = 0.;
+
+	Real rho_inf = 1.;
+	Real p_inf = 1/_gamma/_mach/_mach;
+	Real pl = pressure(ul);
+	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
+	Real vel = vel_left.norm();
+	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
+	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
+
+	if(vn < 0)  // 入口
+	{
+		if (vel > cl) //超音速
+		{
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+		}
+		else	//亚音速
+		{
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+		}
+	}
+	else  //出口
+	{
+		if (vel > cl) //超音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = ul[4];
+		}
+		else	//亚音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
+		}
+	}
 }
 
 void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
@@ -198,9 +271,16 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 	Real vel, s;
 	Real Rp, Rm;
 
-	uR = 1.0 * cos(_attack) * cos(_slide);
-	vR = 1.0 * sin(_attack) * cos(_slide);
-	wR = 1.0 * sin(_slide);
+	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+	if(_current_elem->dim() == 2)
+		vel_inf(2) = 0.;
+	uR = vel_inf(0);
+	vR = vel_inf(1);
+	wR = vel_inf(2);
+
+	Real lam[3];
+	eigenValue(lam, ul, normal);
+
 	rhoR = 1.0;
 
 	pR = 1 / _gamma /_mach / _mach;
@@ -216,16 +296,9 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 	cL = sqrt(fabs(_gamma * pL / rhoL));
 	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
 
-	if (vel >= cL) {	//超声速
-		if (vnL >= 0.0) //exit
-		{
-			ur[0] = ul[0];
-			ur[1] = ul[1];
-			ur[2] = ul[2];
-			ur[3] = ul[3];
-			ur[4] = ul[4];
-		}
-		else //inlet
+	if(lam[1] < 0)  // 入口
+	{
+		if (vel > cL) //超音速
 		{
 			ur[0] = rhoR;
 			ur[1] = rhoR * uR;
@@ -233,24 +306,7 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[3] = rhoR * wR;
 			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
 		}
-	}
-	else
-	{ 	//  亚声速
-		if (vnL >= 0.0)
-		{			//exit
-			s = pL / pow(rhoL, _gamma);
-			Rp = vnL + 2 * cL / (_gamma - 1);
-			Rm = vnR - 2 * cR / (_gamma - 1);
-			vnb = (Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
-			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
-			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-		}
-		else
+		else	//亚音速
 		{
 			s = pR / pow(rhoR, _gamma);
 			Rp = -vnR + 2.0 * cR / (_gamma - 1);
@@ -262,6 +318,31 @@ void NSBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
 			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
 			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
+			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+		}
+	}
+	else  //出口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = ul[4];
+		}
+		else	//亚音速
+		{
+			s = pL / pow(rhoL, _gamma);
+			Rp = vnL + 2 * cL / (_gamma - 1);
+			Rm = vnR - 2 * cR / (_gamma - 1);
+			vnb = (Rp + Rm) / 2.0;
+			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+
+			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
+			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
+			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
 			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
 		}
 	}
@@ -290,16 +371,13 @@ void NSBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradi
 	for (int eq = 0; eq < _n_equations; ++eq)
 		dur[eq] = dul[eq];
 
-	const Point &normal = _normals[_qp];
-	RealVectorValue momentum(ul[1], ul[2], ul[3]);
-    Real vn = momentum*normal;
-    Real pre = 1 / _gamma /_mach / _mach;
-
-    ur[0] = ul[0];
-    ur[1] = ul[1];
-    ur[2] = ul[2];
-    ur[3] = ul[3];
-    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
+	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
+	Real p_inf = 1/_gamma/_mach/_mach;
+	ur[0] = ul[0];
+	ur[1] = ul[1];
+	ur[2] = ul[2];
+	ur[3] = ul[3];
+	ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
 }
 
 void NSBndMaterial::resizeQpProperty()
@@ -317,5 +395,65 @@ void NSBndMaterial::resizeQpProperty()
 		_flux_jacobi_grad_variable[_qp][p].resize(_n_equations);
 		_penalty_jacobi_variable_ee[_qp][p].resize(_n_equations);
 		_penalty_jacobi_variable_ne[_qp][p].resize(_n_equations);
+	}
+}
+
+
+
+void NSBndMaterial::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* duh)
+{
+	if(_bc_type == "adiabatic_wall")
+	{
+	Real rho = uh[0];
+	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
+	RealGradient grad_rho(duh[0]);
+	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
+	RealTensor temp;
+	for (int alpha = 0; alpha < 3; ++alpha) {
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			temp(alpha,beta) = velocity(alpha)*grad_rho(beta);
+		}
+	}
+	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
+	RealTensor tau = velocity_tensor + velocity_tensor.transpose();
+	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
+	Real lamdiv = 2./3. * div;
+	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
+	Real mu = physicalViscosity(uh);
+	tau *= mu/_reynolds;
+
+	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
+	grad_enthalpy *= (mu/_reynolds)*(_gamma/_prandtl);
+
+	int component = 0;
+	viscous_term[component](0) = 0.;
+	viscous_term[component](1) = 0.;
+	viscous_term[component](2) = 0.;
+
+	component = 1;
+	viscous_term[component](0) = tau(0, 0);
+	viscous_term[component](1) = tau(0, 1);
+	viscous_term[component](2) = tau(0, 2);
+
+	component = 2;
+	viscous_term[component](0) = tau(1, 0);
+	viscous_term[component](1) = tau(1, 1);
+	viscous_term[component](2) = tau(1, 2);
+
+	component = 3;
+	viscous_term[component](0) = tau(2, 0);
+	viscous_term[component](1) = tau(2, 1);
+	viscous_term[component](2) = tau(2, 2);
+
+	component = 4;
+	RealVectorValue vel_tau = tau * velocity;// + grad_enthalpy;
+	viscous_term[component](0) = vel_tau(0);
+	viscous_term[component](1) = vel_tau(1);
+	viscous_term[component](2) = vel_tau(2);
+	}
+	else
+	{
+		NSBase::viscousTerm(viscous_term, uh, duh);
 	}
 }

@@ -1,11 +1,15 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
   mach = 0.5
   reynolds = 5000
-	attack = 1.0
+	attack = 45.0
+	sideslip = 0
+	pitch = 0
+	yaw = 180
+	roll = 0
 	ref_area = 0.05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
@@ -324,7 +328,7 @@
 
   [./wall_material]
 		boundary = wall
-		bc_type = wall
+		bc_type = isothermal_wall
     type = NSBndMaterial
   [../]
   [./far_field_material]

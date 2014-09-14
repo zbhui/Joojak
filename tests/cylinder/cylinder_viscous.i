@@ -3,13 +3,8 @@
  	order = FIRST
  	family = MONOMIAL
   	
-  gamma = 1.4
   mach = 0.2
   reynolds = 40.0
-  prandtl = 0.72
-  	
-  attack = 0
-  slide = 0
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -319,7 +314,7 @@
 
   [./wall_material]
 		boundary = wall
-		bc_type = wall
+		bc_type = adiabatic_wall
     type = NSBndMaterial
   [../]
 

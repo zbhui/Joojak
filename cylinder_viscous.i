@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = THIRD
+ 	order = SECOND
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -8,8 +8,7 @@
   reynolds = 40.0
   prandtl = 0.72
   	
-  attack = 0
-  slide = 0
+  attack = 45
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -112,7 +111,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+08
+		dt = 1e+08
 		ratio = 2
 		step = 2
 		max_dt = 1e+08
@@ -154,21 +153,21 @@
 		force_type = total
 		boundary  = wall
 	[../]
-	[./force_form-y]
+	[./force_form-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = form
 		boundary  = wall
 	[../]
-	[./force_friction-y]
+	[./force_friction-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = friction
 		boundary  = wall
 	[../]
-	[./force_total-y]
+	[./force_total-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = total
 		boundary  = wall
 	[../]
@@ -363,7 +362,7 @@
 
   [./wall_material]
 		boundary = wall
-		bc_type = wall
+		bc_type = adiabatic_wall
     type = NSBndMaterial
   [../]
 
