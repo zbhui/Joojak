@@ -132,8 +132,511 @@ Euler/N-S方程
 RANS方程
 \end_layout
 
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho}{\partial t}+\frac{\partial(\rho u_{_{\beta}})}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial(\rho u_{\alpha})}{\partial t}+\frac{\partial(\rho u_{\beta}u_{\alpha}+(p+\frac{2}{3}\rho k)\delta_{\alpha\beta})}{\partial x_{\beta}}-\frac{\partial\overline{\tau}_{\alpha\beta}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho e}{\partial t}+\frac{\partial((\rho h+\frac{2}{3}\rho k)u_{\beta})}{\partial x_{\beta}}-\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}=-\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}+\beta_{k}\rho ke^{\tilde{\omega}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho k}{\partial t}+\frac{\partial(\rho u_{\beta}k)}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{k}\rho ke^{\tilde{\omega}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\omega}}{\partial t}+\frac{\partial(\rho u_{\beta}\tilde{\omega})}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{\omega}\mu_{t})\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\right]=\frac{\alpha_{\omega}}{k}\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{\omega}\rho e^{\tilde{\omega}}+\left(\mu+\sigma_{\omega}\mu_{t}\right)\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\frac{\partial\tilde{\omega}}{\partial x_{\beta}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流粘性
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{t}=\rho ke^{-\tilde{\omega}}
+\]
+
+\end_inset
+
+ 应力张量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reynolds应力张量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\sigma_{\alpha\beta}=\mu_{t}(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})-\frac{2}{3}\rho k\delta_{\alpha\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+热流
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{q}_{\beta}=-(\frac{\mu\gamma}{Pr}+\frac{\mu_{t}\gamma}{Pr_{t}})\partial_{\beta}(e-\frac{1}{2}u_{k}^{2})
+\]
+
+\end_inset
+
+ 湍流Prandtl数
+\begin_inset Formula $Pr_{t}=0.9$
+\end_inset
+
+，分子Prandlt数
+\begin_inset Formula $Pr=0.72$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+模型系数
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\alpha_{\omega}=\frac{5}{9},\:\beta_{k}=\frac{9}{100},\:\beta_{\omega}=\frac{3}{40},\:\sigma_{k}=\sigma_{\omega}=\frac{1}{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+壁面边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\text{\omega}_{w}=\frac{60\mu}{\rho\beta_{\omega}(\Delta y_{1})^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{w}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+远场边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}V_{\infty}^{2},\;(\text{default: \text{Tu}_{\infty}=0.005})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\omega_{\infty}=\frac{\rho_{\infty}k_{\infty}}{r_{\mu}\mu_{\infty}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+r_{\mu}=10^{-5}
+\]
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 无量纲化
+\end_layout
+
+\begin_layout Standard
+无量纲参考量选择
+\begin_inset Formula $L,\rho_{\infty},V_{\infty},\mu_{\infty}$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+则
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+t\sim\frac{L}{V_{\infty}},p\sim\rho_{\infty}V_{\infty}^{2},e\sim V_{\infty}^{2},k\sim V_{\infty}^{2},\omega\sim\frac{V_{\infty}}{L}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reynolds数
+\begin_inset Formula $Re=\frac{\rho V_{\infty}L}{\mu_{\infty}}$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $k-\omega$
+\end_inset
+
+模型的无量纲形式为
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho}{\partial t}+\frac{\partial(\rho u_{_{\beta}})}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial(\rho u_{\alpha})}{\partial t}+\frac{\partial(\rho u_{\beta}u_{\alpha}+(p+\frac{2}{3}\rho k)\delta_{\alpha\beta})}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial\overline{\tau}_{\alpha\beta}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho e}{\partial t}+\frac{\partial((\rho h+\frac{2}{3}\rho k)u_{\beta})}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}=-\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}+\beta_{k}\rho ke^{\tilde{\omega}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho k}{\partial t}+\frac{\partial(\rho u_{\beta}k)}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{k}\rho ke^{\tilde{\omega}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\omega}}{\partial t}+\frac{\partial(\rho u_{\beta}\tilde{\omega})}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{\omega}\mu_{t})\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\right]=\frac{\alpha_{\omega}}{k}\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{\omega}\rho e^{\tilde{\omega}}+\frac{1}{Re}\left(\mu+\sigma_{\omega}\mu_{t}\right)\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\frac{\partial\tilde{\omega}}{\partial x_{\beta}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流粘性
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{t}=Re\rho ke^{-\tilde{\omega}}
+\]
+
+\end_inset
+
+ 应力张量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reynolds应力张量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\sigma_{\alpha\beta}=\frac{1}{Re}\mu_{t}(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})-\frac{2}{3}\rho k\delta_{\alpha\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+热流
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{q}_{\beta}=-(\frac{\mu\gamma}{Pr}+\frac{\mu_{t}\gamma}{Pr_{t}})\partial_{\beta}(e-\frac{1}{2}u_{k}^{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+壁面边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{\omega}_{w}=\ln\left(\frac{60\mu}{Re\rho\beta_{\omega}(\Delta y_{1})^{2}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{w}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+远场边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\omega_{\infty}=\frac{Re\rho_{\infty}k_{\infty}}{r_{\mu}\mu_{\infty}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流Prandtl数
+\begin_inset Formula $Pr_{t}=0.9$
+\end_inset
+
+，分子Prandlt数
+\begin_inset Formula $Pr=0.72$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+模型系数
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\alpha_{\omega}=\frac{5}{9},\:\beta_{k}=\frac{9}{100},\:\beta_{\omega}=\frac{3}{40},\:\sigma_{k}=\sigma_{\omega}=\frac{1}{2}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -3270,7 +3773,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00036659
+1.739346e-02
 \end_layout
 
 \end_inset
@@ -3279,7 +3782,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06598684
+6.380800e-02
 \end_layout
 
 \end_inset
@@ -3299,7 +3802,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00036047
+5.600357e-03
 \end_layout
 
 \end_inset
@@ -3308,7 +3811,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06460744
+6.513965e-02
 \end_layout
 
 \end_inset
@@ -3348,7 +3851,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-三阶
+三阶+L1
 \end_layout
 
 \end_inset
@@ -3357,7 +3860,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00033741
+4.671813e-03
 \end_layout
 
 \end_inset
@@ -3366,7 +3869,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06073442
+6.101299e-02
 \end_layout
 
 \end_inset
@@ -3377,7 +3880,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+三阶+L2
 \end_layout
 
 \end_inset
@@ -3386,7 +3889,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+1.728221e-03
 \end_layout
 
 \end_inset
@@ -3395,7 +3898,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+6.639876e-02
 \end_layout
 
 \end_inset
