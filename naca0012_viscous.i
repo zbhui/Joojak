@@ -1,29 +1,26 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = FOURTH
  	family = MONOMIAL
   	
-  gamma = 1.4
-  mach = 0.1
-  reynolds = 40.0
-  prandtl = 0.72
+  mach = 0.5
+	reynolds = 5000
+	attack = 1
   	
-  attack = 0
-  	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe rhok rhoo'
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/cylinder.msh
+  file = ../high-order-workshop/C1.3_naca0012/N0012-fine-quad.msh
   dim = 2
   
-  block_id = 10
+  block_id = 0
   block_name = 'fluid'
   
-  boundary_id = '8 9'
-  boundary_name = 'far_field wall'
+  boundary_id = '1 4 2 3'
+  boundary_name = 'far_top far_bottom wall_top wall_bottom'
 	
 	uniform_refine = 0 
 []
@@ -121,6 +118,7 @@
 
 [Postprocessors]
 
+
 	[./residual_final]
   	type = Residual
 	[../]
@@ -138,37 +136,37 @@
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = form
-		boundary  = wall
+		boundary  = '2 3'
 	[../]
 	[./force_friction-x]
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = friction
-		boundary  = wall
+		boundary  = '2 3'
 	[../]
 	[./force_total-x]
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = total
-		boundary  = wall
+		boundary  = '2 3'
 	[../]
 	[./force_form-z]
   	type = CFDForcePostprocessor
 		direction_by = z
 		force_type = form
-		boundary  = wall
+		boundary  = '2 3'
 	[../]
 	[./force_friction-z]
   	type = CFDForcePostprocessor
 		direction_by = z
 		force_type = friction
-		boundary  = wall
+		boundary  = '2 3'
 	[../]
 	[./force_total-z]
   	type = CFDForcePostprocessor
 		direction_by = z
 		force_type = total
-		boundary  = wall
+		boundary  = '2 3'
 	[../]
  
 []
@@ -208,39 +206,35 @@
 
 # 变量
 [Variables]
+	active = 'rho momentum_x momentum_y momentum_z rhoe'
+
 	[./rho]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
   [../]
+
  	[./momentum_x]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
-  [../]  
+  [../]
+  
  	[./momentum_y]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
-  [../] 	
-  [./momentum_z]
+  [../]
+  	
+   [./momentum_z]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
-  [../] 	
+  [../]
+  	
   [./rhoe]
 		[./InitialCondition] 
-			type = KOIC
-		[../]
-  [../]	
-  [./rhok]
-		[./InitialCondition] 
-			type = KOIC
-		[../]
-  [../]	
-  [./rhoo]
-		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
   [../]	
 		
@@ -268,138 +262,104 @@
 		type = TimeDerivative
 		variable = rhoe
 	[../]
-	[./rhok_time]
-		type = TimeDerivative
-		variable = rhok
-	[../]
-	[./rhoo_time]
-		type = TimeDerivative
-		variable = rhoo
-	[../]
 
 	[./mass_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = rhoe
-	[../]
-	[./rhok_space]
-		type = KOCellKernel
-		variable = rhok
-	[../]
-	[./rhoo_space]
-		type = KOCellKernel
-		variable = rhoo
 	[../]
 []
 
 
 [DGKernels]
 	[./mass_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = rhoe
-	[../]
-	[./rhok_dg]
-		type = KOFaceKernel
-		variable = rhok
-	[../]
-	[./rhoo_dg]
-		type = KOFaceKernel
-		variable = rhoo
 	[../]
 []
 
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '8 9'
-		type =KOBC
+		boundary = '1 2 3 4'
+		type =NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '8 9'
-		type =KOBC
+		boundary = '1 2 3 4'
+		type =NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '8 9'
-		type =KOBC
+		boundary = '1 2 3 4'
+		type =NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '8 9'
-		type =KOBC
+		boundary = '1 2 3 4'
+		type =NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '8 9'
-		type =KOBC
+		boundary = '1 2 3 4'
+		type =NSBC
 		variable = rhoe
-	[../]
-	[./rhok_bc]
-		boundary = '8 9'
-		type =KOBC
-		variable = rhok
-	[../]
-	[./rhoo_bc]
-		boundary = '8 9'
-		type =KOBC
-		variable = rhoo
 	[../]
 []
 
 # 材料属性
 [Materials]
   [./cell_material]
-		block = 10
-    type = KOCellMaterial
+		block = fluid
+    type = NSCellMaterial
   [../]
 
   [./face_material]
-		block = 10
-    type = KOFaceMaterial
+		block = fluid
+    type = NSFaceMaterial
   [../]
 
  	[./far_field_material]
-		boundary = far_field
+		boundary = '1 4'
 		bc_type = far_field
-    type = KOBndMaterial
+    type = NSBndMaterial
   [../]
 
   [./wall_material]
-		boundary = wall
-		bc_type = isothermal_wall
-    type = KOBndMaterial
+		boundary = '2 3'
+		bc_type = adiabatic_wall
+    type = NSBndMaterial
   [../]
 
 []
