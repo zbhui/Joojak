@@ -312,7 +312,7 @@ Reynolds应力张量
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\text{\omega}_{w}=\frac{60\mu}{\rho\beta_{\omega}(\Delta y_{1})^{2}}
+\tilde{\omega}_{\text{w}}=\ln\left(\frac{60\mu}{\rho\beta_{\omega}(\Delta y_{1})^{2}}\right)
 \]
 
 \end_inset
@@ -323,7 +323,7 @@ Reynolds应力张量
 \begin_layout Standard
 \begin_inset Formula 
 \[
-k_{w}=0
+k_{\text{w}}=0
 \]
 
 \end_inset
@@ -338,7 +338,7 @@ k_{w}=0
 \begin_layout Standard
 \begin_inset Formula 
 \[
-k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}V_{\infty}^{2},\;(\text{default: \text{Tu}_{\infty}=0.005})
+k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}\boldsymbol{V}_{\infty}^{2},\;(\text{default: \text{Tu}_{\infty}=0.005})
 \]
 
 \end_inset
@@ -554,7 +554,7 @@ Reynolds应力张量
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\tilde{\omega}_{w}=\ln\left(\frac{60\mu}{Re\rho\beta_{\omega}(\Delta y_{1})^{2}}\right)
+\tilde{\omega}_{\text{w}}=\ln\left(\frac{60\mu}{Re\rho\beta_{\omega}(\Delta y_{1})^{2}}\right)
 \]
 
 \end_inset
@@ -565,7 +565,7 @@ Reynolds应力张量
 \begin_layout Standard
 \begin_inset Formula 
 \[
-k_{w}=0
+k_{\text{w}}=0
 \]
 
 \end_inset
@@ -591,7 +591,7 @@ k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\omega_{\infty}=\frac{Re\rho_{\infty}k_{\infty}}{r_{\mu}\mu_{\infty}}
+\omega_{\infty}=\frac{Rek_{\infty}}{r_{\mu}}
 \]
 
 \end_inset

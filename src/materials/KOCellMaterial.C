@@ -126,7 +126,3 @@ void KOCellMaterial::fluxTerm(RealVectorValue* flux_term, Real* uh, RealGradient
 	}
 }
 
-void KOCellMaterial::sourceTerm(Real* source_term, Real* uh, RealGradient* duh)
-{
-	KOBase::sourceTerm(source_term, uh, duh);
-}

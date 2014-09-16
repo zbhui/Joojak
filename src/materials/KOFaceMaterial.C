@@ -161,7 +161,7 @@ void KOFaceMaterial::computeQpRightGradValue(RealGradient *ur)
 
 void KOFaceMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
 {
-	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
+	RealVectorValue ifl[10], ifr[10], vfl[10], vfr[10];
 
 	inviscousTerm(ifl, ul);
 	inviscousTerm(ifr, ur);

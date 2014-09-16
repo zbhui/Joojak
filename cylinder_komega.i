@@ -5,7 +5,7 @@
   	
   gamma = 1.4
   mach = 0.1
-  reynolds = 40.0
+  reynolds = 4000.0
   prandtl = 0.72
   	
   attack = 0
@@ -16,7 +16,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/cylinder.msh
+  file = grids/cylinder_fine.msh
   dim = 2
   
   block_id = 10
@@ -42,6 +42,8 @@
   [../]
 
   [./velocity_z]
+  [../]
+  [./eddy_viscosity]
   [../]
 []
 
@@ -69,6 +71,10 @@
   [./velocity_z]
 		type = NSAuxVariable
 		variable = velocity_z
+  [../]
+  [./eddy_viscosity]
+		type = NSAuxVariable
+		variable = eddy_viscosity
   [../]
 []
 
@@ -111,7 +117,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1e+08
+		dt = 1e-02
 		ratio = 2
 		step = 2
 		max_dt = 1e+08

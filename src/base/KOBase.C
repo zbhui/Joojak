@@ -10,7 +10,7 @@ InputParameters validParams<KOBase>()
 
 KOBase::KOBase(const std::string& name, InputParameters parameters):
 		NSBase(name, parameters),
-		_sigma_k(0.5), _sigma_o(0.5), _beta_k(0.09), _beta_o(0.0075), _alpha_o(5./9),
+		_sigma_k(0.5), _sigma_o(0.5), _beta_k(9./100), _beta_o(3./40), _alpha_o(5./9),
 		_prandtl_turb(0.9),
 		_tu_infty(0.005), _r_mu(1e-05)
 {
@@ -191,7 +191,9 @@ void KOBase::sourceTerm(Real* source_term, Real* uh, RealGradient* duh)
 
 Real KOBase::eddyViscosity(Real* uh)
 {
-	return _reynolds * uh[5]/std::exp(uh[6]/uh[0]);
+	Real eddy_vis =std::max<Real>(_reynolds * uh[5]/std::exp(uh[6]/uh[0]), 0);
+
+	return eddy_vis;
 }
 
 

@@ -149,7 +149,7 @@ void KOBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, R
 
 void KOBndMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
 {
-	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
+	RealVectorValue ifl[10], ifr[10], vfl[10], vfr[10];
 
 	inviscousTerm(ifl, ul);
 	inviscousTerm(ifr, ur);
@@ -390,7 +390,7 @@ void KOBndMaterial::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradien
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 
 	ur[5] = ul[5];
-	ur[6] = ur[6];
+	ur[6] = ul[6];
 }
 
 void KOBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)

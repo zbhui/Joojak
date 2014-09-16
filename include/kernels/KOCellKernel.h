@@ -16,8 +16,12 @@ public:
 protected:
 	int _eq;
 	MaterialProperty<std::vector<RealVectorValue> > &_flux_term;
+	MaterialProperty<std::vector<Real> > & _source_term;
 	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _flux_jacobi_variable;
 	MaterialProperty<std::vector<std::vector<RealTensorValue> > >& _flux_jacobi_grad_variable;
+	MaterialProperty<std::vector<std::vector<Real> > >& _source_jacobi_variable;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _source_jacobi_grad_variable;
+
 
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();
