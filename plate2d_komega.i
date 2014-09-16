@@ -1,12 +1,12 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
   mach = 0.3
   reynolds = 1E+06
   	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  variables = 'rho momentum_x momentum_y momentum_z rhoe rhok rhoo'
 []
 
 # 网格
@@ -37,6 +37,8 @@
 
   [./velocity_z]
   [../]
+  [./eddy_viscosity]
+  [../]
 []
 
 [AuxKernels]
@@ -64,6 +66,10 @@
 		type = NSAuxVariable
 		variable = velocity_z
   [../]
+  [./eddy_viscosity]
+		type = NSAuxVariable
+		variable = eddy_viscosity
+  [../]
 []
 
 [Preconditioning]
@@ -71,8 +77,12 @@
 		type = SMP
 		full = true
 
-    petsc_options_iname = 'ksp_type -pc_type '
-  	petsc_options_value = 'gmres lu'
+	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+  	#petsc_options_value = 'lu test'
+		#petsc_options = '-pc_sor_symmetric'
+    petsc_options_iname = '-ksp_type  -pc_type '
+  	petsc_options_value = 'gmres 				bjacobi  '
 	[../]
 
 []
@@ -91,7 +101,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-3
+  	nl_rel_tol = 1e-4
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -101,16 +111,15 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+01
+		dt = 1e-02
 		ratio = 2
 		step = 2
-		max_dt = 1E+08
+		max_dt = 1e+08
 	[../]
 []
 
 
 [Postprocessors]
-
 
 	[./residual_final]
   	type = Residual
@@ -143,26 +152,27 @@
 		force_type = total
 		boundary  = wall
 	[../]
-	[./force_form-y]
+	[./force_form-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = form
 		boundary  = wall
 	[../]
-	[./force_friction-y]
+	[./force_friction-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = friction
 		boundary  = wall
 	[../]
-	[./force_total-y]
+	[./force_total-z]
   	type = CFDForcePostprocessor
-		direction_by = y
+		direction_by = z
 		force_type = total
 		boundary  = wall
 	[../]
  
 []
+
 # 输出和后处理
 [Outputs]
 	[./exodus]
@@ -171,7 +181,7 @@
 		
 		interval = 1 					#间隔
 		oversample = true
-		refinements = 0
+		refinements = 1
 	[../]
 	
 	[./console]
@@ -184,6 +194,10 @@
     	#time_precision = 6
     	#fit_mode = 100
 	[../]
+	[./checkpoint]
+		type  = Checkpoint
+		interval = 1 					#间隔
+	[../]
 	[./debug]
 	    type = DebugOutput
   		#show_var_residual_norms = true
@@ -194,35 +208,39 @@
 
 # 变量
 [Variables]
-	active = 'rho momentum_x momentum_y momentum_z rhoe'
-
 	[./rho]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
   [../]
-
  	[./momentum_x]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
-  [../]
-  
+  [../]  
  	[./momentum_y]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
-  [../]
-  	
-   [./momentum_z]
+  [../] 	
+  [./momentum_z]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
-  [../]
-  	
+  [../] 	
   [./rhoe]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
+		[../]
+  [../]	
+  [./rhok]
+		[./InitialCondition] 
+			type = KOIC
+		[../]
+  [../]	
+  [./rhoo]
+		[./InitialCondition] 
+			type = KOIC
 		[../]
   [../]	
 		
@@ -250,77 +268,113 @@
 		type = TimeDerivative
 		variable = rhoe
 	[../]
+	[./rhok_time]
+		type = TimeDerivative
+		variable = rhok
+	[../]
+	[./rhoo_time]
+		type = TimeDerivative
+		variable = rhoo
+	[../]
 
 	[./mass_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = rhoe
+	[../]
+	[./rhok_space]
+		type = KOCellKernel
+		variable = rhok
+	[../]
+	[./rhoo_space]
+		type = KOCellKernel
+		variable = rhoo
 	[../]
 []
 
+
 [DGKernels]
 	[./mass_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = rhoe
 	[../]
+	[./rhok_dg]
+		type = KOFaceKernel
+		variable = rhok
+	[../]
+	[./rhoo_dg]
+		type = KOFaceKernel
+		variable = rhoo
+	[../]
 []
+
 # 边界条件
 [BCs]
 	[./mass_bc]
 		boundary = '1 2 3 4 5'
-		type = NSBC
+		type =KOBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
 		boundary = '1 2 3 4 5'
-		type = NSBC
+		type =KOBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
 		boundary = '1 2 3 4 5'
-		type = NSBC
+		type =KOBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
 		boundary = '1 2 3 4 5'
-		type = NSBC
+		type =KOBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
 		boundary = '1 2 3 4 5'
-		type = NSBC
+		type =KOBC
 		variable = rhoe
+	[../]
+	[./rhok_bc]
+		boundary = '1 2 3 4 5'
+		type =KOBC
+		variable = rhok
+	[../]
+	[./rhoo_bc]
+		boundary = '1 2 3 4 5'
+		type =KOBC
+		variable = rhoo
 	[../]
 []
 
@@ -328,7 +382,7 @@
 [Materials]
   [./cell_material]
 		block = fluid
-    type = NSCellMaterial
+    type = KOCellMaterial
   [../]
 
   [./face_material]
@@ -339,19 +393,18 @@
   [./wall_material]
 		boundary = 2
 		bc_type = isothermal_wall
-    type = NSBndMaterial
+    type = KOBndMaterial
   [../]
   [./far_field_material]
 		boundary = '3 4 5'
 		bc_type = far_field
-    type = NSBndMaterial
+    type = KOBndMaterial
   [../]
   [./symmetric_material]
 		boundary = 1
 		bc_type = symmetric
-    type = NSBndMaterial
+    type = KOBndMaterial
   [../]
-
 
 []
 

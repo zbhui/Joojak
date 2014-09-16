@@ -435,53 +435,67 @@ void KOBndMaterial::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGra
 {
 	if(_bc_type == "adiabatic_wall")
 	{
-	Real rho = uh[0];
-	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
-	RealGradient grad_rho(duh[0]);
-	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
-	RealTensor temp;
-	for (int alpha = 0; alpha < 3; ++alpha) {
-		for (int beta = 0; beta < 3; ++beta)
-		{
-			temp(alpha,beta) = velocity(alpha)*grad_rho(beta);
+		Real rho = uh[0];
+		RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
+		RealGradient grad_rho(duh[0]);
+		RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
+		RealTensor temp;
+		for (int i = 0; i < 3; ++i) {
+			for (int j = 0; j < 3; ++j)
+			{
+				temp(i,j) = velocity(i)*grad_rho(j);
+			}
 		}
-	}
-	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
-	RealTensor tau = velocity_tensor + velocity_tensor.transpose();
-	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
-	Real lamdiv = 2./3. * div;
-	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
-	Real mu = physicalViscosity(uh);
-	tau *= mu/_reynolds;
+		RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
+		RealTensor tau = velocity_tensor + velocity_tensor.transpose();
+		Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
+		Real lamdiv = 2./3. * div;
+		tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
+		Real mu = physicalViscosity(uh);
+		Real mu_turb = eddyViscosity(uh);
+		tau *= (mu+mu_turb)/_reynolds;
 
-	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
-	grad_enthalpy *= (mu/_reynolds)*(_gamma/_prandtl);
+		RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
+		grad_enthalpy *= (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma);
 
-	int component = 0;
-	viscous_term[component](0) = 0.;
-	viscous_term[component](1) = 0.;
-	viscous_term[component](2) = 0.;
 
-	component = 1;
-	viscous_term[component](0) = tau(0, 0);
-	viscous_term[component](1) = tau(0, 1);
-	viscous_term[component](2) = tau(0, 2);
+		int component = 0;
+		viscous_term[component](0) = 0.;
+		viscous_term[component](1) = 0.;
+		viscous_term[component](2) = 0.;
 
-	component = 2;
-	viscous_term[component](0) = tau(1, 0);
-	viscous_term[component](1) = tau(1, 1);
-	viscous_term[component](2) = tau(1, 2);
+		component = 1;
+		viscous_term[component](0) = tau(0, 0);
+		viscous_term[component](1) = tau(0, 1);
+		viscous_term[component](2) = tau(0, 2);
 
-	component = 3;
-	viscous_term[component](0) = tau(2, 0);
-	viscous_term[component](1) = tau(2, 1);
-	viscous_term[component](2) = tau(2, 2);
+		component = 2;
+		viscous_term[component](0) = tau(1, 0);
+		viscous_term[component](1) = tau(1, 1);
+		viscous_term[component](2) = tau(1, 2);
 
-	component = 4;
-	RealVectorValue vel_tau = tau * velocity;// + grad_enthalpy;
-	viscous_term[component](0) = vel_tau(0);
-	viscous_term[component](1) = vel_tau(1);
-	viscous_term[component](2) = vel_tau(2);
+		component = 3;
+		viscous_term[component](0) = tau(2, 0);
+		viscous_term[component](1) = tau(2, 1);
+		viscous_term[component](2) = tau(2, 2);
+
+		component = 4;
+		RealVectorValue vel_tau = tau * velocity;
+		viscous_term[component](0) = vel_tau(0);
+		viscous_term[component](1) = vel_tau(1);
+		viscous_term[component](2) = vel_tau(2);
+
+		component = 5;
+		RealVectorValue grad_k = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0]/_reynolds;
+		viscous_term[component](0) = (mu + _sigma_k*mu_turb)*grad_k(0);
+		viscous_term[component](1) = (mu + _sigma_k*mu_turb)*grad_k(1);
+		viscous_term[component](2) = (mu + _sigma_k*mu_turb)*grad_k(2);
+
+		component = 6;
+		RealVectorValue grad_o = (duh[6] - uh[6]/uh[0]*duh[0])/uh[0]/_reynolds;
+		viscous_term[component](0) = (mu + _sigma_o*mu_turb)*grad_o(0);
+		viscous_term[component](1) = (mu + _sigma_o*mu_turb)*grad_o(1);
+		viscous_term[component](2) = (mu + _sigma_o*mu_turb)*grad_o(2);
 	}
 	else
 	{

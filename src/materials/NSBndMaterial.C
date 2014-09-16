@@ -120,8 +120,8 @@ void NSBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, R
 	}
 	if(_bc_type == "far_field")
 	{
-//		farFieldRiemann(ur, dur, ul, dul);
-		farField(ur, dur, ul, dul);
+		farFieldRiemann(ur, dur, ul, dul);
+//		farField(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "symmetric")

@@ -1,10 +1,16 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
   mach = 0.3
-  reynolds = 1E+06
+  reynolds = 4000
+	attack = 12.5
+	sideslip = 0
+	pitch = 0
+	yaw = 180
+	roll = 0
+	ref_area = 0.133974596
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -12,14 +18,15 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
-  dim = 2
+  file = ../high-order-workshop/C2.4_delta/delta.1.msh
+  dim = 3
 
-  boundary_id = '1 2 3 4 5' 
-  boundary_name = 'symmetric wall right top left'
+  boundary_id = '1 2 3'
+  boundary_name = 'wall symmetric far_field'
 
   block_id = '0'
   block_name = 'fluid'
+	uniform_refine = 0
 []
 
 [AuxVariables]
@@ -72,7 +79,7 @@
 		full = true
 
     petsc_options_iname = 'ksp_type -pc_type '
-  	petsc_options_value = 'gmres lu'
+  	petsc_options_value = 'bcgs bjacobi'
 	[../]
 
 []
@@ -101,10 +108,10 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+01
+		dt = 1E+02
 		ratio = 2
 		step = 2
-		max_dt = 1E+08
+		max_dt = 1E+02
 	[../]
 []
 
@@ -125,34 +132,11 @@
 		time_type = alive
 	[../]
 
-	[./force_form-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-x]
-  	type = CFDForcePostprocessor
-		direction_by = x
-		force_type = friction
-		boundary  = wall
-	[../]
+
 	[./force_total-x]
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = total
-		boundary  = wall
-	[../]
-	[./force_form-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = form
-		boundary  = wall
-	[../]
-	[./force_friction-y]
-  	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = friction
 		boundary  = wall
 	[../]
 	[./force_total-y]
@@ -161,10 +145,17 @@
 		force_type = total
 		boundary  = wall
 	[../]
+	[./force_total-z]
+  	type = CFDForcePostprocessor
+		direction_by = z
+		force_type = total
+		boundary  = wall
+	[../]
  
 []
 # 输出和后处理
 [Outputs]
+	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
@@ -298,27 +289,27 @@
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3'
 		type = NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3'
 		type = NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3 '
 		type = NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3 '
 		type = NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 2 3'
 		type = NSBC
 		variable = rhoe
 	[../]
@@ -337,17 +328,17 @@
   [../]
 
   [./wall_material]
-		boundary = 2
+		boundary = wall
 		bc_type = isothermal_wall
     type = NSBndMaterial
   [../]
   [./far_field_material]
-		boundary = '3 4 5'
+		boundary = '3'
 		bc_type = far_field
     type = NSBndMaterial
   [../]
   [./symmetric_material]
-		boundary = 1
+		boundary = 2
 		bc_type = symmetric
     type = NSBndMaterial
   [../]
