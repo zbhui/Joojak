@@ -5,7 +5,7 @@
   	
   gamma = 1.4
   mach = 0.1
-  reynolds = 4000.0
+  reynolds = 40.0
   prandtl = 0.72
   	
   attack = 0
@@ -16,7 +16,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = grids/cylinder_fine.msh
+  file = grids/cylinder_tri.msh
   dim = 2
   
   block_id = 10
@@ -117,8 +117,8 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1e-02
-		ratio = 2
+		dt = 1e-03
+		ratio = 1
 		step = 2
 		max_dt = 1e+08
 	[../]
@@ -199,10 +199,6 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
-	[../]
-	[./checkpoint]
-		type  = Checkpoint
-		interval = 1 					#间隔
 	[../]
 	[./debug]
 	    type = DebugOutput

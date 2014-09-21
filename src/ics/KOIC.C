@@ -103,11 +103,11 @@ Real KOIC::total_energy(const Point &p)
 
 Real KOIC::turbulence_kinetic_energy(const Point& p)
 {
-	return density(p)*3./2*_tu_infty;
+	return density(p)*_tu_infty;
 }
 
 Real KOIC::turbulence_disspation_ratio(const Point& p)
 {
-	Real omega = _reynolds*3./2*_tu_infty/_r_mu;
-	return density(p)*std::log(omega);
+	Real omega = _reynolds*density(p)*_tu_infty/_r_mu;
+	return density(p)*log(omega);
 }

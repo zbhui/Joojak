@@ -1,10 +1,10 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
   mach = 0.3
-  reynolds = 1E+06
+  reynolds = 1E+04
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -12,7 +12,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
+  file = ../high-order-workshop/C1.4_plate/a1-125-2s.msh
   dim = 2
 
   boundary_id = '1 2 3 4 5' 
@@ -91,7 +91,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-3
+  	nl_rel_tol = 1e-2
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -101,7 +101,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+01
+		dt = 1E+08
 		ratio = 2
 		step = 2
 		max_dt = 1E+08
@@ -338,7 +338,7 @@
 
   [./wall_material]
 		boundary = 2
-		bc_type = isothermal_wall
+		bc_type = adiabatic_wall
     type = NSBndMaterial
   [../]
   [./far_field_material]

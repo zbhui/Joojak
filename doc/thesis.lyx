@@ -2774,7 +2774,7 @@ NACA0012绕流气动力
 placement H
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -3214,7 +3214,7 @@ block jacobi
 placement H
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -3726,6 +3726,22 @@ Ref
 
 \end_layout
 
+\begin_layout Standard
+湍流测试
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename cylinder_turb.png
+	lyxscale 50
+	width 8cm
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 平板边界层
 \end_layout
@@ -4225,7 +4241,7 @@ Euler方程计算结果
 placement H
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -4456,23 +4472,11 @@ NS方程计算结果
 \end_layout
 
 \begin_layout Standard
-\align center
-\begin_inset Graphics
-	filename /home/lw4992/projects/Joojak/doc/residual_dg1_body_e1.png
-	lyxscale 50
-	width 8cm
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float table
 placement H
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -4699,7 +4703,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002577788
+2.577788e-03
 \end_layout
 
 \end_inset
@@ -4708,7 +4712,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06317449
+6.317449e-02
 \end_layout
 
 \end_inset

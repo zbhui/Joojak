@@ -1,22 +1,24 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = SECOND
  	family = MONOMIAL
   	
-  mach = 0.2
-  reynolds = 5E+06
+  mach = 0.134
+  reynolds = 6.5e+05
   	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe rhok rhoo'
+  attack = 2.79
+  	
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a1-125-2s.msh
+  file = ../high-order-workshop/C2.2_rae2822/rae2822_level5.msh
   dim = 2
 
-  boundary_id = '1 2 3 4 5' 
-  boundary_name = 'symmetric wall right top left'
+  boundary_id = '1 3' 
+  boundary_name = 'wall far_field'
 
   block_id = '0'
   block_name = 'fluid'
@@ -36,8 +38,6 @@
   [../]
 
   [./velocity_z]
-  [../]
-  [./eddy_viscosity]
   [../]
 []
 
@@ -65,10 +65,6 @@
   [./velocity_z]
 		type = NSAuxVariable
 		variable = velocity_z
-  [../]
-  [./eddy_viscosity]
-		type = NSAuxVariable
-		variable = eddy_viscosity
   [../]
 []
 
@@ -101,7 +97,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-3
+  	nl_rel_tol = 1e-4
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -120,6 +116,7 @@
 
 
 [Postprocessors]
+
 
 	[./residual_final]
   	type = Residual
@@ -208,39 +205,35 @@
 
 # 变量
 [Variables]
+	active = 'rho momentum_x momentum_y momentum_z rhoe'
+
 	[./rho]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
   [../]
+
  	[./momentum_x]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
-  [../]  
+  [../]
+  
  	[./momentum_y]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
-  [../] 	
-  [./momentum_z]
+  [../]
+  	
+   [./momentum_z]
 		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
-  [../] 	
+  [../]
+  	
   [./rhoe]
 		[./InitialCondition] 
-			type = KOIC
-		[../]
-  [../]	
-  [./rhok]
-		[./InitialCondition] 
-			type = KOIC
-		[../]
-  [../]	
-  [./rhoo]
-		[./InitialCondition] 
-			type = KOIC
+			type = CFDPassFlowIC
 		[../]
   [../]	
 		
@@ -268,113 +261,79 @@
 		type = TimeDerivative
 		variable = rhoe
 	[../]
-	[./rhok_time]
-		type = TimeDerivative
-		variable = rhok
-	[../]
-	[./rhoo_time]
-		type = TimeDerivative
-		variable = rhoo
-	[../]
 
 	[./mass_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_space]
-		type = KOCellKernel
+		type = NSCellKernel
 		variable = rhoe
-	[../]
-	[./rhok_space]
-		type = KOCellKernel
-		variable = rhok
-	[../]
-	[./rhoo_space]
-		type = KOCellKernel
-		variable = rhoo
 	[../]
 []
 
 
 [DGKernels]
 	[./mass_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_dg]
-		type = KOFaceKernel
+		type = NSFaceKernel
 		variable = rhoe
-	[../]
-	[./rhok_dg]
-		type = KOFaceKernel
-		variable = rhok
-	[../]
-	[./rhoo_dg]
-		type = KOFaceKernel
-		variable = rhoo
 	[../]
 []
 
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '1 2 3 4 5'
-		type =KOBC
+		boundary = '1 3'
+		type =NSBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '1 2 3 4 5'
-		type =KOBC
+		boundary = '1 3'
+		type =NSBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '1 2 3 4 5'
-		type =KOBC
+		boundary = '1 3'
+		type =NSBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '1 2 3 4 5'
-		type =KOBC
+		boundary = '1 3'
+		type =NSBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '1 2 3 4 5'
-		type =KOBC
+		boundary = '1 3'
+		type =NSBC
 		variable = rhoe
-	[../]
-	[./rhok_bc]
-		boundary = '1 2 3 4 5'
-		type =KOBC
-		variable = rhok
-	[../]
-	[./rhoo_bc]
-		boundary = '1 2 3 4 5'
-		type =KOBC
-		variable = rhoo
 	[../]
 []
 
@@ -382,28 +341,24 @@
 [Materials]
   [./cell_material]
 		block = fluid
-    type = KOCellMaterial
+    type = NSCellMaterial
   [../]
 
   [./face_material]
 		block = fluid
-    type = KOFaceMaterial
+    type = NSFaceMaterial
+  [../]
+
+ 	[./far_field_material]
+		boundary = far_field
+		bc_type = far_field
+    type = NSBndMaterial
   [../]
 
   [./wall_material]
-		boundary = 2
-		bc_type = isothermal_wall
-    type = KOBndMaterial
-  [../]
-  [./far_field_material]
-		boundary = '3 4 5'
-		bc_type = far_field
-    type = KOBndMaterial
-  [../]
-  [./symmetric_material]
-		boundary = 1
-		bc_type = symmetric
-    type = KOBndMaterial
+		boundary = wall
+		bc_type = adiabatic_wall
+    type = NSBndMaterial
   [../]
 
 []

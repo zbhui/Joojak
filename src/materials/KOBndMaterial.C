@@ -68,7 +68,6 @@ void KOBndMaterial::computeQpProperties()
 
 	penaltyTerm(&_penalty[_qp][0], &_penalty_neighbor[_qp][0], ul, ur);
 	fluxTerm(&_flux[_qp][0], ul, ur, dul, dur);
-
 	for (int q = 0; q < _n_equations; ++q)
 	{
 		ul[q] += _ds;
@@ -122,8 +121,8 @@ void KOBndMaterial::computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, R
 	}
 	if(_bc_type == "far_field")
 	{
-//		farFieldRiemann(ur, dur, ul, dul);
-		farField(ur, dur, ul, dul);
+		farFieldRiemann(ur, dur, ul, dul);
+//		farField(ur, dur, ul, dul);
 		return;
 	}
 	if(_bc_type == "symmetric")
@@ -192,8 +191,12 @@ void KOBndMaterial::isothermalWall(Real *ur, RealGradient *dur, Real *ul, RealGr
 	Real rho = ul[0];
 	Real mu = physicalViscosity(ul);
 
-    ur[5] = ur[0]*0.;
-    ur[6] = rho * std::log(60.*mu/(_reynolds*rho*_beta_o*distance*distance));
+    ur[5] = rho*0.;
+    ur[6] = rho*log(6000.*mu/(_reynolds*rho*_beta_o*distance*distance));
+//    ur[5] = 2E-07;
+//    ur[6] = 50;
+//	std::cout << distance <<std::endl;
+
 }
 
 void KOBndMaterial::adiabaticWall(Real* ur, RealGradient* dur, Real* ul, RealGradient* dul)
@@ -211,8 +214,8 @@ void KOBndMaterial::adiabaticWall(Real* ur, RealGradient* dur, Real* ul, RealGra
 	Real rho = ul[0];
 	Real mu = physicalViscosity(ul);
 
-    ur[5] = ur[0]*0.;
-    ur[6] = rho * std::log(60.*mu/(_reynolds*rho*_beta_o*distance*distance));
+    ur[5] = rho*0.;
+    ur[6] = rho*log(60.*mu/(_reynolds*rho*_beta_o*distance*distance));
 }
 
 void KOBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
@@ -274,8 +277,8 @@ void KOBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 	}
 
 	Real rho = ul[0];
-	ur[5] = rho*3./2*_tu_infty;
-	ur[6] = rho*std::log(_reynolds*3./2*_tu_infty/_r_mu);
+	ur[5] = rho*_tu_infty;
+	ur[6] = rho*log(_reynolds*ur[5]/_r_mu);
 }
 
 void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
@@ -368,8 +371,8 @@ void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 		}
 	}
 	Real rho = ul[0];
-	ur[5] = rho*3./2*_tu_infty;
-	ur[6] = rho*std::log(_reynolds*3./2*_tu_infty/_r_mu);
+	ur[5] = rho*_tu_infty;
+	ur[6] = rho*log(_reynolds*ur[5]/_r_mu);
 }
 
 
@@ -391,6 +394,7 @@ void KOBndMaterial::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradien
 
 	ur[5] = ul[5];
 	ur[6] = ul[6];
+//	std::cout << ur[6] <<std::endl;
 }
 
 void KOBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
@@ -407,8 +411,8 @@ void KOBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradi
 	ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
 
 	Real rho = ul[0];
-	ur[5] = rho*3./2*_tu_infty;
-	ur[6] = rho*std::log(_reynolds*3./2*_tu_infty/_r_mu);
+	ur[5] = rho*_tu_infty;
+	ur[6] = rho*log(_reynolds*ur[5]/_r_mu);
 }
 
 void KOBndMaterial::resizeQpProperty()

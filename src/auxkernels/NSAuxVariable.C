@@ -46,7 +46,7 @@ Real NSAuxVariable::computeValue()
 	if(var_name == "velocity_z")
 		return uh[3]/uh[0];
 	if(var_name == "eddy_viscosity")
-		return _reynolds * uh[5]/std::exp(uh[6]/uh[0]);
+		return _reynolds * uh[5]/exp(uh[6]/uh[0]);
 
 	mooseError(var_name << "辅助变量名不存在");
 	return 0.;
