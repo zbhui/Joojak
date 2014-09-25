@@ -108,6 +108,6 @@ Real KOIC::turbulence_kinetic_energy(const Point& p)
 
 Real KOIC::turbulence_disspation_ratio(const Point& p)
 {
-	Real omega = _reynolds*density(p)*_tu_infty/_r_mu;
-	return density(p)*log(omega);
+//	Real omega = _reynolds*density(p)*_tu_infty/_r_mu;
+	return density(p)*log(_omega_infty);
 }

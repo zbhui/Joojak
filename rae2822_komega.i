@@ -4,7 +4,7 @@
  	family = MONOMIAL
   	
   mach = 0.134
-  reynolds = 5.0e+06  	
+  reynolds = 5.0e+05  	
   attack = 2.79
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe rhok rhoo'
@@ -102,7 +102,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-4
+  	nl_rel_tol = 1e-3
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -112,8 +112,8 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1e-03
-		ratio = 1
+		dt = 1e-02
+		ratio = 2
 		step = 2
 		max_dt = 1e+08
 	[../]

@@ -192,7 +192,7 @@ void KOBndMaterial::isothermalWall(Real *ur, RealGradient *dur, Real *ul, RealGr
 	Real mu = physicalViscosity(ul);
 
     ur[5] = rho*0.;
-    ur[6] = rho*log(6000.*mu/(_reynolds*rho*_beta_o*distance*distance));
+    ur[6] = rho*log(60.*mu/(_reynolds*rho*_beta_o*distance*distance));
 //    ur[5] = 2E-07;
 //    ur[6] = 50;
 //	std::cout << distance <<std::endl;
@@ -230,6 +230,7 @@ void KOBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 		vel_inf(2) = 0.;
 
 	Real rho_inf = 1.;
+	Real rho = ul[0];
 	Real p_inf = 1/_gamma/_mach/_mach;
 	Real pl = pressure(ul);
 	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
@@ -246,6 +247,8 @@ void KOBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 			ur[2] = rho_inf*vel_inf(1);
 			ur[3] = rho_inf*vel_inf(2);
 			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+			ur[5] = rho*_tu_infty;
+			ur[6] = rho*log(_omega_infty);
 		}
 		else	//亚音速
 		{
@@ -254,6 +257,8 @@ void KOBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 			ur[2] = rho_inf*vel_inf(1);
 			ur[3] = rho_inf*vel_inf(2);
 			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+			ur[5] = rho*_tu_infty;
+			ur[6] = rho*log(_omega_infty);
 		}
 	}
 	else  //出口
@@ -265,6 +270,8 @@ void KOBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 			ur[2] = ul[2];
 			ur[3] = ul[3];
 			ur[4] = ul[4];
+			ur[5] = ul[5];
+			ur[6] = ul[6];
 		}
 		else	//亚音速
 		{
@@ -273,12 +280,12 @@ void KOBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 			ur[2] = ul[2];
 			ur[3] = ul[3];
 			ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
+			ur[5] = ul[5];
+			ur[6] = ul[6];
 		}
 	}
-
-	Real rho = ul[0];
-	ur[5] = rho*_tu_infty;
-	ur[6] = rho*log(_reynolds*ur[5]/_r_mu);
+//	ur[5] = rho*_tu_infty;
+//	ur[6] = rho*log(_omega_infty);
 }
 
 void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
@@ -312,6 +319,7 @@ void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
 
 	rhoL = ul[0];
+	Real rho = ul[0];
 	uL = ul[1] / rhoL;
 	vL = ul[2] / rhoL;
 	wL = ul[3] / rhoL;
@@ -329,6 +337,8 @@ void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[2] = rhoR * vR;
 			ur[3] = rhoR * wR;
 			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
+			ur[5] = rho*_tu_infty;
+			ur[6] = rho*log(_omega_infty);
 		}
 		else	//亚音速
 		{
@@ -343,6 +353,8 @@ void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
 			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
 			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+			ur[5] = rho*_tu_infty;
+			ur[6] = rho*log(_omega_infty);
 		}
 	}
 	else  //出口
@@ -354,6 +366,8 @@ void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[2] = ul[2];
 			ur[3] = ul[3];
 			ur[4] = ul[4];
+			ur[5] = ul[5];
+			ur[6] = ul[6];
 		}
 		else	//亚音速
 		{
@@ -368,11 +382,11 @@ void KOBndMaterial::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient
 			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
 			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
 			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+			ur[5] = ul[5];
+			ur[6] = ul[6];
 		}
 	}
-	Real rho = ul[0];
-	ur[5] = rho*_tu_infty;
-	ur[6] = rho*log(_reynolds*ur[5]/_r_mu);
+
 }
 
 
@@ -391,7 +405,6 @@ void KOBndMaterial::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradien
     ur[2] = ul[2] - 2.0 * vn * normal(1);
     ur[3] = ul[3] - 2.0 * vn * normal(2);
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
-
 	ur[5] = ul[5];
 	ur[6] = ul[6];
 //	std::cout << ur[6] <<std::endl;
@@ -409,10 +422,8 @@ void KOBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradi
 	ur[2] = ul[2];
 	ur[3] = ul[3];
 	ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
-
-	Real rho = ul[0];
-	ur[5] = rho*_tu_infty;
-	ur[6] = rho*log(_reynolds*ur[5]/_r_mu);
+	ur[5] = ul[5];
+	ur[6] = ul[6];
 }
 
 void KOBndMaterial::resizeQpProperty()

@@ -10,12 +10,14 @@ InputParameters validParams<KOBase>()
 
 KOBase::KOBase(const std::string& name, InputParameters parameters):
 		NSBase(name, parameters),
-		_sigma_k(0.5), _sigma_o(0.5), _beta_k(9./100), _beta_o(3./40), _alpha_o(5./9),
+		_sigma_k(0.5), _sigma_o(0.5), _beta_k(9./100), _beta_o(3./40), _alpha_o(5./9), _sigma_d(1./8), _c_lim(7./8),
 		_prandtl_turb(0.9),
-		_tu_infty(1e-4), _r_mu(1e-4)
+		_tu_infty(1e-09), _r_mu(1e-02)
 {
-//	Real w_infty = 100000.;
-//	_tu_infty = w_infty*_r_mu/_reynolds;
+//	_omega_infty = _reynolds*1*_tu_infty/_r_mu;
+	_omega_infty = 10;
+//	Real w_infty = 1000.;
+	_tu_infty = _omega_infty*_r_mu/_reynolds;
 //	_r_mu = 1e-03;
 }
 
@@ -39,24 +41,24 @@ void KOBase::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 	inviscous_term[component](2) = uh[3];	// rhow
 
 	component = 1;
-	inviscous_term[component](0) = uh[1] * u + p ;//+ 2./3*uh[5];
+	inviscous_term[component](0) = uh[1] * u + p + 2./3*uh[5];
 	inviscous_term[component](1) = uh[1] * v;
 	inviscous_term[component](2) = uh[1] * w;
 
 	component = 2;
 	inviscous_term[component](0) = uh[2] * u;
-	inviscous_term[component](1) = uh[2] * v + p ;//+ 2./3*uh[5];
+	inviscous_term[component](1) = uh[2] * v + p + 2./3*uh[5];
 	inviscous_term[component](2) = uh[2] * w;
 
 	component = 3;
 	inviscous_term[component](0) = uh[3] * u;
 	inviscous_term[component](1) = uh[3] * v;
-	inviscous_term[component](2) = uh[3] * w + p ;//+ 2./3*uh[5];
+	inviscous_term[component](2) = uh[3] * w + p + 2./3*uh[5];
 
 	component = 4;
-	inviscous_term[component](0) = rho * (h) * u;
-	inviscous_term[component](1) = rho * (h) * v;
-	inviscous_term[component](2) = rho * (h) * w;
+	inviscous_term[component](0) = rho * (h+2/3.*k) * u;
+	inviscous_term[component](1) = rho * (h+2/3.*k) * v;
+	inviscous_term[component](2) = rho * (h+2/3.*k) * w;
 
 	component = 5;
 	inviscous_term[component](0) = uh[5] * u;
@@ -89,8 +91,15 @@ void KOBase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* 
 	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
 	Real lamdiv = 2./3. * div;
 	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
+
 	Real mu = physicalViscosity(uh);
-	Real mu_turb = eddyViscosity(uh);
+//	Real mu_turb = eddyViscosity(uh);
+	Real w_lim = log(7./8*sqrt(tau.size_sq()/_beta_k/2.));
+	Real k = uh[5]/uh[0];
+	Real w = uh[6]/uh[0];
+	w = std::max<Real>(w, w_lim);
+	Real mu_turb = _reynolds*uh[0]*k/exp(w);
+
 	tau *= (mu+mu_turb)/_reynolds;
 
 	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
@@ -152,28 +161,24 @@ void KOBase::sourceTerm(Real* source_term, Real* uh, RealGradient* duh)
 		}
 	}
 	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
-	RealTensor sigma = velocity_tensor + velocity_tensor.transpose();
-	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
-	Real lamdiv = 2./3. * div;
-	sigma(0, 0) -= lamdiv; sigma(1, 1) -= lamdiv; sigma(2, 2) -= lamdiv;
-	Real mu_turb = eddyViscosity(uh);
+	RealTensor stress = (velocity_tensor + velocity_tensor.transpose())/2.;
+//	Real mu_turb = eddyViscosity(uh);
 	Real mu = physicalViscosity(uh);
-	sigma *= mu_turb/_reynolds;
-	sigma(0, 0) -= 2./3*uh[5]; sigma(1, 1) -= 2./3*uh[5]; sigma(2, 2) -= 2./3*uh[5];
+	Real production = 2*stress.size_sq();
 
-	Real production = 0;
-	for (int a = 0; a < LIBMESH_DIM; ++a)
-	{
-		for (int b = 0; b < LIBMESH_DIM; ++b)
-		{
-			production += sigma(a,b)*velocity_tensor(a,b);
-		}
-	}
+	Real lamdiv = (velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2))/3.;
+	RealTensor stress1 = stress;
+	stress1(0, 0) -= lamdiv; stress1(1, 1) -= lamdiv; stress1(2, 2) -= lamdiv;
+	Real w_lim = log(7./8*sqrt(2*stress1.size_sq()/_beta_k));
 
 	Real k = uh[5]/uh[0];
 	Real w = uh[6]/uh[0];
-	k = std::max<Real>(k, _tu_infty);
+	k = std::max<Real>(k, 0);
+	w = std::max<Real>(w, w_lim);
+	Real mu_turb = _reynolds*uh[0]*k/exp(w);
+
 	RealVectorValue grad_o = (duh[6] - uh[6]/uh[0]*duh[0])/uh[0];
+	RealVectorValue grad_k = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
 	Real grad_o_square = grad_o.size_sq();
 
 	int component = 0;
@@ -192,28 +197,32 @@ void KOBase::sourceTerm(Real* source_term, Real* uh, RealGradient* duh)
 	source_term[component] = 0.;
 
 	component = 5;
-	source_term[component] = production - _beta_k*rho*k*exp(w);
-//	source_term[component] = -0.000;
+	source_term[component] = mu_turb/_reynolds*production - _beta_k*rho*k*exp(w);
+//	source_term[component] = 0.;
 
 	component = 6;
-	source_term[component] = _alpha_o/k*production - _beta_o*rho*exp(w)+grad_o_square*(mu + _sigma_o*mu_turb)/_reynolds;
-//	source_term[component] = -0.000;
-//	std::cout << production - _beta_k*rho*k*exp(w) <<std::endl;
-//	std::cout << k << std::endl;
+	source_term[component] = _alpha_o*rho/exp(w)*production
+						   - _beta_o*rho*exp(w)
+						   + grad_o_square*(mu + _sigma_o*mu_turb)/_reynolds;
+//	source_term[component] = 0.;
 
+//	if(grad_k*grad_o > 0)
+//		source_term[component] += _sigma_d*grad_k*grad_o/exp(w);
 }
 
 Real KOBase::eddyViscosity(Real* uh)
 {
-//	Real eddy_vis =_reynolds * uh[5]/(uh[6]/uh[0]);
-//	eddy_vis = std::max<Real>(eddy_vis, 0);
-//	eddy_vis = std::min<Real>(eddy_vis, 500);
 	Real k = uh[5]/uh[0];
 	Real w = uh[6]/uh[0];
-	k = std::max<Real>(k, _tu_infty);
+
+	k = std::max<Real>(k, 0);
+	k = std::min<Real>(k, 10000*_tu_infty);
 	return _reynolds*uh[0]*k/exp(w);
-//	std::cout << eddy_vis <<std::endl;
-//	return 0*eddy_vis;
 }
 
+Real KOBase::pressure(Real* uh)
+{
+//	return NSBase::pressure(uh);
+	return (_gamma-1)*(uh[4] - uh[5] - 0.5*(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0]);
+}
 

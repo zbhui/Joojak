@@ -4,7 +4,7 @@
  	family = MONOMIAL
   	
   mach = 0.2
-  reynolds = 5E+06
+  reynolds = 1E+06
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe rhok rhoo'
 []
@@ -93,19 +93,19 @@
   num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
- 	l_tol = 1e-02
+ 	l_tol = 1e-01
  # l_abs_step_tol = -1e-04
    # 最大线性迭代步	
  	l_max_its = 100
  	
  	# 最大非线性迭代步
- 	nl_max_its = 100
+ 	nl_max_its = 10
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-3
+  	nl_rel_tol = 1e-2
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
-  	
+  	#restart_file_base = plate2d_komega_checkpoint_cp/0026 
 	 #abort_on_solve_fail = true	
   #end_time = 0.1
   
@@ -114,7 +114,7 @@
 		dt = 1e-02
 		ratio = 2
 		step = 2
-		max_dt = 1e+08
+		max_dt = 1e+01
 	[../]
 []
 
@@ -391,17 +391,18 @@
   [../]
 
   [./wall_material]
-		boundary = 2
+		boundary = wall
 		bc_type = isothermal_wall
+		#bc_type = far_field
     type = KOBndMaterial
   [../]
   [./far_field_material]
-		boundary = '3 4 5'
+		boundary = 'left right'
 		bc_type = far_field
     type = KOBndMaterial
   [../]
   [./symmetric_material]
-		boundary = 1
+		boundary = 'symmetric top'
 		bc_type = symmetric
     type = KOBndMaterial
   [../]
