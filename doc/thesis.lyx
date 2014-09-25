@@ -129,6 +129,338 @@ Euler/N-S方程
 \end_layout
 
 \begin_layout Subsection
+SA一方程模型
+\end_layout
+
+\begin_layout Standard
+SA湍流模型方程：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho}{\partial t}+\frac{\partial\rho u_{_{\beta}}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho u_{\alpha}}{\partial t}+\frac{\partial(\rho u_{\beta}u_{\alpha}+p\delta_{\alpha\beta})}{\partial x_{\beta}}-\frac{\partial\overline{\tau}_{\alpha\beta}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho e}{\partial t}+\frac{\partial\rho hu_{\beta}}{\partial x_{\beta}}-\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\nu}}{\partial t}+\frac{\partial\rho\tilde{\nu}u_{\beta}}{\partial x_{\beta}}-\frac{1}{\sigma}\left[\frac{\partial}{\partial x_{\alpha}}\left((\mu+\mu\Psi)\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\right)\right]=c_{b1}\tilde{S}\mu\Psi+\frac{1}{\sigma}c_{b2}\rho\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\frac{\partial\tilde{\nu}}{\partial x_{\beta}}-\frac{1}{\rho}c_{w1}f_{w}\left(\frac{\mu\Psi}{D}\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\chi=\frac{\rho\tilde{\nu}}{\mu}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi=\begin{cases}
+0.05\ln(1+e^{20\chi}) & \text{if}\ \chi\leq10\\
+\chi & \text{if}\ \chi>10
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{v1}=\frac{\Psi^{3}}{\Psi^{3}+c_{v1}^{3}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{v2}=1-\frac{\Psi}{1+\Psi f_{v1}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{S}=\frac{\mu\Psi}{\rho\kappa^{2}D^{2}}f_{v2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{S}=\begin{cases}
+\left|\Omega\right|+\hat{S} & \text{if}\ \hat{S}\geq-c_{v2}\left|\Omega\right|\\
+\left|\Omega\right|+\frac{(c_{v2}^{2}\left|\Omega\right|+c_{v3}\hat{S})\left|\Omega\right|}{(c_{v3}-2c_{v2})\left|\Omega\right|-\hat{S}} & \text{if}\ \hat{S}<-c_{v2}\left|\Omega\right|
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+|\Omega|=\sqrt{2W_{\alpha\beta}W_{\alpha\beta}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W_{\alpha\beta}=\frac{1}{2}(\partial_{\beta}u_{\alpha}-\partial_{\alpha}u_{\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其他函数定义如下：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+r=\min\left(\frac{\hat{S}}{\tilde{S}f_{v2}},10\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g=r+c_{w2}(r^{6}-r)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{w}=g\left(\frac{1+c_{w3}^{6}}{g^{6}+c_{w3}^{6}}\right)^{\frac{1}{6}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流粘性
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{t}=\mu\Psi f_{v1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{q}_{\beta}=-(\frac{\mu\gamma}{Pr}+\frac{\mu_{t}\gamma}{Pr_{t}})\partial_{\beta}(e-\frac{1}{2}u_{k}^{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+模型参数如下：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+c_{b1} & = & 0.1355,\ c_{b2}=0.622,\ \sigma=\frac{2}{3},\ \kappa=0.41,
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+c_{w1}=\frac{c_{b1}}{\kappa^{2}}+\frac{1+c_{b2}}{\sigma},\ c_{w2}=0.3,\ c_{w3}=2.0,\ c_{v1}=7.1,\ c_{v2}=0.7,\ c_{v3}=0.9
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+c_{t1}=1.0,\ c_{t2}=2.0,\ c_{t_{3}}=1.2,\ c_{t4}=0.5
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+物面边界条件
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{\text{\nu}}_{wall}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+远场边界条件
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{v}_{\infty}=0.01
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+初始条件
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{v}=0.01
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SA方程的无量纲形式
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\nu}}{\partial t}+\frac{\partial\rho\tilde{\nu}u_{\beta}}{\partial x_{\beta}}-\frac{1}{Re}\frac{1}{\sigma}\left[\frac{\partial}{\partial x_{\alpha}}\left((\mu+\mu\Psi)\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\right)\right]=c_{b1}\tilde{S}\mu\Psi+\frac{1}{Re}\frac{1}{\sigma}c_{b2}\rho\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\frac{\partial\tilde{\nu}}{\partial x_{\beta}}-\frac{1}{Re}\frac{1}{\rho}c_{w1}f_{w}\left(\frac{\mu\Psi}{D}\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{S}=\frac{\mu\Psi}{Re\rho\kappa^{2}D^{2}}f_{v2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Wilcox(2006)
 \begin_inset Formula $k-\omega$
 \end_inset
@@ -438,19 +770,6 @@ Reynolds应力张量
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 \alpha_{\omega}=\frac{5}{9},\:\beta_{k}=\frac{9}{100},\:\beta_{\omega}=\frac{3}{40},\:\sigma_{k}=\sigma_{\omega}=\frac{1}{2}
@@ -680,19 +999,6 @@ Reynolds应力张量
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 \sigma_{\alpha\beta}=\frac{1}{Re}\mu_{t}(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})-\frac{2}{3}\rho k\delta_{\alpha\beta}
