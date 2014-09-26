@@ -19,8 +19,9 @@ protected:
 	int equationIndex(const std::string &var_name);
 	Real eddyViscosity(Real *uh);
 	virtual void inviscousTerm(RealVectorValue* inviscous_term, Real* uh);
+	virtual void viscousAndSourceTerm(RealVectorValue *viscous_term, Real* source_term, Real *uh, RealGradient *duh, Real d);
 	virtual void viscousTerm(RealVectorValue *viscous_term, Real *uh, RealGradient *duh);
-	virtual void sourceTerm(Real* source_term, Real* uh, RealGradient* duh, Real d);
+//	virtual void sourceTerm(Real* source_term, Real* uh, RealGradient* duh, Real d);
 protected:
 	Real _cb1, _cb2, _sigma_sa, _kappa;
 	Real _cw1, _cw2, _cw3, _cv1, _cv2, _cv3;

@@ -43,6 +43,6 @@ protected:
 
 
 	void computeQpValue(Real *uh, RealGradient *duh);
-	void fluxTerm(RealVectorValue *flux_term, Real *uh, RealGradient *duh);
+	void fluxTerm(RealVectorValue *flux_term, Real *source_term, Real *uh, RealGradient *duh);
 	Real distance();
 };

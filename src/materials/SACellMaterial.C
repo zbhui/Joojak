@@ -48,19 +48,20 @@ void SACellMaterial::computeQpProperties()
 	Real uh[10];
 	RealGradient duh[10];
 	RealVectorValue flux_term_new[10];
-	Real d= distance();
 
 	computeQpValue(uh, duh);
-	fluxTerm(&_flux_term[_qp][0], uh, duh);
-	sourceTerm(&_source_term[_qp][0], uh, duh, d);
+//	fluxTerm(&_flux_term[_qp][0], uh, duh);
+//	sourceTerm(&_source_term[_qp][0], uh, duh, d);
+	fluxTerm(&_flux_term[_qp][0], &_source_term[_qp][0], uh, duh);
 
 	RealVectorValue invis_term_new[10];
 	Real source_term_new[10];
 	for (int q = 0; q < _n_equations; ++q)
 	{
 		uh[q] += _ds;
-		fluxTerm(flux_term_new, uh, duh);
-		sourceTerm(source_term_new, uh, duh, d);
+//		fluxTerm(flux_term_new, uh, duh);
+//		sourceTerm(source_term_new, uh, duh, d);
+		fluxTerm(flux_term_new, source_term_new, uh, duh);
 
 		for (int p = 0; p < _n_equations; ++p)
 		{
@@ -73,8 +74,9 @@ void SACellMaterial::computeQpProperties()
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			duh[q](beta) += _ds;
-			fluxTerm(flux_term_new, uh, duh);
-			sourceTerm(source_term_new, uh, duh, d);
+//			fluxTerm(flux_term_new, uh, duh);
+//			sourceTerm(source_term_new, uh, duh, d);
+			fluxTerm(flux_term_new, source_term_new, uh, duh);
 			for (int p = 0; p < _n_equations; ++p)
 			{
 				_source_jacobi_grad_variable[_qp][p][q](beta) = (source_term_new[p] - _source_term[_qp][p])/_ds;
@@ -116,11 +118,12 @@ void SACellMaterial::resizeQpProperty()
 
 }
 
-void SACellMaterial::fluxTerm(RealVectorValue* flux_term, Real* uh, RealGradient* duh)
+void SACellMaterial::fluxTerm(RealVectorValue* flux_term, Real *source_term, Real* uh, RealGradient* duh)
 {
 	RealVectorValue invis_term[10], viscous_term[10];
+	Real d = distance();
 	inviscousTerm(invis_term, uh);
-	viscousTerm(viscous_term, uh, duh);
+	viscousAndSourceTerm(viscous_term, source_term, uh, duh, d);
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		flux_term[eq] = invis_term[eq] - viscous_term[eq];

@@ -58,6 +58,8 @@
 #include "CFDForcePostprocessor.h"
 #include "BumpElementL2Error.h"
 
+#include "SAInclude.h"
+
 template<>
 InputParameters validParams<JoojakApp>()
 {
@@ -142,9 +144,40 @@ JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(ElementExtremeTimeDerivative);
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
+
+	registerSAObjects(factory);
 }
 
 void
 JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+}
+
+void JoojakApp::registerSAObjects(Factory & factory)
+{
+	/// 注册初始条件
+	registerInitialCondition(SAIC);
+
+	/// 注册边界条件
+	registerBoundaryCondition(SABC);
+
+	/// 注册Kernel
+	registerKernel(SACellKernel);
+
+	/// 注册DGKernel
+	registerDGKernel(SAFaceKernel);
+
+	/// 注册材料属性
+	registerMaterial(SACellMaterial);
+	registerMaterial(SAFaceMaterial);
+	registerMaterial(SABndMaterial);
+
+	/// 注册函数
+
+	///注册辅助kernel
+	registerAux(SAAuxVariable);
+
+	/// 注册时间步长
+
+	/// 注册后处理
 }
