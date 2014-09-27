@@ -4,13 +4,14 @@
  	family = MONOMIAL
   	
   mach = 0.5
+	reynolds = 10
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.1_bump/bump_tri_level5.msh
+  file = ../high-order-workshop/C1.1_bump/bump_tri_level2.msh
   dim = 2
   
   block_id = 5
@@ -139,12 +140,6 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
-	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
 	[../]
 []
 

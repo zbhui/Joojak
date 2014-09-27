@@ -18,7 +18,7 @@ InputParameters validParams<EulerBndMaterial>()
   params += validParams<EulerBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
-  MooseEnum bc_types("wall, far_field, symmetric, pressure_out, none", "none");  // 边界条件的类型，可以增加
+  MooseEnum bc_types("wall far_field symmetric pressure_out none", "none");  // 边界条件的类型，可以增加
   params.addRequiredParam<MooseEnum>("bc_type", bc_types, "边界条件");
 
   return params;

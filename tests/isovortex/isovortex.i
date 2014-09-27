@@ -142,12 +142,6 @@
 		linear_residuals = true
 	  nonlinear_residuals =  true	
 	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
-	[../]
 []
 
 # 变量

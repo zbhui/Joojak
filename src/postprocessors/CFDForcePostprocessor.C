@@ -5,8 +5,8 @@
 template<>
 InputParameters validParams<CFDForcePostprocessor>()
 {
-	MooseEnum direction_options("x,y,z");
-	MooseEnum force_options("form,friction,total");
+	MooseEnum direction_options("x y z");
+	MooseEnum force_options("form friction total");
 	InputParameters params = validParams<SideIntegralPostprocessor>();
 	params += validParams<NSBase>();
 	params.addRequiredParam<MooseEnum>("direction_by", direction_options, "气动力分量");
