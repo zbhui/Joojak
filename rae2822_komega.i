@@ -1,28 +1,23 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
-  mach = 0.5
-  reynolds = 5000
-	attack = 1
-	sideslip = 0
-	pitch = 0
-	yaw = 180
-	roll = 0
-	ref_area = 0.05
+  mach = 0.134
+  reynolds = 5.0e+05  	
+  attack = 2.79
   	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  variables = 'rho momentum_x momentum_y momentum_z rhoe rhok rhoo'
 []
 
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C2.3_body/btc0-NLR-E2.v2.msh
-  dim = 3
+  file = ../high-order-workshop/C2.2_rae2822/rae2822_level5.msh
+  dim = 2
 
-  boundary_id = '1 2 3'
-  boundary_name = 'wall symmetric far_field'
+  boundary_id = '1 3' 
+  boundary_name = 'wall far_field'
 
   block_id = '0'
   block_name = 'fluid'
@@ -42,6 +37,8 @@
   [../]
 
   [./velocity_z]
+  [../]
+  [./eddy_viscosity]
   [../]
 []
 
@@ -70,6 +67,10 @@
 		type = NSAuxVariable
 		variable = velocity_z
   [../]
+  [./eddy_viscosity]
+		type = NSAuxVariable
+		variable = eddy_viscosity
+  [../]
 []
 
 [Preconditioning]
@@ -77,8 +78,12 @@
 		type = SMP
 		full = true
 
-    petsc_options_iname = 'ksp_type -pc_type '
-  	petsc_options_value = 'bcgs bjacobi'
+	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+  	#petsc_options_value = 'lu test'
+		#petsc_options = '-pc_sor_symmetric'
+    petsc_options_iname = '-ksp_type  -pc_type '
+  	petsc_options_value = 'gmres 				bjacobi  '
 	[../]
 
 []
@@ -107,16 +112,15 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+02
+		dt = 1e-02
 		ratio = 2
 		step = 2
-		max_dt = 1E+02
+		max_dt = 1e+08
 	[../]
 []
 
 
 [Postprocessors]
-
 
 	[./residual_final]
   	type = Residual
@@ -131,17 +135,34 @@
 		time_type = alive
 	[../]
 
-
+	[./force_form-x]
+  	type = CFDForcePostprocessor
+		direction_by = x
+		force_type = form
+		boundary  = wall
+	[../]
+	[./force_friction-x]
+  	type = CFDForcePostprocessor
+		direction_by = x
+		force_type = friction
+		boundary  = wall
+	[../]
 	[./force_total-x]
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = total
 		boundary  = wall
 	[../]
-	[./force_total-y]
+	[./force_form-z]
   	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = total
+		direction_by = z
+		force_type = form
+		boundary  = wall
+	[../]
+	[./force_friction-z]
+  	type = CFDForcePostprocessor
+		direction_by = z
+		force_type = friction
 		boundary  = wall
 	[../]
 	[./force_total-z]
@@ -152,16 +173,16 @@
 	[../]
  
 []
+
 # 输出和后处理
 [Outputs]
-	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
 		
 		interval = 1 					#间隔
 		oversample = true
-		refinements = 0
+		refinements = 1
 	[../]
 	
 	[./console]
@@ -184,35 +205,39 @@
 
 # 变量
 [Variables]
-	active = 'rho momentum_x momentum_y momentum_z rhoe'
-
 	[./rho]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
   [../]
-
  	[./momentum_x]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
-  [../]
-  
+  [../]  
  	[./momentum_y]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
-  [../]
-  	
-   [./momentum_z]
+  [../] 	
+  [./momentum_z]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
 		[../]
-  [../]
-  	
+  [../] 	
   [./rhoe]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = KOIC
+		[../]
+  [../]	
+  [./rhok]
+		[./InitialCondition] 
+			type = KOIC
+		[../]
+  [../]	
+  [./rhoo]
+		[./InitialCondition] 
+			type = KOIC
 		[../]
   [../]	
 		
@@ -240,77 +265,113 @@
 		type = TimeDerivative
 		variable = rhoe
 	[../]
+	[./rhok_time]
+		type = TimeDerivative
+		variable = rhok
+	[../]
+	[./rhoo_time]
+		type = TimeDerivative
+		variable = rhoo
+	[../]
 
 	[./mass_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_space]
-		type = NSCellKernel
+		type = KOCellKernel
 		variable = rhoe
+	[../]
+	[./rhok_space]
+		type = KOCellKernel
+		variable = rhok
+	[../]
+	[./rhoo_space]
+		type = KOCellKernel
+		variable = rhoo
 	[../]
 []
 
+
 [DGKernels]
 	[./mass_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_dg]
-		type = NSFaceKernel
+		type = KOFaceKernel
 		variable = rhoe
 	[../]
+	[./rhok_dg]
+		type = KOFaceKernel
+		variable = rhok
+	[../]
+	[./rhoo_dg]
+		type = KOFaceKernel
+		variable = rhoo
+	[../]
 []
+
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '1 2 3'
-		type = NSBC
+		boundary = '1 3'
+		type =KOBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '1 2 3'
-		type = NSBC
+		boundary = '1 3'
+		type =KOBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '1 2 3 '
-		type = NSBC
+		boundary = '1 3'
+		type =KOBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '1 2 3 '
-		type = NSBC
+		boundary = '1 3'
+		type =KOBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '1 2 3'
-		type = NSBC
+		boundary = '1 3'
+		type =KOBC
 		variable = rhoe
+	[../]
+	[./rhok_bc]
+		boundary = '1 3'
+		type =KOBC
+		variable = rhok
+	[../]
+	[./rhoo_bc]
+		boundary = '1 3'
+		type =KOBC
+		variable = rhoo
 	[../]
 []
 
@@ -318,30 +379,25 @@
 [Materials]
   [./cell_material]
 		block = fluid
-    type = NSCellMaterial
+    type = KOCellMaterial
   [../]
 
   [./face_material]
 		block = fluid
-    type = NSFaceMaterial
+    type = KOFaceMaterial
+  [../]
+
+ 	[./far_field_material]
+		boundary = far_field
+		bc_type = far_field
+    type = KOBndMaterial
   [../]
 
   [./wall_material]
 		boundary = wall
 		bc_type = isothermal_wall
-    type = NSBndMaterial
+    type = KOBndMaterial
   [../]
-  [./far_field_material]
-		boundary = '3'
-		bc_type = far_field
-    type = NSBndMaterial
-  [../]
-  [./symmetric_material]
-		boundary = 2
-		bc_type = symmetric
-    type = NSBndMaterial
-  [../]
-
 
 []
 

@@ -1,16 +1,16 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
-  mach = 0.5
-  reynolds = 5000
-	attack = 1
+  mach = 0.3
+  reynolds = 4000
+	attack = 12.5
 	sideslip = 0
 	pitch = 0
 	yaw = 180
 	roll = 0
-	ref_area = 0.05
+	ref_area = 0.133974596
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
@@ -18,7 +18,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C2.3_body/btc0-NLR-E2.v2.msh
+  file = ../high-order-workshop/C2.4_delta/delta.1.msh
   dim = 3
 
   boundary_id = '1 2 3'
@@ -26,6 +26,7 @@
 
   block_id = '0'
   block_name = 'fluid'
+	uniform_refine = 0
 []
 
 [AuxVariables]

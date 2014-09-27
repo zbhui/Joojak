@@ -129,11 +129,991 @@ Euler/N-S方程
 \end_layout
 
 \begin_layout Subsection
+SA一方程模型
+\end_layout
+
+\begin_layout Standard
+SA湍流模型方程：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho}{\partial t}+\frac{\partial\rho u_{_{\beta}}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho u_{\alpha}}{\partial t}+\frac{\partial(\rho u_{\beta}u_{\alpha}+p\delta_{\alpha\beta})}{\partial x_{\beta}}-\frac{\partial\overline{\tau}_{\alpha\beta}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho e}{\partial t}+\frac{\partial\rho hu_{\beta}}{\partial x_{\beta}}-\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\nu}}{\partial t}+\frac{\partial\rho\tilde{\nu}u_{\beta}}{\partial x_{\beta}}-\frac{1}{\sigma}\left[\frac{\partial}{\partial x_{\alpha}}\left((\mu+\mu\Psi)\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\right)\right]=c_{b1}\tilde{S}\mu\Psi+\frac{1}{\sigma}c_{b2}\rho\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\frac{\partial\tilde{\nu}}{\partial x_{\beta}}-\frac{1}{\rho}c_{w1}f_{w}\left(\frac{\mu\Psi}{D}\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\chi=\frac{\rho\tilde{\nu}}{\mu}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\Psi=\begin{cases}
+0.05\ln(1+e^{20\chi}) & \text{if}\ \chi\leq10\\
+\chi & \text{if}\ \chi>10
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{v1}=\frac{\Psi^{3}}{\Psi^{3}+c_{v1}^{3}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{v2}=1-\frac{\Psi}{1+\Psi f_{v1}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{S}=\frac{\mu\Psi}{\rho\kappa^{2}D^{2}}f_{v2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{S}=\begin{cases}
+\left|\Omega\right|+\hat{S} & \text{if}\ \hat{S}\geq-c_{v2}\left|\Omega\right|\\
+\left|\Omega\right|+\frac{(c_{v2}^{2}\left|\Omega\right|+c_{v3}\hat{S})\left|\Omega\right|}{(c_{v3}-2c_{v2})\left|\Omega\right|-\hat{S}} & \text{if}\ \hat{S}<-c_{v2}\left|\Omega\right|
+\end{cases}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+|\Omega|=\sqrt{2W_{\alpha\beta}W_{\alpha\beta}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+W_{\alpha\beta}=\frac{1}{2}(\partial_{\beta}u_{\alpha}-\partial_{\alpha}u_{\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其他函数定义如下：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+r=\min\left(\frac{\hat{S}}{\tilde{S}f_{v2}},10\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g=r+c_{w2}(r^{6}-r)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{w}=g\left(\frac{1+c_{w3}^{6}}{g^{6}+c_{w3}^{6}}\right)^{\frac{1}{6}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流粘性
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{t}=\mu\Psi f_{v1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{q}_{\beta}=-(\frac{\mu\gamma}{Pr}+\frac{\mu_{t}\gamma}{Pr_{t}})\partial_{\beta}(e-\frac{1}{2}u_{k}^{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+模型参数如下：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+c_{b1} & = & 0.1355,\ c_{b2}=0.622,\ \sigma=\frac{2}{3},\ \kappa=0.41,
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+c_{w1}=\frac{c_{b1}}{\kappa^{2}}+\frac{1+c_{b2}}{\sigma},\ c_{w2}=0.3,\ c_{w3}=2.0,\ c_{v1}=7.1,\ c_{v2}=0.7,\ c_{v3}=0.9
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+c_{t1}=1.0,\ c_{t2}=2.0,\ c_{t_{3}}=1.2,\ c_{t4}=0.5
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+物面边界条件
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{\text{\nu}}_{wall}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+远场边界条件
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{v}_{\infty}=0.01
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+初始条件
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{v}=0.01
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SA方程的无量纲形式
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\nu}}{\partial t}+\frac{\partial\rho\tilde{\nu}u_{\beta}}{\partial x_{\beta}}-\frac{1}{Re}\frac{1}{\sigma}\left[\frac{\partial}{\partial x_{\alpha}}\left((\mu+\mu\Psi)\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\right)\right]=c_{b1}\tilde{S}\mu\Psi+\frac{1}{Re}\frac{1}{\sigma}c_{b2}\rho\frac{\partial\tilde{\nu}}{\partial x_{\beta}}\frac{\partial\tilde{\nu}}{\partial x_{\beta}}-\frac{1}{Re}\frac{1}{\rho}c_{w1}f_{w}\left(\frac{\mu\Psi}{D}\right)^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{S}=\frac{\mu\Psi}{Re\rho\kappa^{2}D^{2}}f_{v2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Wilcox(2006)
+\begin_inset Formula $k-\omega$
+\end_inset
+
+两方程模型
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho}{\partial t}+\frac{\partial(\rho u_{_{\beta}})}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial(\rho u_{\alpha})}{\partial t}+\frac{\partial(\rho u_{\beta}u_{\alpha}+(p+\frac{2}{3}\rho k)\delta_{\alpha\beta})}{\partial x_{\beta}}-\frac{\partial\overline{\tau}_{\alpha\beta}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho e}{\partial t}+\frac{\partial((\rho h+\frac{2}{3}\rho k)u_{\beta})}{\partial x_{\beta}}-\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho k}{\partial t}+\frac{\partial(\rho u_{\beta}k)}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=P-\beta_{k}\rho\omega k
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\omega}{\partial t}+\frac{\partial(\rho u_{\beta}\omega)}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{\omega}\mu_{t})\frac{\partial\omega}{\partial x_{\beta}}\right]=\frac{\alpha_{\omega}\omega}{k}P-\beta_{\omega}\rho\omega^{2}+\frac{\rho\sigma_{d}}{\omega}\frac{\partial k}{\partial x_{\beta}}\frac{\partial\omega}{\partial x_{\beta}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中生成项
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P=\tau_{\alpha\beta}\partial_{\beta}u_{\alpha}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tau_{\alpha\beta}=\mu_{t}(2S_{\alpha\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})-\frac{2}{3}\rho k\delta_{\alpha\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(2S_{\alpha\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+S_{\alpha\beta}=\frac{1}{2}(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流涡粘性
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{t}=\frac{\rho k}{\omega}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+对
+\begin_inset Formula $\omega$
+\end_inset
+
+的限制
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\hat{\omega}=\max\left[\omega,C_{\lim}\sqrt{\frac{2\overline{S}_{\alpha\beta}\overline{S}_{\alpha\beta}}{\beta_{k}}}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{S}_{\alpha\beta}=S_{\alpha\beta}-\frac{1}{3}\partial_{k}u_{k}\delta_{\alpha\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 RANS方程
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho}{\partial t}+\frac{\partial(\rho u_{_{\beta}})}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial(\rho u_{\alpha})}{\partial t}+\frac{\partial(\rho u_{\beta}u_{\alpha}+(p+\frac{2}{3}\rho k)\delta_{\alpha\beta})}{\partial x_{\beta}}-\frac{\partial\overline{\tau}_{\alpha\beta}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho e}{\partial t}+\frac{\partial((\rho h+\frac{2}{3}\rho k)u_{\beta})}{\partial x_{\beta}}-\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}=-\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}+\beta_{k}\rho ke^{\tilde{\omega}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho k}{\partial t}+\frac{\partial(\rho u_{\beta}k)}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{k}\rho ke^{\tilde{\omega}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\omega}}{\partial t}+\frac{\partial(\rho u_{\beta}\tilde{\omega})}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{\omega}\mu_{t})\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\right]=\frac{\alpha_{\omega}}{k}\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{\omega}\rho e^{\tilde{\omega}}+\left(\mu+\sigma_{\omega}\mu_{t}\right)\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\frac{\partial\tilde{\omega}}{\partial x_{\beta}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流粘性
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{t}=\rho ke^{-\tilde{\omega}}
+\]
+
+\end_inset
+
+ 应力张量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reynolds应力张量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\sigma_{\alpha\beta}=\mu_{t}(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})-\frac{2}{3}\rho k\delta_{\alpha\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+热流
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{q}_{\beta}=-(\frac{\mu\gamma}{Pr}+\frac{\mu_{t}\gamma}{Pr_{t}})\partial_{\beta}(e-\frac{1}{2}u_{k}^{2})
+\]
+
+\end_inset
+
+ 湍流Prandtl数
+\begin_inset Formula $Pr_{t}=0.9$
+\end_inset
+
+，分子Prandlt数
+\begin_inset Formula $Pr=0.72$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+模型系数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\alpha_{\omega}=\frac{5}{9},\:\beta_{k}=\frac{9}{100},\:\beta_{\omega}=\frac{3}{40},\:\sigma_{k}=\sigma_{\omega}=\frac{1}{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+壁面边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{\omega}_{\text{w}}=\ln\left(\frac{60\mu}{\rho\beta_{\omega}(\Delta y_{1})^{2}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{\text{w}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+远场边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}\boldsymbol{V}_{\infty}^{2},\;(\text{default: \text{Tu}_{\infty}=0.005})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\omega_{\infty}=\frac{\rho_{\infty}k_{\infty}}{r_{\mu}\mu_{\infty}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+r_{\mu}=10^{-5}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 无量纲化
+\end_layout
+
+\begin_layout Standard
+无量纲参考量选择
+\begin_inset Formula $L,\rho_{\infty},V_{\infty},\mu_{\infty}$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+则
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+t\sim\frac{L}{V_{\infty}},p\sim\rho_{\infty}V_{\infty}^{2},e\sim V_{\infty}^{2},k\sim V_{\infty}^{2},\omega\sim\frac{V_{\infty}}{L}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reynolds数
+\begin_inset Formula $Re=\frac{\rho V_{\infty}L}{\mu_{\infty}}$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $k-\omega$
+\end_inset
+
+模型的无量纲形式为
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho}{\partial t}+\frac{\partial(\rho u_{_{\beta}})}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial(\rho u_{\alpha})}{\partial t}+\frac{\partial(\rho u_{\beta}u_{\alpha}+(p+\frac{2}{3}\rho k)\delta_{\alpha\beta})}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial\overline{\tau}_{\alpha\beta}}{\partial x_{\beta}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho e}{\partial t}+\frac{\partial((\rho h+\frac{2}{3}\rho k)u_{\beta})}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho k}{\partial t}+\frac{\partial(\rho u_{\beta}k)}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{k}\rho ke^{\tilde{\omega}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial\rho\tilde{\omega}}{\partial t}+\frac{\partial(\rho u_{\beta}\tilde{\omega})}{\partial x_{\beta}}-\frac{1}{Re}\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{\omega}\mu_{t})\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\right]=\frac{\alpha_{\omega}}{k}\sigma_{\alpha\beta}\frac{\partial u_{\alpha}}{\partial x_{\beta}}-\beta_{\omega}\rho e^{\tilde{\omega}}+\frac{1}{Re}\left(\mu+\sigma_{\omega}\mu_{t}\right)\frac{\partial\tilde{\omega}}{\partial x_{\beta}}\frac{\partial\tilde{\omega}}{\partial x_{\beta}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+压强需要考虑湍动能的贡献
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p=(\gamma-1)(e-k-\frac{1}{2}\boldsymbol{v}^{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流粘性
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mu_{t}=Re\rho ke^{-\tilde{\omega}}
+\]
+
+\end_inset
+
+ 应力张量
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reynolds应力张量
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sigma_{\alpha\beta}=\frac{1}{Re}\mu_{t}(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})-\frac{2}{3}\rho k\delta_{\alpha\beta}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+热流
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\overline{q}_{\beta}=-(\frac{\mu\gamma}{Pr}+\frac{\mu_{t}\gamma}{Pr_{t}})\partial_{\beta}(e-\frac{1}{2}u_{k}^{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+壁面边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\tilde{\omega}_{\text{w}}=\ln\left(\frac{60\mu}{Re\rho\beta_{\omega}(\Delta y_{1})^{2}}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{\text{w}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+远场边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\omega_{\infty}=\frac{Rek_{\infty}}{r_{\mu}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+湍流Prandtl数
+\begin_inset Formula $Pr_{t}=0.9$
+\end_inset
+
+，分子Prandlt数
+\begin_inset Formula $Pr=0.72$
+\end_inset
+
+。
+\end_layout
+
+\begin_layout Standard
+模型系数
+\end_layout
+
+\begin_layout Standard
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\lang english
+\begin_inset Formula 
+\[
+\alpha_{\omega}=\frac{5}{9},\:\beta_{k}=\frac{9}{100},\:\beta_{\omega}=\frac{3}{40},\:\sigma_{k}=\sigma_{\omega}=\frac{1}{2}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1491,6 +2471,767 @@ Reynolds输运方程
 \end_layout
 
 \begin_layout Section
+NACA0012翼型绕流
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Ma_{\infty}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $Reynolds$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+攻角
+\begin_inset Formula $\alpha$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+亚音速无粘绕流
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+---
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2^{\circ}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+跨音速无粘绕流
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+---
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.25^{\circ}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+亚音速粘性绕流
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5000
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1^{\circ}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+NACA0012翼型绕流计算条件
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="9">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell multirow="3" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lift
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Drag
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lift
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Drag
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lift
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Drag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+二阶
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.597041e-01
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4.579912e-03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.325973e-02
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3.077293e-01
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3.059035e-02
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4.994556e-02
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+三阶
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.510917e-01
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.354972e-03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.192763e-02
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5.427221e-02
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+四阶
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.673468e-02
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5.502928e-02
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+五阶
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ref
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.865e-01
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.4219e-06
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.300700e-02
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+3.645358e-01
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.827381e-02
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5.531673e-02
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+NACA0012绕流气动力
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 圆柱绕流
 \end_layout
 
@@ -1607,16 +3348,16 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-26.2
+26.2s
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell multirow="3" alignment="left" valignment="middle" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-3.1893e-11
+1.0e-12
 \end_layout
 
 \end_inset
@@ -1634,7 +3375,7 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $dt=10000$
+\begin_inset Formula $dt=1\times10^{8}$
 \end_inset
 
 
@@ -1675,12 +3416,12 @@ block jacobi
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+55s
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1745,7 +3486,7 @@ block jacobi
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1805,12 +3546,12 @@ block jacobi
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+300s
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1875,7 +3616,7 @@ block jacobi
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell multirow="4" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2459,6 +4200,42 @@ Ref
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+湍流测试
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename cylinder_turb.png
+	lyxscale 50
+	width 8cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+平板边界层
+\end_layout
+
+\begin_layout Standard
+计算条件
+\begin_inset Formula $Ma=0.3$
+\end_inset
+
+，
+\begin_inset Formula $Reynolds=1\times10^{6}$
+\end_inset
+
+．
+\end_layout
+
+\begin_layout Standard
 
 \end_layout
 
@@ -3172,18 +4949,6 @@ NS方程计算结果
 \end_layout
 
 \begin_layout Standard
-\align center
-\begin_inset Graphics
-	filename /home/lw4992/projects/Joojak/doc/residual_dg1_body_e1.png
-	lyxscale 50
-	width 8cm
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 \begin_inset Float table
 placement H
 wide false
@@ -3270,7 +5035,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00036659
+1.739346e-02
 \end_layout
 
 \end_inset
@@ -3279,7 +5044,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06598684
+6.380800e-02
 \end_layout
 
 \end_inset
@@ -3299,7 +5064,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00036047
+5.600357e-03
 \end_layout
 
 \end_inset
@@ -3308,7 +5073,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06460744
+6.513965e-02
 \end_layout
 
 \end_inset
@@ -3338,6 +5103,260 @@ drag
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+三阶+L1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4.671813e-03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6.101299e-02
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+三阶+L2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.728221e-03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6.639876e-02
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ref
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.577788e-03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+6.317449e-02
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+旋转体层流气动力
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+半模参考面积
+\begin_inset Formula $ref\_area=0.05$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+三角翼
+\end_layout
+
+\begin_layout Standard
+计算状态
+\begin_inset Formula $Ma=0.3$
+\end_inset
+
+，
+\begin_inset Formula $Reynolds=4000$
+\end_inset
+
+，攻角
+\begin_inset Formula $12.5^{\circ}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename delta_wing.png
+	lyxscale 50
+	width 10cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+DGM精度
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lift
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="3" alignment="left" valignment="middle" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+drag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multirow="4" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+二阶
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.3106
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.1327
 \end_layout
 
 \end_inset
@@ -3357,7 +5376,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00033741
+
 \end_layout
 
 \end_inset
@@ -3366,7 +5385,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06073442
+
 \end_layout
 
 \end_inset
@@ -3377,7 +5396,7 @@ drag
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+四阶
 \end_layout
 
 \end_inset
@@ -3415,7 +5434,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.002577788
+0.347
 \end_layout
 
 \end_inset
@@ -3424,7 +5443,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.06317449
+0.1658
 \end_layout
 
 \end_inset
@@ -3441,18 +5460,9 @@ Ref
 \begin_inset Caption
 
 \begin_layout Plain Layout
-旋转体层流气动力
+三角翼层流气动力
 \end_layout
 
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-半模参考面积
-\begin_inset Formula $ref\_area=0.05$
 \end_inset
 
 

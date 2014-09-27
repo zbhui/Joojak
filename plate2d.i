@@ -1,9 +1,9 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
-  mach = 0.5
+  mach = 0.2
   reynolds = 1E+05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
@@ -12,7 +12,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
+  file = ../high-order-workshop/C1.4_plate/a0-125-2s.msh
   dim = 2
 
   boundary_id = '1 2 3 4 5' 
@@ -67,6 +67,7 @@
 []
 
 [Preconditioning]
+	active = PBP
 	[./SMP]
 		type = SMP
 		full = true
@@ -74,12 +75,19 @@
     petsc_options_iname = 'ksp_type -pc_type '
   	petsc_options_value = 'gmres lu'
 	[../]
-
+	[./PBP]
+    type = PBP
+    solve_order = 'rho rhoe'
+    preconditioner  = 'LU LU'
+    off_diag_row    = 'rho'
+    off_diag_column = 'rhoe'
+  [../]
+	[../]
 []
 # 非线性系统求解
 [Executioner]
   type = Transient
-  solve_type = NEWTON
+  solve_type = JFNK
   num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
@@ -91,7 +99,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 100
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-3
+  	nl_rel_tol = 1e-2
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -101,7 +109,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+01
+		dt = 1E-02
 		ratio = 2
 		step = 2
 		max_dt = 1E+08

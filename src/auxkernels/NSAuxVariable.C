@@ -5,7 +5,7 @@ template<>
 InputParameters validParams<NSAuxVariable>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params += validParams<EulerBase>();
+  params += validParams<NSBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
   return params;
@@ -13,7 +13,7 @@ InputParameters validParams<NSAuxVariable>()
 
 NSAuxVariable::NSAuxVariable(const std::string & name, InputParameters parameters) :
     AuxKernel(name, parameters),
-    EulerBase(name, parameters)
+    NSBase(name, parameters)
 {
 	size_t n_equation = coupledComponents("variables");
 	for (size_t i = 0; i < n_equation; ++i)
@@ -45,6 +45,8 @@ Real NSAuxVariable::computeValue()
 		return uh[2]/uh[0];
 	if(var_name == "velocity_z")
 		return uh[3]/uh[0];
+	if(var_name == "eddy_viscosity")
+		return _reynolds * uh[5]/exp(uh[6]/uh[0]);
 
 	mooseError(var_name << "辅助变量名不存在");
 	return 0.;

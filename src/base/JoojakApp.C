@@ -6,19 +6,23 @@
 /// 单元积分
 #include "EulerCellKernel.h"
 #include "NSCellKernel.h"
+#include "KOCellKernel.h"
 
 
 /// 面积分
 #include "EulerFaceKernel.h"
 #include "NSFaceKernel.h"
+#include "KOFaceKernel.h"
 
 /// 初始条件
 #include "IsoVortexIC.h"
 #include "CFDPassFlowIC.h"
+#include "KOIC.h"
 
 /// 边界条件
 #include "EulerBC.h"
 #include "NSBC.h"
+#include "KOBC.h"
 
 /// 函数
 #include "IsoVortexExact.h"
@@ -41,6 +45,10 @@
 #include "NSBndMaterial.h"
 #include "CouetteFlowBndMaterial.h"
 
+#include "KOCellMaterial.h"
+#include "KOFaceMaterial.h"
+#include "KOBndMaterial.h"
+
 /// 时间步长增加策略
 #include "RatioTimeStepper.h"
 
@@ -49,6 +57,8 @@
 #include "ElementExtremeTimeDerivative.h"
 #include "CFDForcePostprocessor.h"
 #include "BumpElementL2Error.h"
+
+#include "SAInclude.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -87,18 +97,22 @@ JoojakApp::registerObjects(Factory & factory)
 	/// 注册初始条件
 	registerInitialCondition(IsoVortexIC);
 	registerInitialCondition(CFDPassFlowIC);
+	registerInitialCondition(KOIC);
 
 	/// 注册边界条件
 	registerBoundaryCondition(EulerBC);
 	registerBoundaryCondition(NSBC);
+	registerBoundaryCondition(KOBC);
 
 	/// 注册Kernel
 	registerKernel(EulerCellKernel);
 	registerKernel(NSCellKernel);
+	registerKernel(KOCellKernel);
 
 	/// 注册DGKernel
 	registerDGKernel(EulerFaceKernel);
 	registerDGKernel(NSFaceKernel);
+	registerDGKernel(KOFaceKernel);
 
 	/// 注册材料属性
 	registerMaterial(EulerCellMaterial);
@@ -110,6 +124,11 @@ JoojakApp::registerObjects(Factory & factory)
 	registerMaterial(NSFaceMaterial);
 	registerMaterial(NSBndMaterial);
 	registerMaterial(CouetteFlowBndMaterial);
+
+	registerMaterial(KOCellMaterial);
+	registerMaterial(KOFaceMaterial);
+	registerMaterial(KOBndMaterial);
+
 	/// 注册函数
 	registerFunction(IsoVortexExact);
 	registerFunction(CouetteFlowExact);
@@ -125,9 +144,40 @@ JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(ElementExtremeTimeDerivative);
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
+
+	registerSAObjects(factory);
 }
 
 void
 JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+}
+
+void JoojakApp::registerSAObjects(Factory & factory)
+{
+	/// 注册初始条件
+	registerInitialCondition(SAIC);
+
+	/// 注册边界条件
+	registerBoundaryCondition(SABC);
+
+	/// 注册Kernel
+	registerKernel(SACellKernel);
+
+	/// 注册DGKernel
+	registerDGKernel(SAFaceKernel);
+
+	/// 注册材料属性
+	registerMaterial(SACellMaterial);
+	registerMaterial(SAFaceMaterial);
+	registerMaterial(SABndMaterial);
+
+	/// 注册函数
+
+	///注册辅助kernel
+	registerAux(SAAuxVariable);
+
+	/// 注册时间步长
+
+	/// 注册后处理
 }

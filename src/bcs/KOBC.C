@@ -1,18 +1,18 @@
 
-#include "NSBC.h"
+#include "KOBC.h"
 
 template<>
-InputParameters validParams<NSBC>()
+InputParameters validParams<KOBC>()
 {
 	InputParameters params = validParams<CFDBC>();
-	params += validParams<NSBase>();
+	params += validParams<KOBase>();
 
 	return params;
 }
 
-NSBC::NSBC(const std::string & name, InputParameters parameters):
+KOBC::KOBC(const std::string & name, InputParameters parameters):
 		CFDBC(name, parameters),
-		NSBase(name, parameters),
+		KOBase(name, parameters),
 		_flux(getMaterialProperty<std::vector<Real> >("flux")),
 		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable")),
 		_flux_jacobi_grad_variable(getMaterialProperty<std::vector<std::vector<RealGradient> > >("flux_jacobi_grad_variable")),
@@ -34,18 +34,21 @@ NSBC::NSBC(const std::string & name, InputParameters parameters):
 		_eq = 3;
 	if(var_name == "rhoe")
 		_eq = 4;
+	if(var_name == "rhok")
+		_eq = 5;
+	if(var_name == "rhoo")
+		_eq = 6;
 }
 
-Real NSBC::computeQpResidual()
+Real KOBC::computeQpResidual()
 {
 	Real CIP = computeCIP();
 	Real flux = _flux[_qp][_eq] ;
-//	flux += CIP*(_penalty[_qp][_eq])*_normals[_qp];
-	flux += CIP*(_penalty[_qp][_eq]+_penalty_neighbor[_qp][_eq])*_normals[_qp];
+	flux += CIP*(_penalty[_qp][_eq] + _penalty_neighbor[_qp][_eq])*_normals[_qp];
 	return  flux * _test[_i][_qp] + _epsilon * _penalty[_qp][_eq]* _grad_test[_i][_qp];
 }
 
-Real NSBC::computeQpJacobian()
+Real KOBC::computeQpJacobian()
 {
 	Real r = 0;
 	Real CIP = computeCIP();
@@ -53,13 +56,12 @@ Real NSBC::computeQpJacobian()
 	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
 	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q] + _penalty_jacobi_variable_ne[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
-//	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _epsilon*_penalty_jacobi_variable_ee[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
 
 	return r;
 }
 
-Real NSBC::computeQpOffDiagJacobian(unsigned int jvar)
+Real KOBC::computeQpOffDiagJacobian(unsigned int jvar)
 {
 	Real r = 0;
 	Real CIP = computeCIP();
@@ -67,12 +69,11 @@ Real NSBC::computeQpOffDiagJacobian(unsigned int jvar)
 	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
 	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q] + _penalty_jacobi_variable_ne[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
-//	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _epsilon*_penalty_jacobi_variable_ee[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
 	return r;
 }
 
-Real NSBC::computeCIP()
+Real KOBC::computeCIP()
 {
 	const unsigned int elem_b_order = static_cast<unsigned int> (_var.getOrder());
 	const double h_elem = (_current_elem_volume+_current_elem_volume)/_current_side_volume * 1./std::pow(elem_b_order, 2.)/2.;

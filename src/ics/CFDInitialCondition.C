@@ -39,6 +39,7 @@ switch (_eq) {
 		break;
 	case 3:
 		return z_momentum(p);
+		break;
 	case 4:
 		return total_energy(p);
 		break;

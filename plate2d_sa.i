@@ -3,26 +3,20 @@
  	order = SECOND
  	family = MONOMIAL
   	
-  mach = 0.5
-  reynolds = 5000
-	attack = 1
-	sideslip = 0
-	pitch = 0
-	yaw = 180
-	roll = 0
-	ref_area = 0.05
+  mach = 0.2
+  reynolds = 1E+05
   	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
 []
 
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C2.3_body/btc0-NLR-E2.v2.msh
-  dim = 3
+  file = ../high-order-workshop/C1.4_plate/a1-125-2s.msh
+  dim = 2
 
-  boundary_id = '1 2 3'
-  boundary_name = 'wall symmetric far_field'
+  boundary_id = '1 2 3 4 5' 
+  boundary_name = 'symmetric wall right top left'
 
   block_id = '0'
   block_name = 'fluid'
@@ -43,32 +37,38 @@
 
   [./velocity_z]
   [../]
+  [./eddy_viscosity]
+  [../]
 []
 
 [AuxKernels]
   [./pressure]
-		type = NSAuxVariable
+		type = SAAuxVariable
 		variable = pressure
   [../]
 
   [./mach]
-		type = NSAuxVariable
+		type = SAAuxVariable
 		variable = mach
   [../]
 
   [./velocity_x]
-		type = NSAuxVariable
+		type = SAAuxVariable
 		variable = velocity_x
   [../]
 
   [./velocity_y]
-		type = NSAuxVariable
+		type = SAAuxVariable
 		variable = velocity_y
   [../]
 
   [./velocity_z]
-		type = NSAuxVariable
+		type = SAAuxVariable
 		variable = velocity_z
+  [../]
+  [./eddy_viscosity]
+		type = SAAuxVariable
+		variable = eddy_viscosity
   [../]
 []
 
@@ -77,8 +77,12 @@
 		type = SMP
 		full = true
 
-    petsc_options_iname = 'ksp_type -pc_type '
-  	petsc_options_value = 'bcgs bjacobi'
+	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+  	#petsc_options_value = 'lu test'
+		#petsc_options = '-pc_sor_symmetric'
+    petsc_options_iname = '-ksp_type  -pc_type '
+  	petsc_options_value = 'gmres 				ilu  '
 	[../]
 
 []
@@ -89,34 +93,33 @@
   num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
- 	l_tol = 1e-02
+ 	l_tol = 1e-01
  # l_abs_step_tol = -1e-04
    # 最大线性迭代步	
  	l_max_its = 100
  	
  	# 最大非线性迭代步
- 	nl_max_its = 100
+ 	nl_max_its = 10
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-3
+  	nl_rel_tol = 1e-02
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
-  	
+  	#restart_file_base = plate2d_komega_checkpoint_cp/0026 
 	 #abort_on_solve_fail = true	
   #end_time = 0.1
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E+02
+		dt = 1e-02
 		ratio = 2
 		step = 2
-		max_dt = 1E+02
+		max_dt = 1e+01
 	[../]
 []
 
 
 [Postprocessors]
-
 
 	[./residual_final]
   	type = Residual
@@ -131,17 +134,34 @@
 		time_type = alive
 	[../]
 
-
+	[./force_form-x]
+  	type = CFDForcePostprocessor
+		direction_by = x
+		force_type = form
+		boundary  = wall
+	[../]
+	[./force_friction-x]
+  	type = CFDForcePostprocessor
+		direction_by = x
+		force_type = friction
+		boundary  = wall
+	[../]
 	[./force_total-x]
   	type = CFDForcePostprocessor
 		direction_by = x
 		force_type = total
 		boundary  = wall
 	[../]
-	[./force_total-y]
+	[./force_form-z]
   	type = CFDForcePostprocessor
-		direction_by = y
-		force_type = total
+		direction_by = z
+		force_type = form
+		boundary  = wall
+	[../]
+	[./force_friction-z]
+  	type = CFDForcePostprocessor
+		direction_by = z
+		force_type = friction
 		boundary  = wall
 	[../]
 	[./force_total-z]
@@ -152,16 +172,16 @@
 	[../]
  
 []
+
 # 输出和后处理
 [Outputs]
-	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
 		
 		interval = 1 					#间隔
 		oversample = true
-		refinements = 0
+		refinements = 1
 	[../]
 	
 	[./console]
@@ -174,6 +194,10 @@
     	#time_precision = 6
     	#fit_mode = 100
 	[../]
+	[./checkpoint]
+		type  = Checkpoint
+		interval = 1 					#间隔
+	[../]
 	[./debug]
 	    type = DebugOutput
   		#show_var_residual_norms = true
@@ -184,38 +208,36 @@
 
 # 变量
 [Variables]
-	active = 'rho momentum_x momentum_y momentum_z rhoe'
-
 	[./rho]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = SAIC
 		[../]
   [../]
-
  	[./momentum_x]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = SAIC
 		[../]
-  [../]
-  
+  [../]  
  	[./momentum_y]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = SAIC
 		[../]
-  [../]
-  	
-   [./momentum_z]
+  [../] 	
+  [./momentum_z]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = SAIC
 		[../]
-  [../]
-  	
+  [../] 	
   [./rhoe]
 		[./InitialCondition] 
-			type = CFDPassFlowIC
+			type = SAIC
 		[../]
   [../]	
-		
+  [./rhon]
+		[./InitialCondition] 
+			type = SAIC
+		[../]
+  [../]	
 []
 
 # 体积分
@@ -240,77 +262,96 @@
 		type = TimeDerivative
 		variable = rhoe
 	[../]
+	[./rhon_time]
+		type = TimeDerivative
+		variable = rhon
+	[../]
 
 	[./mass_space]
-		type = NSCellKernel
+		type = SACellKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_space]
-		type = NSCellKernel
+		type = SACellKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_space]
-		type = NSCellKernel
+		type = SACellKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_space]
-		type = NSCellKernel
+		type = SACellKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_space]
-		type = NSCellKernel
+		type = SACellKernel
 		variable = rhoe
+	[../]
+	[./rhon_space]
+		type = SACellKernel
+		variable = rhon
 	[../]
 []
 
+
 [DGKernels]
 	[./mass_dg]
-		type = NSFaceKernel
+		type = SAFaceKernel
 		variable = rho
 	[../]		
 	[./x-momentumum_dg]
-		type = NSFaceKernel
+		type = SAFaceKernel
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_dg]
-		type = NSFaceKernel
+		type = SAFaceKernel
 		variable = momentum_y
 	[../]
 	[./z-momentumum_dg]
-		type = NSFaceKernel
+		type = SAFaceKernel
 		variable = momentum_z
 	[../]		
 	[./total-energy_dg]
-		type = NSFaceKernel
+		type = SAFaceKernel
 		variable = rhoe
 	[../]
+	[./rhon_dg]
+		type = SAFaceKernel
+		variable = rhon
+	[../]
 []
+
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '1 2 3'
-		type = NSBC
+		boundary = '1 2 3 4 5'
+		type =SABC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '1 2 3'
-		type = NSBC
+		boundary = '1 2 3 4 5'
+		type =SABC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '1 2 3 '
-		type = NSBC
+		boundary = '1 2 3 4 5'
+		type =SABC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '1 2 3 '
-		type = NSBC
+		boundary = '1 2 3 4 5'
+		type =SABC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '1 2 3'
-		type = NSBC
+		boundary = '1 2 3 4 5'
+		type =SABC
 		variable = rhoe
+	[../]
+	[./rhon_bc]
+		boundary = '1 2 3 4 5'
+		type =SABC
+		variable = rhon
 	[../]
 []
 
@@ -318,30 +359,29 @@
 [Materials]
   [./cell_material]
 		block = fluid
-    type = NSCellMaterial
+    type = SACellMaterial
   [../]
 
   [./face_material]
 		block = fluid
-    type = NSFaceMaterial
+    type = SAFaceMaterial
   [../]
 
   [./wall_material]
 		boundary = wall
 		bc_type = isothermal_wall
-    type = NSBndMaterial
+    type = SABndMaterial
   [../]
   [./far_field_material]
-		boundary = '3'
+		boundary = 'left right top'
 		bc_type = far_field
-    type = NSBndMaterial
+    type = SABndMaterial
   [../]
   [./symmetric_material]
-		boundary = 2
+		boundary = 'symmetric'
 		bc_type = symmetric
-    type = NSBndMaterial
+    type = SABndMaterial
   [../]
-
 
 []
 

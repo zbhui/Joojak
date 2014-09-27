@@ -1,24 +1,25 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = SECOND
  	family = MONOMIAL
   	
-  mach = 0.5
-  reynolds = 10.0
+  mach = 0.8
+	reynolds = 10
+	attack = 1.25
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.3_naca0012/naca_ref3.msh
+  file = ../high-order-workshop/C1.3_naca0012/N0012-fine-quad.msh
   dim = 2
   
-  block_id = 4
+  block_id = 0
   block_name = 'fluid'
   
-  boundary_id = '1 2 3'
-  boundary_name = 'wall subsonic_in subsonic_out'
+  boundary_id = '1 4 2 3'
+  boundary_name = 'far_top far_bottom wall_top wall_bottom'
 	
 	uniform_refine = 0 
 []
@@ -58,12 +59,12 @@
 
   [./velocity_y]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_y
   [../]
 
   [./velocity_z]
 		type = NSAuxVariable
-		variable = velocity_x
+		variable = velocity_z
   [../]
 []
 
@@ -89,7 +90,7 @@
   num_steps = 1000
   
     # 线性迭代步的残差下降（相对）量级
- 	l_tol = 1e-01
+ 	l_tol = 1e-02
  # l_abs_step_tol = -1e-04
    # 最大线性迭代步	
  	l_max_its = 50
@@ -97,9 +98,9 @@
  	# 最大非线性迭代步
  	nl_max_its = 10
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-02
+  	nl_rel_tol = 1e-03
   	# 非线性迭代绝对残值
-  	#nl_abs_tol = 1e-05
+  	nl_abs_tol = 1e-012
 
   	
 	 #abort_on_solve_fail = true	
@@ -107,7 +108,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 0.100000
+		dt = 0.0100000
 		ratio = 2
 		step = 2
 		max_dt = 1000000
@@ -121,37 +122,37 @@
 []
 
 [Postprocessors]
-  #[./h]
-   # type = AverageElementSize
-    #variable = rho
- # [../]
-
- # [./dofs]
-  #  type = NumDOFs
- # [../]
-
-  [./l2_err]
-    type = ElementL2Error
-    variable = rho
-    function = exact_rho
-  [../]
+	[./residual_final]
+  	type = Residual
+	[../]
   
-  #[./nodes]
-  #  type = NumNodes
-  #[../]
+	[./residual_initial]
+  	type = CFDResidual
+	[../]
 
-  #[./elements]
-   # type = NumElems
-  #[../]
+	[./run_time]
+  	type = RunTime
+		time_type = alive
+	[../]
 
- # [./residuals]
- #   type = Residual
- # [../]
-  
- #[./integral_left]
- #  type = ElementIntegralVariablePostprocessor
- #  variable = rho
- #[../]  
+	[./force_form-x]
+  	type = CFDForcePostprocessor
+		direction_by = x
+		force_type = form
+		boundary  = '2 3'
+	[../]
+	[./force_form-y]
+  	type = CFDForcePostprocessor
+		direction_by = y
+		force_type = form
+		boundary  = '2 3'
+	[../]
+	[./force_form-z]
+  	type = CFDForcePostprocessor
+		direction_by = z
+		force_type = form
+		boundary  = '2 3'
+	[../]
 []
 
 # 输出和后处理
@@ -291,27 +292,27 @@
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '1 2 3'
+		boundary = '1 2 3 4'
 		type =EulerBC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '1 2 3'
+		boundary = '1 2 3 4'
 		type =EulerBC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '1 2 3'
+		boundary = '1 2 3 4'
 		type =EulerBC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '1 2 3'
+		boundary = '1 2 3 4'
 		type =EulerBC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '1 2 3'
+		boundary = '1 2 3 4'
 		type =EulerBC
 		variable = rhoe
 	[../]
@@ -320,23 +321,23 @@
 # 材料属性
 [Materials]
   [./cell_material]
-		block = 4
+		block = fluid
     type = EulerCellMaterial
   [../]
 
   [./face_material]
-		block = 4
+		block = fluid
     type = EulerFaceMaterial
   [../]
 
  	[./far_field_material]
-		boundary = '2 3'
+		boundary = '1 4'
 		bc_type = far_field
     type = EulerBndMaterial
   [../]
 
   [./wall_material]
-		boundary = wall
+		boundary = '2 3'
 		bc_type = wall
     type = EulerBndMaterial
   [../]

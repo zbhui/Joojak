@@ -2,7 +2,7 @@
 #pragma once
 
 #include "AuxKernel.h"
-#include "EulerBase.h"
+#include "NSBase.h"
 
 class NSAuxVariable;
 
@@ -14,7 +14,7 @@ InputParameters validParams<NSAuxVariable>();
  */
 class NSAuxVariable :
 public AuxKernel,
-public EulerBase
+public NSBase
 {
 public:
 

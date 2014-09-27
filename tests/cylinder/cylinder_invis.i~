@@ -4,7 +4,6 @@
  	family = MONOMIAL
   	
   mach = 0.38
-	attack = 90
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
