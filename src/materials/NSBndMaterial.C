@@ -18,7 +18,7 @@ InputParameters validParams<NSBndMaterial>()
   params += validParams<NSBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
-  MooseEnum bc_types("isothermal_wall, adiabatic_wall, far_field, symmetric, pressure_out, none", "none");  // 边界条件的类型，可以增加
+  MooseEnum bc_types("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none");  // 边界条件的类型，可以增加
   params.addRequiredParam<MooseEnum>("bc_type", bc_types, "边界条件");
 
   return params;

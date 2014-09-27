@@ -8,11 +8,7 @@
   reynolds = 10.0
   prandtl = 0.72
   	
-  attack = 0
-  slide = 0
-  	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
-	lumping = false
 []
 
 # 网格
@@ -93,7 +89,7 @@
 # 非线性系统求解
 [Executioner]
   type = Transient
-  solve_type = JFNK
+  solve_type = NEWTON
   dt = 0.01
   num_steps = 2
   

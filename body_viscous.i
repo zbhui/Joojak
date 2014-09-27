@@ -18,7 +18,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C2.3_body/btc0-NLR-E2.v2.msh
+  file = ../high-order-workshop/C2.3_body/btc0-NLR-E1.v2.msh
   dim = 3
 
   boundary_id = '1 2 3'
@@ -171,15 +171,10 @@
 	  	nonlinear_residuals =  true	
 		#verbose = true
     	#setup_log_early = true
-    	#time_precision = 6
+    	#time_precision = 6																																											
     	#fit_mode = 100
 	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
-	[../]
+
 []
 
 # 变量

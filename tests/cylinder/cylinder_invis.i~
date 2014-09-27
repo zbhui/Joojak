@@ -4,6 +4,7 @@
  	family = MONOMIAL
   	
   mach = 0.38
+	reynolds = 10
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 

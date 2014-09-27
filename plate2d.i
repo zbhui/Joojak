@@ -12,7 +12,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a0-125-2s.msh
+  file = ../high-order-workshop/C1.4_plate/a1-125-2s.msh
   dim = 2
 
   boundary_id = '1 2 3 4 5' 
@@ -67,13 +67,13 @@
 []
 
 [Preconditioning]
-	active = PBP
+	active = SMP
 	[./SMP]
 		type = SMP
 		full = true
 
     petsc_options_iname = 'ksp_type -pc_type '
-  	petsc_options_value = 'gmres lu'
+  	petsc_options_value = 'gmres ilu'
 	[../]
 	[./PBP]
     type = PBP
@@ -82,12 +82,12 @@
     off_diag_row    = 'rho'
     off_diag_column = 'rhoe'
   [../]
-	[../]
+	
 []
 # 非线性系统求解
 [Executioner]
   type = Transient
-  solve_type = JFNK
+  solve_type = NEWTON
   num_steps = 100000
   
     # 线性迭代步的残差下降（相对）量级
@@ -109,7 +109,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1E-02
+		dt = 1E-04
 		ratio = 2
 		step = 2
 		max_dt = 1E+08
@@ -191,12 +191,6 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
-	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
 	[../]
 []
 

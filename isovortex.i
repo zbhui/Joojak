@@ -8,11 +8,8 @@
   reynolds = 10.0
   prandtl = 0.72
   	
-  attack = 0
-  slide = 0
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
-	lumping = false
 []
 
 # 网格
@@ -183,12 +180,6 @@
     	#setup_log_early = true
     	#time_precision = 6
     	#fit_mode = 100
-	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
 	[../]
 []
 

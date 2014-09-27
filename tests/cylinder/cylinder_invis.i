@@ -175,12 +175,6 @@
     	#time_precision = 6
     	#fit_mode = 100
 	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
-	[../]
 []
 
 # 变量
