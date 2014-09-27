@@ -137,7 +137,7 @@ Real SACellMaterial::distance()
 	Real z = _q_point[_qp](2);
 	Real d;
 	if(x > 0)
-		d = x;
+		d = y;
 	else
 		d = sqrt(x*x+y*y+z*z);
 	return d;

@@ -14,9 +14,10 @@ SABase::SABase(const std::string& name, InputParameters parameters):
 		_cw2(0.3), _cw3(2.0), _cv1(7.1), _cv2(0.7), _cv3(0.9),
 		_ct1(1.0), _ct2(2.0), _ct3(1.2), _ct4(0.5),
 		_prandtl_turb(0.9),
-		_nu_infty(0.01)
+		_nu_infty(0.001)
 {
 	_cw1 = _cb1/_kappa/_kappa + (1+_cb2)/_sigma_sa;
+	_cw3_pow6 = _cw3*_cw3*_cw3*_cw3*_cw3*_cw3;
 }
 
 void SABase::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
@@ -85,17 +86,18 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 
 	Real mu = physicalViscosity(uh);
 	Real X = uh[5]/mu;
-	Real psi;
+	Real psi(X);
 	if (X <= 10)
 		psi = 0.05*log(1+exp(20*X));
 	else
 		psi = X;
 
-	Real fv1 = pow(psi,3)/(pow(psi,3)+pow(_cv1,3));
-	Real mu_turb = mu*psi*fv1;
+	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	Real mu_turb = uh[5]*fv1;
+//	Real mu_turb = mu*psi*fv1;
+
 	if(uh[5] < 0)
 		mu_turb = 0.;
-//	Real mu_turb = eddyViscosity(uh);
 
 	tau *= (mu+mu_turb)/_reynolds;
 
@@ -145,10 +147,14 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 		s_title = vorticity+s_hat;
 	else
 		s_title = vorticity+(_cv2*_cv2*vorticity+_cv3*s_hat)*vorticity/((_cv3-2*_cv2)*vorticity-s_hat);
-
+//
 	Real r = std::min<Real>(s_hat/s_title/fv2, 10);
-	Real g = r+_cw2*(pow(r,6)-r);
-	Real fw = g*(pow((1+pow(_cw3, 6))/(pow(g,6)+pow(_cw3, 6)),1./6));
+	Real tmp_pow = r*r*r;
+	tmp_pow *= tmp_pow;
+	Real g = r+_cw2*(tmp_pow-r);
+	tmp_pow = g*g*g;
+	tmp_pow *= tmp_pow;
+	Real fw = g*(pow((1+_cw3_pow6)/(tmp_pow+_cw3_pow6),1./6));
 
 	component = 0;
 	source_term[component] = 0;
@@ -192,17 +198,17 @@ void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* 
 
 	Real mu = physicalViscosity(uh);
 	Real X = uh[5]/mu;
-	Real psi;
+	Real psi(X);
 	if (X <= 10)
 		psi = 0.05*log(1+exp(20*X));
 	else
 		psi = X;
 
-	Real fv1 = pow(psi,3)/(pow(psi,3)+pow(_cv1,3));
-	Real mu_turb = mu*psi*fv1;
+	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	Real mu_turb = uh[5]*fv1;
+//	Real mu_turb = mu*psi*fv1;
 	if(uh[5] < 0)
 		mu_turb = 0.;
-//	Real mu_turb = eddyViscosity(uh);
 
 	tau *= (mu+mu_turb)/_reynolds;
 
@@ -316,8 +322,8 @@ Real SABase::eddyViscosity(Real* uh)
 	else
 		psi = X;
 
-	Real fv1 = pow(psi,3)/(pow(psi,3)+pow(_cv1,3));
-	return mu*psi*fv1;
+	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	return uh[5]*fv1;
 }
 
 int SABase::equationIndex(const std::string &var_name)

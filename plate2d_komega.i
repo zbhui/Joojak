@@ -1,10 +1,10 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = SECOND
  	family = MONOMIAL
   	
   mach = 0.2
-  reynolds = 1E+06
+  reynolds = 1E+05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe rhok rhoo'
 []
@@ -12,7 +12,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a1-125-2s.msh
+  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
   dim = 2
 
   boundary_id = '1 2 3 4 5' 
@@ -82,7 +82,7 @@
   	#petsc_options_value = 'lu test'
 		#petsc_options = '-pc_sor_symmetric'
     petsc_options_iname = '-ksp_type  -pc_type '
-  	petsc_options_value = 'gmres 				bjacobi  '
+  	petsc_options_value = 'gmres 				lu  '
 	[../]
 
 []

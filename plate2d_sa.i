@@ -1,10 +1,10 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = SECOND
  	family = MONOMIAL
   	
   mach = 0.2
-  reynolds = 2E+05
+  reynolds = 1E+05
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
 []
@@ -82,7 +82,7 @@
   	#petsc_options_value = 'lu test'
 		#petsc_options = '-pc_sor_symmetric'
     petsc_options_iname = '-ksp_type  -pc_type '
-  	petsc_options_value = 'gmres 				bjacobi  '
+  	petsc_options_value = 'gmres 				ilu  '
 	[../]
 
 []
@@ -101,7 +101,7 @@
  	# 最大非线性迭代步
  	nl_max_its = 10
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-1
+  	nl_rel_tol = 1e-02
   	# 非线性迭代绝对残值
   	nl_abs_tol = 1e-010
 
@@ -111,7 +111,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1e-03
+		dt = 1e-02
 		ratio = 2
 		step = 2
 		max_dt = 1e+01

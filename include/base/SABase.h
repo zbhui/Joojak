@@ -28,6 +28,8 @@ protected:
 	Real _ct1, _ct2, _ct3, _ct4;
 	Real _prandtl_turb;
 
+	Real _cw3_pow6;
+
 	Real _nu_infty;
 
 };

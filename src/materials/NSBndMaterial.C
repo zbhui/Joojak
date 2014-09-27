@@ -363,7 +363,8 @@ void NSBndMaterial::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradien
     ur[1] = ul[1] - 2.0 * vn * normal(0);
     ur[2] = ul[2] - 2.0 * vn * normal(1);
     ur[3] = ul[3] - 2.0 * vn * normal(2);
-    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
+    ur[4] = ul[4];
+//    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 
 void NSBndMaterial::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)

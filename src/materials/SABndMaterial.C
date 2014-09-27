@@ -440,14 +440,17 @@ void SABndMaterial::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGra
 
 		Real mu = physicalViscosity(uh);
 		Real X = uh[5]/mu;
-		Real psi;
+		Real psi(X);
 		if (X <= 10)
-			psi = 0.05*log(1+exp(20*X));
+			psi = 0.1*log(1+exp(10*X));
 		else
 			psi = X;
 
-		Real fv1 = pow(psi,3)/(pow(psi,3)+pow(_cv1,3));
+		Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	//	Real mu_turb = uh[5]*fv1;
 		Real mu_turb = mu*psi*fv1;
+		if(uh[5] < 0)
+			mu_turb = 0.;
 
 		tau *= (mu+mu_turb)/_reynolds;
 
@@ -476,7 +479,7 @@ void SABndMaterial::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGra
 		viscous_term[component](2) = tau(2, 2);
 
 		component = 4;
-		RealVectorValue vel_tau = tau * velocity;
+		RealVectorValue vel_tau = tau * velocity ;
 		viscous_term[component](0) = vel_tau(0);
 		viscous_term[component](1) = vel_tau(1);
 		viscous_term[component](2) = vel_tau(2);
