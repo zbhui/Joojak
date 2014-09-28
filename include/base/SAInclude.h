@@ -14,6 +14,7 @@
 
 /// 辅助kernel
 #include "SAAuxVariable.h"
+#include "NearestWallDistance.h"
 
 /// Action
 

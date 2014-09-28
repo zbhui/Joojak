@@ -58,6 +58,8 @@
 #include "CFDForcePostprocessor.h"
 #include "BumpElementL2Error.h"
 
+#include "SteadyTransientExecutioner.h"
+
 #include "SAInclude.h"
 
 template<>
@@ -145,6 +147,8 @@ JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
 
+	registerExecutioner(SteadyTransientExecutioner);
+
 	registerSAObjects(factory);
 }
 
@@ -176,6 +180,7 @@ void JoojakApp::registerSAObjects(Factory & factory)
 
 	///注册辅助kernel
 	registerAux(SAAuxVariable);
+	registerAux(NearestWallDistance);
 
 	/// 注册时间步长
 
