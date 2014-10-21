@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
   mach = 0.2
@@ -12,7 +12,7 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a1-125-2s.msh
+  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
   dim = 2
 
   boundary_id = '1 2 3 4 5' 

@@ -213,9 +213,11 @@ void NSBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 	Real p_inf = 1/_gamma/_mach/_mach;
 	Real pl = pressure(ul);
 	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
-	Real vel = vel_left.norm();
+//	Real vel = vel_left.norm();
+	Real vel = vel_inf.norm();
 	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
-	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
+//	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
+	Real vn = vel_inf(0)*normal(0)+vel_inf(1)*normal(1)+vel_inf(2)*normal(2);
 
 	if(vn < 0)  // 入口
 	{

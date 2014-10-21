@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FIRST
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -74,7 +74,7 @@
 
 [Preconditioning]
 	[./SMP]
-		type = SMP
+		type = FDP
 		full = true
 
 	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
@@ -82,7 +82,7 @@
   	#petsc_options_value = 'lu test'
 		#petsc_options = '-pc_sor_symmetric'
     petsc_options_iname = '-ksp_type  -pc_type '
-  	petsc_options_value = 'gmres 				bjacobi  '
+  	petsc_options_value = 'gmres 				lu  '
 	[../]
 
 []
@@ -111,17 +111,18 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1e+08
+		dt = 1e+02
 		ratio = 2
 		step = 2
-		max_dt = 1e+08
+		max_dt = 1e+02
 	[../]
 []
 
 
 [Postprocessors]
-
-
+	[./num_timestep]
+		type = NumTimeStep
+	[../]
 	[./residual_final]
   	type = Residual
 	[../]
@@ -176,6 +177,7 @@
 
 # 输出和后处理
 [Outputs]
+	csv = true
 	file_base = cylinder_viscous
 	[./exodus]
 		type = Exodus

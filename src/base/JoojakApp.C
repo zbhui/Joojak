@@ -57,6 +57,7 @@
 #include "ElementExtremeTimeDerivative.h"
 #include "CFDForcePostprocessor.h"
 #include "BumpElementL2Error.h"
+#include "NumTimeStep.h"
 
 #include "SteadyTransientExecutioner.h"
 
@@ -146,6 +147,7 @@ JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(ElementExtremeTimeDerivative);
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
+	registerPostprocessor(NumTimeStep);
 
 	registerExecutioner(SteadyTransientExecutioner);
 

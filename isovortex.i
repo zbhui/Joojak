@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = SECOND
+ 	order = FOURTH
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -17,8 +17,8 @@
   type = GeneratedMesh
   dim = 2
   
-  nx = 20
-  ny = 20
+  nx = 10
+  ny = 10
   
   xmin = -10
   xmax = 0
@@ -28,6 +28,7 @@
   
   block_id = '0'
   block_name = 'fluid'
+	uniform_refine = 2
 []
 
 [AuxVariables]
@@ -78,10 +79,6 @@
 	[./SMP]
 		type = SMP
 		full = true
-
-	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
-    #petsc_options_iname = '-pc_type -snes_type'
-  	#petsc_options_value = 'lu test'
     petsc_options_iname = '-pc_type '
   	petsc_options_value = 'ilu'
 	[../]
@@ -91,9 +88,10 @@
 [Executioner]
   type = Transient
   solve_type = NEWTON
- 	scheme = 'bdf2'
-  dt = 0.01
-  num_steps = 10
+ 	scheme = 'crank-nicolson'
+  dt = 0.002
+	end_time = 1
+  num_steps = 10000
   
     # 线性迭代步的残差下降（相对）量级
  	l_tol = 1e-04
@@ -104,17 +102,10 @@
  	# 最大非线性迭代步
  	nl_max_its = 10
  	# 非线性迭代的残值下降（相对）量级
-  	nl_rel_tol = 1e-05
+  	nl_rel_tol = 1e-08
   	# 非线性迭代绝对残值
   	#nl_abs_tol = 1e-05
 
-  	
-	 abort_on_solve_fail = true	
-  #end_time = 0.1
-  
-  	[./Adaptivity]
-  	
- 	[../]
 []
 
 [Functions]
@@ -124,44 +115,14 @@
 []
 
 [Postprocessors]
-  #[./h]
-   # type = AverageElementSize
-    #variable = rho
- # [../]
-
- # [./dofs]
-  #  type = NumDOFs
- # [../]
-
   [./l2_err]
     type = ElementL2Error
     variable = rho
     function = exact_rho
-  [../]
-  
-  #[./nodes]
-  #  type = NumNodes
-  #[../]
-
-  #[./elements]
-   # type = NumElems
-  #[../]
-
- # [./residuals]
- #   type = Residual
- # [../]
-  
- #[./integral_left]
- #  type = ElementIntegralVariablePostprocessor
- #  variable = rho
- #[../]  
+  [../] 
 []
 
-# 输出和后处理
 [Outputs]
-  	file_base = isovortex
-	
- 	
 	[./exodus]
 		type = Exodus
 		output_initial = true
@@ -175,11 +136,7 @@
 		type = Console	
 		perf_log = true
 		linear_residuals = true
-	  	nonlinear_residuals =  true	
-		#verbose = true
-    	#setup_log_early = true
-    	#time_precision = 6
-    	#fit_mode = 100
+	  nonlinear_residuals =  true	
 	[../]
 []
 

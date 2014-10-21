@@ -1,11 +1,10 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = FOURTH
  	family = MONOMIAL
   	
-  gamma = 1.4
   mach = 0.1
-  reynolds = 10.0
+  reynolds = 1000.0
   prandtl = 0.72
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
@@ -16,8 +15,8 @@
   type = GeneratedMesh
   dim = 2
   
-  nx = 10
-  ny = 5
+  nx = 4
+  ny = 2
   
   xmin = 0
   xmax = 4
@@ -27,6 +26,8 @@
   
   block_id = '0'
   block_name = 'fluid'
+
+	uniform_refine = 1
 []
 
 [AuxVariables]
@@ -92,28 +93,13 @@
   solve_type = NEWTON
   dt = 100
   num_steps = 1000
+ 	nl_max_its = 100
+ 	l_max_its = 20
   
-	#line_search = cp
-    # 线性迭代步的残差下降（相对）量级
- 	l_tol = 1e-01
- # l_abs_step_tol = -1e-04
-   # 最大线性迭代步	
- 	l_max_its = 10
- 	
- 	# 最大非线性迭代步
- 	nl_max_its = 10
- 	# 非线性迭代的残值下降（相对）量级
-  	#nl_rel_tol = 1e-10
-  	# 非线性迭代绝对残值
-  	nl_abs_tol = 1e-010
-
-  	
-	 abort_on_solve_fail = true	
-  #end_time = 0.1
-  
-  	[./Adaptivity]
-  	
- 	[../]
+ 	l_tol = 1e-02
+  nl_rel_tol = 1e-3
+ 	nl_abs_tol = 1e-010
+	abort_on_solve_fail = true	
 []
 
 [Functions]
@@ -139,26 +125,10 @@
     variable = rho
 	 	execute_on = TIMESTEP_BEGIN
   [../]
-
-  [./area]
-    type = AreaPostprocessor
-		boundary = left
-  [../]
-
-[]
-
-[VectorPostprocessors]
-  [./point_sample]
-    type = PointValueSampler
-    variable = 'rho rhoe'
-    points = '0.1 0.1 0  0.23 0.4 0  0.78 0.2 0'
-    sort_by = id
-  [../]
 []
 
 # 输出和后处理
 [Outputs]
-	csv = true
 	[./exodus]
 		type = Exodus
 		output_initial = true
@@ -172,11 +142,7 @@
 		type = Console	
 		perf_log = true
 		linear_residuals = true
-	  	nonlinear_residuals =  true	
-		#verbose = true
-    	#setup_log_early = true
-    	#time_precision = 6
-    	#fit_mode = 100
+	  nonlinear_residuals =  true	
 	[../]
 []
 

@@ -23,19 +23,19 @@ Real CFDPassFlowIC::density(const Point &p)
 
 Real CFDPassFlowIC::x_momentum(const Point &p)
 {
-	Vector3d vel = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(0);
 }
 
 Real CFDPassFlowIC::y_momentum(const Point &p)
 {
-	Vector3d vel = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(1);
 }
 
 Real CFDPassFlowIC::z_momentum(const Point &p)
 {
-	Vector3d vel = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
 	if(_current_elem->dim() == 2)
 		return 0.;
 	else if(_current_elem->dim() == 3)
