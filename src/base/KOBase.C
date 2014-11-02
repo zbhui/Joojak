@@ -12,10 +12,10 @@ KOBase::KOBase(const std::string& name, InputParameters parameters):
 		NSBase(name, parameters),
 		_sigma_k(0.5), _sigma_o(0.5), _beta_k(9./100), _beta_o(3./40), _alpha_o(5./9), _sigma_d(1./8), _c_lim(7./8),
 		_prandtl_turb(0.9),
-		_tu_infty(1e-09), _r_mu(1e-02)
+		_tu_infty(1e-09), _r_mu(1e-03)
 {
 //	_omega_infty = _reynolds*1*_tu_infty/_r_mu;
-	_omega_infty = 10;
+	_omega_infty = 1;
 //	Real w_infty = 1000.;
 	_tu_infty = _omega_infty*_r_mu/_reynolds;
 //	_r_mu = 1e-03;

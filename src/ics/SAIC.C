@@ -6,13 +6,14 @@ InputParameters validParams<SAIC>()
 {
   InputParameters params = validParams<InitialCondition>();
   params += validParams<SABase>();
+  params.addParam<Real>("velocity", 1.0, "均匀流速度");
   return params;
 }
 
 SAIC::SAIC(const std::string & name, InputParameters parameters) :
 		InitialCondition(name, parameters),
 		SABase(name, parameters),
-		_velocity(1)
+	    _velocity(getParam<Real>("velocity"))
 {
 	_eq = equationIndex(_var.name());
 }
@@ -52,19 +53,19 @@ Real SAIC::density(const Point &p)
 
 Real SAIC::momentumX(const Point &p)
 {
-	Vector3d vel = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(0);
 }
 
 Real SAIC::momentumY(const Point &p)
 {
-	Vector3d vel = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(1);
 }
 
 Real SAIC::momentumZ(const Point &p)
 {
-	Vector3d vel = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
 	if(_current_elem->dim() == 2)
 		return 0.;
 	else if(_current_elem->dim() == 3)
