@@ -17,6 +17,7 @@ InputParameters validParams<SACellMaterial>()
   InputParameters params = validParams<Material>();
   params += validParams<SABase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
+  params.addRequiredCoupledVar("wall_distance", "壁面距离");
 
   return params;
 }
@@ -24,6 +25,7 @@ InputParameters validParams<SACellMaterial>()
 SACellMaterial::SACellMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
 		SABase(name, parameters),
+		_distance(coupledValue("wall_distance")),
 		_flux_term(declareProperty<std::vector<RealVectorValue> >("flux_term")),
 		_source_term(declareProperty<std::vector<Real> >("source_term")),
 		_flux_jacobi_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("flux_term_jacobi_variable")),
@@ -132,13 +134,14 @@ void SACellMaterial::fluxTerm(RealVectorValue* flux_term, Real *source_term, Rea
 
 Real SACellMaterial::distance()
 {
-	Real x = _q_point[_qp](0);
-	Real y = _q_point[_qp](1);
-	Real z = _q_point[_qp](2);
-	Real d;
-	if(x > 0)
-		d = y;
-	else
-		d = sqrt(x*x+y*y+z*z);
-	return d;
+//	Real x = _q_point[_qp](0);
+//	Real y = _q_point[_qp](1);
+//	Real z = _q_point[_qp](2);
+//	Real d;
+//	if(x > 0)
+//		d = y;
+//	else
+//		d = sqrt(x*x+y*y+z*z);
+//	return d;
+	return _distance[_qp];
 }

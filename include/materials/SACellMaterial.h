@@ -31,6 +31,8 @@ protected:
 	virtual void computeQpProperties();
 
 	int _n_equations;
+
+	VariableValue &_distance;
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _uh;
 	std::vector<VariableGradient*> _grad_uh;

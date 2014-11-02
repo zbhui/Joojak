@@ -116,7 +116,9 @@
 
 
 [Postprocessors]
-
+	[./res_evalutions]
+		type = NumTimeStep
+	[../]
 
 	[./residual_final]
   	type = Residual
@@ -168,11 +170,7 @@
 		type = Console	
 		perf_log = true
 		linear_residuals = true
-	  	nonlinear_residuals =  true	
-		#verbose = true
-    	#setup_log_early = true
-    	#time_precision = 6																																											
-    	#fit_mode = 100
+	  nonlinear_residuals =  true	
 	[../]
 
 []

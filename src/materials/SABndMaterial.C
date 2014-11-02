@@ -214,13 +214,14 @@ void SABndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 		vel_inf(2) = 0.;
 
 	Real rho_inf = 1.;
-	Real rho = ul[0];
 	Real p_inf = 1/_gamma/_mach/_mach;
 	Real pl = pressure(ul);
 	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
-	Real vel = vel_left.norm();
+//	Real vel = vel_left.norm();
+	Real vel = vel_inf.norm();
 	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
-	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
+//	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
+	Real vn = vel_inf(0)*normal(0)+vel_inf(1)*normal(1)+vel_inf(2)*normal(2);
 
 	if(vn < 0)  // 入口
 	{
@@ -231,7 +232,7 @@ void SABndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 			ur[2] = rho_inf*vel_inf(1);
 			ur[3] = rho_inf*vel_inf(2);
 			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
-			ur[5] = rho*_nu_infty;
+			ur[5] = rho_inf*_nu_infty;
 		}
 		else	//亚音速
 		{
@@ -240,7 +241,7 @@ void SABndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 			ur[2] = rho_inf*vel_inf(1);
 			ur[3] = rho_inf*vel_inf(2);
 			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
-			ur[5] = rho*_nu_infty;
+			ur[5] = rho_inf*_nu_infty;
 		}
 	}
 	else  //出口

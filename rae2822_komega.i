@@ -112,7 +112,7 @@
   
 	[./TimeStepper]
 		type = RatioTimeStepper
-		dt = 1e-02
+		dt = 1e-03
 		ratio = 2
 		step = 2
 		max_dt = 1e+08
@@ -189,17 +189,7 @@
 		type = Console	
 		perf_log = true
 		linear_residuals = true
-	  	nonlinear_residuals =  true	
-		#verbose = true
-    	#setup_log_early = true
-    	#time_precision = 6
-    	#fit_mode = 100
-	[../]
-	[./debug]
-	    type = DebugOutput
-  		#show_var_residual_norms = true
- 		# show_actions = true
-  		#show_top_residuals = 5
+	  nonlinear_residuals =  true	
 	[../]
 []
 

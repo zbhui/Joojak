@@ -57,6 +57,9 @@
 #include "ElementExtremeTimeDerivative.h"
 #include "CFDForcePostprocessor.h"
 #include "BumpElementL2Error.h"
+#include "NumTimeStep.h"
+
+#include "SteadyTransientExecutioner.h"
 
 #include "SAInclude.h"
 
@@ -144,6 +147,9 @@ JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(ElementExtremeTimeDerivative);
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
+	registerPostprocessor(NumTimeStep);
+
+	registerExecutioner(SteadyTransientExecutioner);
 
 	registerSAObjects(factory);
 }
@@ -176,6 +182,7 @@ void JoojakApp::registerSAObjects(Factory & factory)
 
 	///注册辅助kernel
 	registerAux(SAAuxVariable);
+	registerAux(NearestWallDistance);
 
 	/// 注册时间步长
 

@@ -21,7 +21,7 @@ figs-within-sections
 \maintain_unincluded_children false
 \language chinese-simplified
 \language_package default
-\inputencoding auto
+\inputencoding UTF8
 \fontencoding global
 \font_roman default
 \font_sans default
@@ -94,6 +94,15 @@ CJKindent
 
 \begin_layout Title
 DG
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -460,6 +469,119 @@ SA方程的无量纲形式
 
 \end_layout
 
+\begin_layout Standard
+壁面最近距离求解：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+D=-\left|\nabla\phi\right|+\sqrt{\left|\nabla\phi\right|^{2}+2\phi}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其中势函数
+\begin_inset Formula $\phi$
+\end_inset
+
+满足Possion方程
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\nabla^{2}\phi=1
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+在壁面上，满足Dirichlet边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\phi_{\text{w}}=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+其他边界上，满足Neumann边界
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\nabla_{n}\phi=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+这里的
+\begin_inset Formula $D$
+\end_inset
+
+的求解是近似的。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{b}\boldsymbol{E}\cdot d\boldsymbol{l}=\phi(b)-\phi(a)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+近似计算
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{b}\boldsymbol{E}\cdot d\boldsymbol{l}\approx\frac{1}{2}(\left|\nabla\phi(a)\right|+\nabla\phi(b))
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+电场强度
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{E}=-\nabla\phi
+\]
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Wilcox(2006)
 \begin_inset Formula $k-\omega$
@@ -691,19 +813,6 @@ RANS方程
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 \overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
@@ -719,19 +828,6 @@ Reynolds应力张量
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 \sigma_{\alpha\beta}=\mu_{t}(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})-\frac{2}{3}\rho k\delta_{\alpha\beta}
@@ -971,19 +1067,6 @@ p=(\gamma-1)(e-k-\frac{1}{2}\boldsymbol{v}^{2})
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 \overline{\tau}_{\alpha\beta}=(\mu+\mu_{t})(\partial_{\beta}u_{\alpha}+\partial_{\alpha}u_{\beta}-\frac{2}{3}\partial_{k}u_{k}\delta_{\alpha\beta})
@@ -1093,19 +1176,6 @@ k_{\infty}=\frac{3}{2}\text{Tu}_{\infty}
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 \alpha_{\omega}=\frac{5}{9},\:\beta_{k}=\frac{9}{100},\:\beta_{\omega}=\frac{3}{40},\:\sigma_{k}=\sigma_{\omega}=\frac{1}{2}
@@ -1126,6 +1196,313 @@ DG空间离散
 
 \begin_layout Section
 局部坐标系下的N-S方程
+\end_layout
+
+\begin_layout Standard
+Reynolds输运方程
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:reynolds trans eqn"
+
+\end_inset
+
+描述流体物质体系的物理量随时间变化的关系．作为流体力学理论的基本方程和基础，Reynolds输运方程在流体力学中起着非常重要的作用．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\text{d}}{\text{d}t}\int_{v(t)}\text{\ensuremath{\mathscr{F}}}(\boldsymbol{x},t)\text{d}v=\int_{v(t)}\frac{\partial\text{\ensuremath{\mathscr{F}}}}{\partial t}\text{d}v+\int_{s(t)}\text{\ensuremath{\mathscr{F}}}\boldsymbol{v}\cdot\boldsymbol{n}\text{d}s\label{eq:reynolds trans eqn}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\text{ℱ}(\boldsymbol{x},t)$
+\end_inset
+
+表示某种张量场的强度量．速度
+\begin_inset Formula $\boldsymbol{v}$
+\end_inset
+
+为Euler描述的矢径函数
+\begin_inset Formula $\boldsymbol{x}(\boldsymbol{\xi},t)$
+\end_inset
+
+对时间的偏导数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{v}=\left(\frac{\partial\boldsymbol{x}(\boldsymbol{\xi},t)}{\partial t}\right)_{\boldsymbol{\xi}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+利用它，分别取
+\begin_inset Formula $\text{ℱ}=(\rho,\rho\boldsymbol{v},\rho e)$
+\end_inset
+
+，就可以建立的质量，动量，能量的守恒方程，是流体力学的基本控制方程．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\partial_{t}\boldsymbol{U}+\nabla\cdot\mathcal{F}(\boldsymbol{U},\nabla\boldsymbol{U})=0\label{eq:NS eqn}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+对于无粘问题
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{U}=\left(\begin{array}{c}
+\rho\\
+\rho u\\
+\rho v\\
+\rho w\\
+\rho e
+\end{array}\right)\qquad\mathcal{F}=\left(\begin{array}{ccc}
+\rho u\\
+\\
+\\
+\\
+\end{array}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Reynolds输运方程表述优雅，内涵非常丰富，从物理角度看，Reynolds输运方程表述了Euler描述和Lagrange描述的相互变换，也就是物质导数d和当
+地导数
+\begin_inset Formula $\partial$
+\end_inset
+
+的关系，是守恒性的体现．从数学上看，Reynolds输运方程本质上是坐标系变换的关系．本节就是利用这个原理，推导物理坐标系和参考坐标系的变换．
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename ../../待发表/任意网格上单项式基函数的间断Galerkin格式/mapping.png
+	lyxscale 60
+	width 12cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+物理坐标系和参考坐标系的变换示意图
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+在物理坐标到参考坐标的变换下
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{x}=\boldsymbol{x}(\boldsymbol{\xi},t)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+设变换是正则的，并且关于时间
+\begin_inset Formula $t$
+\end_inset
+
+可微的，变换的Jacobian矩阵
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{J}=\frac{\partial\boldsymbol{x}}{\partial\boldsymbol{\xi}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $J=\text{det}\boldsymbol{J}$
+\end_inset
+
+，体积微元
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\text{d}v=J\text{d}V\label{eq:volume partial}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+面积微元
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\boldsymbol{n}\text{d}s=J^{-1}\boldsymbol{J}^{\text{T}}\boldsymbol{N}\text{d}S\label{eq:area partial}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+将方程
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:NS eqn"
+
+\end_inset
+
+在
+\begin_inset Formula $v(t)$
+\end_inset
+
+上积分，并利用散度定理
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{v(t)}\frac{\partial\boldsymbol{U}}{\partial t}\text{d}v+\int_{s(t)}\mathcal{F}\cdot\boldsymbol{n}\text{d}s=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+利用坐标变换
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{s(t)}\mathcal{F}\cdot\boldsymbol{n}\text{d}s=\int_{S}\mathcal{F}\cdot J\boldsymbol{J}^{-T}\text{d}\boldsymbol{S}=\int_{S}J\boldsymbol{J}^{-1}\mathcal{F}\cdot\text{d}\boldsymbol{S}=\int_{V}\nabla^{\xi}\cdot(J\boldsymbol{J}^{-1}\mathcal{F})\text{d}V
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\nabla^{\xi}$
+\end_inset
+
+为局部坐标系下的Hamiltion算符．
+\end_layout
+
+\begin_layout Standard
+利用Reynolds输运方程
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\int_{v(t)}\frac{\partial\boldsymbol{U}}{\partial t}\text{d}v & = & \frac{\text{d}}{\text{d}t}\int_{v(t)}\boldsymbol{U}\text{d}v-\int_{s(t)}\boldsymbol{U}\boldsymbol{v}_{g}\cdot\text{d}\boldsymbol{s}\\
+ & = & \frac{\text{d}}{\text{d}t}\int_{V}J\boldsymbol{U}\text{d}v-\int_{S}J\boldsymbol{J}^{-1}\boldsymbol{U}\boldsymbol{v}_{g}\cdot\text{d}\boldsymbol{s}\\
+ & = & \int_{V}\frac{\partial(J\boldsymbol{U})}{\partial t}\text{d}v-\int_{S}J\boldsymbol{J}^{-1}\boldsymbol{U}\boldsymbol{v}_{g}\cdot\text{d}\boldsymbol{s}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+可得
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\partial_{t}(J\boldsymbol{U})+\nabla^{\xi}\cdot\left(J\boldsymbol{J}^{-1}(\mathcal{F}-\boldsymbol{U}\boldsymbol{v}_{g})\right)=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+如果计算网格不随时间运动，网格运动速度
+\begin_inset Formula $\boldsymbol{v}_{g}=0$
+\end_inset
+
+，则
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\partial_{t}(J\boldsymbol{U})+\nabla^{\xi}\cdot\left(J\boldsymbol{J}^{-1}\mathcal{F}\right)=0\label{eq:local NS eqn}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+上式即为局部坐标系下的的流体力学控制方程．
 \end_layout
 
 \begin_layout Standard
@@ -1213,6 +1590,84 @@ reference "eq:spacial2"
 
 \begin_layout Section
 单项式基函数（阶谱基函数）
+\end_layout
+
+\begin_layout Standard
+将计算区域
+\begin_inset Formula $\Omega_{h}$
+\end_inset
+
+分割成互不重叠的计算单元
+\begin_inset Formula $\kappa$
+\end_inset
+
+，在每个单元上
+\begin_inset Formula $\kappa$
+\end_inset
+
+上令数值解为
+\begin_inset Formula $p$
+\end_inset
+
+次多项式
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\boldsymbol{U}_{h}=\sum_{i}^{N_{p}}\boldsymbol{u}_{i}\phi_{i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $N_{p}$
+\end_inset
+
+为自由度的个数，二维时
+\begin_inset Formula $N_{p}=(p+1)(p+2)/2$
+\end_inset
+
+．基函数空间
+\begin_inset Formula $\boldsymbol{\phi}=\text{span}\{\phi_{i}\}$
+\end_inset
+
+．在方程
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:local NS eqn"
+
+\end_inset
+
+两边乘以检验函数
+\begin_inset Formula $\boldsymbol{\psi}$
+\end_inset
+
+，分部积分得
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\int_{\kappa}\text{\ensuremath{\partial}}_{t}\boldsymbol{U}_{h}\boldsymbol{\varphi}\text{d}v+\int_{\partial\kappa}\mathcal{F}\boldsymbol{n}\cdot\boldsymbol{\varphi}\text{d}s-\int_{\kappa}\mathcal{F}:\nabla\boldsymbol{\varphi}\text{d}v=0\label{eq: DG weak form}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq: DG weak form"
+
+\end_inset
+
+式中的单元和边界积分用Gauss数值积分近似求解．
 \end_layout
 
 \begin_layout Standard
@@ -1559,19 +2014,6 @@ f_{p\alpha}^{v}=g_{\alpha\beta}^{pq}\partial_{\beta}u_{q}
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \begin{eqnarray*}
 \hat{\mathcal{F}^{v}} & = & \frac{1}{2}(\mathcal{F}^{v}(\boldsymbol{u}^{+},\nabla\boldsymbol{u}^{+})+\mathcal{F}^{v}(\boldsymbol{u}^{-},\nabla\boldsymbol{u}^{-}))-C_{IP}\frac{p^{2}}{h_{f}}\mathscr{G}(\{\boldsymbol{u}\})[\boldsymbol{u}]\\
@@ -1958,19 +2400,6 @@ N-S方程的离散形式
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 \int_{\kappa}\text{\ensuremath{\partial}}_{t}\boldsymbol{u}\cdot\boldsymbol{\varphi}\text{d}\Omega\approx\int_{\kappa}\frac{u_{p}-u_{p}^{t}}{\Delta t}\varphi_{i}\text{d}\Omega
@@ -2031,19 +2460,6 @@ u_{q}=u_{qj}\phi_{j}
 \end_layout
 
 \begin_layout Standard
-
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-\lang english
 \begin_inset Formula 
 \[
 -\int_{\kappa}(\mathcal{F}^{c}-\mathcal{F}^{v}):\nabla\boldsymbol{\varphi}\text{d}\Omega=-\int_{\kappa}f_{p\alpha}\partial_{\alpha}\varphi_{i}\text{d}\Omega
@@ -2471,6 +2887,106 @@ Reynolds输运方程
 \end_layout
 
 \begin_layout Section
+方腔流
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename cavity_condition.png
+	lyxscale 40
+	height 4.5cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename cavity_DGM3_strealine.png
+	lyxscale 40
+	height 4.5cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename cavity_Giha.png
+	lyxscale 80
+	height 4.5cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+方腔流计算条件和计算网格
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename cavity_velocity_of_x_VS._y.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename cavity_velocity_of_y_VS._x.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+方腔流动
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
 NACA0012翼型绕流
 \end_layout
 
@@ -2478,7 +2994,7 @@ NACA0012翼型绕流
 \begin_inset Float table
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -2679,7 +3195,207 @@ NACA0012翼型绕流计算条件
 
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status collapsed
+
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename naca0012_invis_prescoef_DGM1.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename naca0012_invis_prescoef_DGM2.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+NACA0012无粘绕流升力曲线
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lift
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Drag
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p=1$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+4.579912e-03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.597041e-01
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p=2$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.354972e-03
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.510917e-01
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Ref
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.4219e-06
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.865e-01
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+NACA0012翼型无粘绕流计算结果
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
@@ -3710,7 +4426,7 @@ status open
 \begin_inset Text
 
 \begin_layout Plain Layout
-DGM精度
+DGM阶
 \end_layout
 
 \end_inset
@@ -3840,7 +4556,10 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
-二阶
+\begin_inset Formula $p=1$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -3849,7 +4568,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.113636
+1.113636
 \end_layout
 
 \end_inset
@@ -3867,7 +4586,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--0.4868550
+0.4868550
 \end_layout
 
 \end_inset
@@ -3885,7 +4604,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.600491
+1.600491
 \end_layout
 
 \end_inset
@@ -3905,7 +4624,10 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
-三阶
+\begin_inset Formula $p=2$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -3914,7 +4636,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.052037
+1.052037
 \end_layout
 
 \end_inset
@@ -3932,7 +4654,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--0.5386558
+0.5386558
 \end_layout
 
 \end_inset
@@ -3950,7 +4672,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.590693
+1.590693
 \end_layout
 
 \end_inset
@@ -3970,7 +4692,10 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
-四阶
+\begin_inset Formula $p=3$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -3979,7 +4704,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.048229
+1.048229
 \end_layout
 
 \end_inset
@@ -3997,7 +4722,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--0.5391796
+0.5391796
 \end_layout
 
 \end_inset
@@ -4015,7 +4740,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.587408
+1.587408
 \end_layout
 
 \end_inset
@@ -4035,7 +4760,10 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
-五阶
+\begin_inset Formula $p=4$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -4044,7 +4772,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.048094
+1.037518
 \end_layout
 
 \end_inset
@@ -4062,7 +4790,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--0.5389976
+0.534821
 \end_layout
 
 \end_inset
@@ -4080,7 +4808,7 @@ y方向
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.587092
+1.57233
 \end_layout
 
 \end_inset
@@ -4109,7 +4837,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.0264
+1.0264
 \end_layout
 
 \end_inset
@@ -4118,7 +4846,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+---
 \end_layout
 
 \end_inset
@@ -4127,7 +4855,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
--0.49925
+0.49925
 \end_layout
 
 \end_inset
@@ -4136,7 +4864,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+---
 \end_layout
 
 \end_inset
@@ -4145,7 +4873,7 @@ Ref
 \begin_inset Text
 
 \begin_layout Plain Layout
--1.5256
+1.5256
 \end_layout
 
 \end_inset
@@ -4185,32 +4913,63 @@ Ref
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename /home/lw4992/projects/Joojak/doc/cylinder_viscous_dg1_pressure.png
-	lyxscale 50
-	width 8cm
+\begin_inset Float figure
+wide false
+sideways false
+status open
 
-\end_inset
-
-
-\begin_inset Graphics
-	filename /home/lw4992/projects/Joojak/doc/cylinder_viscous_dg3_pressure.png
-	lyxscale 50
-	width 8cm
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-湍流测试
-\end_layout
-
-\begin_layout Standard
+\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename cylinder_turb.png
+	filename cylinder_viscous_pressure_contour.png
+	lyxscale 60
+	width 14cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+不同精度DG格式压强等值线比较
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+均匀流场的
+\begin_inset Formula $k-\omega$
+\end_inset
+
+方程
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename uniform_k.png
+	lyxscale 50
+	width 8cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename uniform_o.png
 	lyxscale 50
 	width 8cm
 
@@ -4236,6 +4995,104 @@ Ref
 \end_layout
 
 \begin_layout Standard
+\begin_inset Graphics
+	filename wall_distance1.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename wall_distance2.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename eddy_vis.png
+	lyxscale 40
+	width 12cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+RAE2822
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename rae2822_sa.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename rae2822_ko.png
+	lyxscale 40
+	width 8cm
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+RAE2822湍流计算
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+左图：SA模型(
+\begin_inset Formula $Ma=0.2$
+\end_inset
+
+，
+\begin_inset Formula $Re=5\times10^{6}$
+\end_inset
+
+，三阶DG)；右图
+\begin_inset Formula $k-\omega$
+\end_inset
+
+模型(
+\begin_inset Formula $Ma=0.2$
+\end_inset
+
+，
+\begin_inset Formula $Re=5\times10^{5}$
+\end_inset
+
+，二阶DG)
+\end_layout
+
+\end_inset
+
 
 \end_layout
 

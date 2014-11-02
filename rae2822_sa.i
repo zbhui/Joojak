@@ -1,10 +1,11 @@
 # 全局变量
 [GlobalParams]
- 	order = FIRST
+ 	order = SECOND
  	family = MONOMIAL
   	
-  mach = 0.2
-  reynolds = 2E+05
+  mach = 0.134
+  reynolds = 5.0e+06  	
+  attack = 2.79
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
 []
@@ -12,11 +13,11 @@
 # 网格
 [Mesh]
   type = FileMesh
-  file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
+  file = ../high-order-workshop/C2.2_rae2822/rae2822_level5.msh
   dim = 2
 
-  boundary_id = '1 2 3 4 5' 
-  boundary_name = 'symmetric wall right top left'
+  boundary_id = '1 3' 
+  boundary_name = 'wall far_field'
 
   block_id = '0'
   block_name = 'fluid'
@@ -330,32 +331,32 @@
 # 边界条件
 [BCs]
 	[./mass_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 3'
 		type =SABC
 		variable = rho
 	[../]		
 	[./x-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 3'
 		type =SABC
 		variable = momentum_x
 	[../]	
 	[./y-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 3'
 		type =SABC
 		variable = momentum_y
 	[../]
 	[./z-momentumum_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 3'
 		type =SABC
 		variable = momentum_z
 	[../]		
 	[./total-energy_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 3'
 		type =SABC
 		variable = rhoe
 	[../]
 	[./rhon_bc]
-		boundary = '1 2 3 4 5'
+		boundary = '1 3'
 		type =SABC
 		variable = rhon
 	[../]
@@ -380,15 +381,9 @@
     type = SABndMaterial
   [../]
   [./far_field_material]
-		boundary = 'left right top'
+		boundary = 'far_field'
 		bc_type = far_field
     type = SABndMaterial
   [../]
-  [./symmetric_material]
-		boundary = 'symmetric'
-		bc_type = symmetric
-    type = SABndMaterial
-  [../]
-
 []
 
