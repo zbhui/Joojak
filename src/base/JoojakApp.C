@@ -59,6 +59,8 @@
 #include "BumpElementL2Error.h"
 #include "NumTimeStep.h"
 
+/// PostProcessor
+#include "PressureAndSkinFrictionCoeff.h"
 #include "SteadyTransientExecutioner.h"
 
 #include "SAInclude.h"
@@ -76,11 +78,11 @@ JoojakApp::JoojakApp(const std::string & name, InputParameters parameters) :
   srand(processor_id());
 
   Moose::registerObjects(_factory);
-  ModulesApp::registerObjects(_factory);
+//  ModulesApp::registerObjects(_factory);
   JoojakApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
-  ModulesApp::associateSyntax(_syntax, _action_factory);
+//  ModulesApp::associateSyntax(_syntax, _action_factory);
   JoojakApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -148,6 +150,8 @@ JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
 	registerPostprocessor(NumTimeStep);
+
+	registerVectorPostprocessor(PressureAndSkinFrictionCoeff);
 
 	registerExecutioner(SteadyTransientExecutioner);
 

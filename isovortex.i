@@ -28,7 +28,7 @@
   
   block_id = '0'
   block_name = 'fluid'
-	uniform_refine = 2
+	uniform_refine = 0
 []
 
 [AuxVariables]
@@ -79,8 +79,9 @@
 	[./SMP]
 		type = SMP
 		full = true
-    petsc_options_iname = '-pc_type '
-  	petsc_options_value = 'ilu'
+		petsc_options = '-help'
+    petsc_options_iname = '-ksp_type -pc_type -pc_hypre_type'
+  	petsc_options_value = 'gmres  hypre parasails'
 	[../]
 
 []

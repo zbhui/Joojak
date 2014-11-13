@@ -47,6 +47,10 @@ Real EulerBase::pressure(Real *uh)
 	return (_gamma-1) * (uh[4] - 0.5*(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0]);  //
 }
 
+Real EulerBase::pressureInfity()
+{
+	return 1.0/_gamma/_mach/_mach;
+}
 Real EulerBase::enthalpy(Real *uh)
 {
 	Real p = pressure(uh);

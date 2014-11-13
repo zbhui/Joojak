@@ -74,7 +74,7 @@
 
 [Preconditioning]
 	[./SMP]
-		type = FDP
+		type = SMP
 		full = true
 
 	  #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
@@ -173,6 +173,15 @@
 		boundary  = wall
 	[../]
  
+[]
+
+[VectorPostprocessors]
+  [./side_sample]
+    type = PressureAndSkinFrictionCoeff
+    variable = 'rho momentum_x momentum_y momentum_z rhoe'
+    boundary = wall
+    sort_by = x
+  [../]
 []
 
 # 输出和后处理

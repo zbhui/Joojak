@@ -24,6 +24,7 @@ public:
 
 protected:
   Real pressure(Real *uh);
+  Real pressureInfity();
   Real enthalpy(Real *uh);
   Real temperature(Real  *uh);
   Real mach_local(Real *uh);
