@@ -150,13 +150,13 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 //
 	Real r = std::min<Real>(s_hat/s_title/fv2, 10);
 //	Real r = s_hat/s_title/fv2;
-//	std::cout << d <<std::endl;
+//	std::cout << r <<std::endl;
 	Real tmp_pow = r*r*r;
-	tmp_pow *= tmp_pow;
+	tmp_pow = tmp_pow*tmp_pow;
 	Real g = r+_cw2*(tmp_pow-r);
 	tmp_pow = g*g*g;
-	tmp_pow *= tmp_pow;
-	Real fw = g*(pow((1+_cw3_pow6)/(tmp_pow+_cw3_pow6),1./6));
+	tmp_pow = tmp_pow*tmp_pow;
+	Real fw = g*pow((1+_cw3_pow6)/(tmp_pow+_cw3_pow6),1./6);
 
 	component = 0;
 	source_term[component] = 0;

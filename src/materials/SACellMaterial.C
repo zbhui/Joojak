@@ -18,6 +18,7 @@ InputParameters validParams<SACellMaterial>()
   params += validParams<SABase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
   params.addRequiredCoupledVar("wall_distance", "壁面距离");
+  params.addRequiredCoupledVar("potential", "势函数");
 
   return params;
 }
@@ -31,7 +32,9 @@ SACellMaterial::SACellMaterial(const std::string & name, InputParameters paramet
 		_flux_jacobi_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("flux_term_jacobi_variable")),
 		_flux_jacobi_grad_variable(declareProperty<std::vector<std::vector<RealTensorValue> > >("flux_term_jacobi_grad_variable")),
 		_source_jacobi_variable(declareProperty<std::vector<std::vector<Real> > >("source_term_jacobi_variable")),
-		_source_jacobi_grad_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("source_term_jacobi_grad_variable"))
+		_source_jacobi_grad_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("source_term_jacobi_grad_variable")),
+		_psi(coupledValue("potential")),
+		_grad_psi(coupledGradient("potential"))
 {
 	_n_equations = coupledComponents("variables");
 	for (int eq = 0; eq < _n_equations; ++eq)
@@ -134,14 +137,15 @@ void SACellMaterial::fluxTerm(RealVectorValue* flux_term, Real *source_term, Rea
 
 Real SACellMaterial::distance()
 {
-//	Real x = _q_point[_qp](0);
-//	Real y = _q_point[_qp](1);
-//	Real z = _q_point[_qp](2);
-//	Real d;
-//	if(x > 0)
-//		d = y;
-//	else
-//		d = sqrt(x*x+y*y+z*z);
+	Real x = _q_point[_qp](0);
+	Real y = _q_point[_qp](1);
+	Real z = _q_point[_qp](2);
+	Real d;
+	if(x > 0)
+		d = y;
+	else
+		d = sqrt(x*x+y*y+z*z);
 //	return d;
-	return _distance[_qp];
+	return -_grad_psi[_qp].size()+sqrt(_grad_psi[_qp].size_sq()+2*_psi[_qp]);
+//	return _distance[_qp];
 }
