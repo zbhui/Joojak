@@ -1,7 +1,8 @@
-#include "JoojakApp.h"
 #include "Moose.h"
+#include "JoojakApp.h"
 #include "AppFactory.h"
-#include "ModulesApp.h"
+#include "ActionFactory.h"
+#include "Syntax.h"
 
 /// 单元积分
 #include "EulerCellKernel.h"
@@ -31,9 +32,6 @@
 /// 辅助kernel
 #include "NSAuxVariable.h"
 
-/// Action
-
-
 /// 材料属性
 #include "EulerCellMaterial.h"
 #include "EulerFaceMaterial.h"
@@ -59,9 +57,14 @@
 #include "BumpElementL2Error.h"
 #include "NumTimeStep.h"
 
-/// PostProcessor
+/// VectorPostProcessor
 #include "PressureAndSkinFrictionCoeff.h"
+
+/// Executioner
 #include "SteadyTransientExecutioner.h"
+
+/// Action
+//#include "CFDAction.h"
 
 #include "SAInclude.h"
 
@@ -161,6 +164,9 @@ JoojakApp::registerObjects(Factory & factory)
 void
 JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+	/// 注册Action
+//	registerAction(Euler1Action, "add_variable");
+//	syntax.registerActionSyntax("EulerAction", "EulerTestAction");
 }
 
 void JoojakApp::registerSAObjects(Factory & factory)

@@ -1,6 +1,6 @@
 # 全局变量
 [GlobalParams]
- 	order = FOURTH
+ 	order = FIRST
  	family = MONOMIAL
   	
   gamma = 1.4
@@ -79,7 +79,7 @@
 	[./SMP]
 		type = SMP
 		full = true
-		petsc_options = '-help'
+		#petsc_options = '-help'
     petsc_options_iname = '-ksp_type -pc_type -pc_hypre_type'
   	petsc_options_value = 'gmres  hypre parasails'
 	[../]
@@ -143,20 +143,20 @@
 
 # 变量
 [Variables]
-	active = 'rho momentum_x momentum_y momentum_z rhoe'
-
 	[./rho]
 		[./InitialCondition] 
 			type = IsoVortexIC
 		[../]
   [../]
-
  	[./momentum_x]
 		[./InitialCondition] 
 			type = IsoVortexIC
 		[../]
   [../]
-  
+[]
+
+# 变量
+[Variables] 
  	[./momentum_y]
 		[./InitialCondition] 
 			type = IsoVortexIC
