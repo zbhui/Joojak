@@ -4,6 +4,11 @@
 #include "ActionFactory.h"
 #include "Syntax.h"
 
+/// Action
+#include "CFDAction.h"
+#include "CFDMetaAction.h"
+#include "CFDMaterialAction.h"
+
 /// 单元积分
 #include "EulerCellKernel.h"
 #include "NSCellKernel.h"
@@ -62,9 +67,6 @@
 
 /// Executioner
 #include "SteadyTransientExecutioner.h"
-
-/// Action
-//#include "CFDAction.h"
 
 #include "SAInclude.h"
 
@@ -165,8 +167,30 @@ void
 JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 	/// 注册Action
-//	registerAction(Euler1Action, "add_variable");
-//	syntax.registerActionSyntax("EulerAction", "EulerTestAction");
+	syntax.registerActionSyntax("CFDAction", "CFD", "add_variable");
+	syntax.registerActionSyntax("CFDAction", "CFD", "add_aux_variable");
+	syntax.registerActionSyntax("CFDAction", "CFD", "add_ic");
+	syntax.registerActionSyntax("CFDAction", "CFD", "add_bc");
+	syntax.registerActionSyntax("CFDAction", "CFD", "add_kernel");
+	syntax.registerActionSyntax("CFDAction", "CFD", "add_aux_kernel");
+	syntax.registerActionSyntax("CFDAction", "CFD", "add_dg_kernel");
+	syntax.registerActionSyntax("CFDAction", "CFD/*", "add_material");
+	syntax.registerActionSyntax("AddMaterialAction", "CFD/Material/*", "add_material");
+	syntax.registerActionSyntax("CFDMaterialAction", "CFD/Material/*", "add_material");
+
+	registerAction(CFDAction, "add_variable");
+	registerAction(CFDAction, "add_aux_variable");
+	registerAction(CFDAction, "add_ic");
+	registerAction(CFDAction, "add_bc");
+	registerAction(CFDAction, "add_kernel");
+	registerAction(CFDAction, "add_aux_kernel");
+	registerAction(CFDAction, "add_dg_kernel");
+	registerAction(CFDMaterialAction, "add_material");
+//	registerAction(CFDAction, "add_material");
+
+
+	syntax.registerActionSyntax("CFDMetaAction", "CFDMetaAction");
+	registerAction(CFDMetaAction, "meta_action");
 }
 
 void JoojakApp::registerSAObjects(Factory & factory)
