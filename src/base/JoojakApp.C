@@ -5,6 +5,13 @@
 #include "Syntax.h"
 
 /// Action
+#include "CFDAddVariablesAction.h"
+#include "CFDAuxVariablesAction.h"
+#include "CFDInitialConditionAction.h"
+#include "CFDBoundaryConditionAction.h"
+#include "CFDKernelsAction.h"
+#include "CFDDGKernelsAction.h"
+#include "CFDPostprocessorAction.h"
 #include "CFDAction.h"
 #include "CFDMetaAction.h"
 #include "CFDMaterialAction.h"
@@ -83,11 +90,9 @@ JoojakApp::JoojakApp(const std::string & name, InputParameters parameters) :
   srand(processor_id());
 
   Moose::registerObjects(_factory);
-//  ModulesApp::registerObjects(_factory);
   JoojakApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
-//  ModulesApp::associateSyntax(_syntax, _action_factory);
   JoojakApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -167,30 +172,24 @@ void
 JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 	/// 注册Action
-	syntax.registerActionSyntax("CFDAction", "CFD", "add_variable");
-	syntax.registerActionSyntax("CFDAction", "CFD", "add_aux_variable");
-	syntax.registerActionSyntax("CFDAction", "CFD", "add_ic");
-	syntax.registerActionSyntax("CFDAction", "CFD", "add_bc");
-	syntax.registerActionSyntax("CFDAction", "CFD", "add_kernel");
-	syntax.registerActionSyntax("CFDAction", "CFD", "add_aux_kernel");
-	syntax.registerActionSyntax("CFDAction", "CFD", "add_dg_kernel");
-	syntax.registerActionSyntax("CFDAction", "CFD/*", "add_material");
-	syntax.registerActionSyntax("AddMaterialAction", "CFD/Material/*", "add_material");
-	syntax.registerActionSyntax("CFDMaterialAction", "CFD/Material/*", "add_material");
 
-	registerAction(CFDAction, "add_variable");
-	registerAction(CFDAction, "add_aux_variable");
-	registerAction(CFDAction, "add_ic");
-	registerAction(CFDAction, "add_bc");
-	registerAction(CFDAction, "add_kernel");
-	registerAction(CFDAction, "add_aux_kernel");
-	registerAction(CFDAction, "add_dg_kernel");
-	registerAction(CFDMaterialAction, "add_material");
-//	registerAction(CFDAction, "add_material");
+	syntax.registerActionSyntax("CFDAddVariablesAction", "CFDVariables", "add_variable");
+	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_variable");
+	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_kernel");
+	syntax.registerActionSyntax("CFDInitialConditionAction", "CFDICs", "add_ic");
+	syntax.registerActionSyntax("CFDBoundaryConditionAction", "CFDBCs", "add_bc");
+	syntax.registerActionSyntax("CFDKernelsAction", "CFDKernels", "add_kernel");
+	syntax.registerActionSyntax("CFDDGKernelsAction", "CFDDGKernels", "add_dg_kernel");
+	syntax.registerActionSyntax("CFDPostprocessorAction", "CFDPostprocessor", "add_postprocessor");
 
-
-	syntax.registerActionSyntax("CFDMetaAction", "CFDMetaAction");
-	registerAction(CFDMetaAction, "meta_action");
+	registerAction(CFDAddVariablesAction, "add_variable");
+	registerAction(CFDAuxVariablesAction, "add_aux_variable");
+	registerAction(CFDAuxVariablesAction, "add_aux_kernel");
+	registerAction(CFDInitialConditionAction, "add_ic");
+	registerAction(CFDBoundaryConditionAction, "add_bc");
+	registerAction(CFDKernelsAction, "add_kernel");
+	registerAction(CFDDGKernelsAction, "add_dg_kernel");
+	registerAction(CFDPostprocessorAction, "add_postprocessor");
 }
 
 void JoojakApp::registerSAObjects(Factory & factory)

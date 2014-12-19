@@ -5,7 +5,7 @@ template<>
 InputParameters validParams<EulerBase>()
 {
   InputParameters params = validParams<MooseObject>();
-  params.addParam<Real>("mach",  0.1, "马赫数");
+  params.addParam<Real>("mach",  0.2, "马赫数");
   params.addParam<Real>("gamma", 1.4, "比热比");
   params.addParam<Real>("attack", 0., "攻角");
   params.addParam<Real>("sideslip", 0., "侧滑角");
