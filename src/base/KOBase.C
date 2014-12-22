@@ -226,3 +226,26 @@ Real KOBase::pressure(Real* uh)
 	return (_gamma-1)*(uh[4] - uh[5] - 0.5*(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0]);
 }
 
+int KOBase::equationIndex(const std::string &var_name)
+{
+	int eq = -1;
+	if(var_name == "rho")
+		eq = 0;
+	if(var_name == "momentum_x")
+		eq = 1;
+	if(var_name == "momentum_y")
+		eq = 2;
+	if(var_name == "momentum_z")
+		eq = 3;
+	if(var_name == "rhoe")
+		eq = 4;
+	if(var_name == "rhok")
+		eq = 5;
+	if(var_name == "rhoo")
+		eq = 6;
+
+	if(eq < 0)
+		mooseError("不可知的变量名");
+
+	return eq;
+}

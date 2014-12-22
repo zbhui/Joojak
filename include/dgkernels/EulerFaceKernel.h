@@ -2,6 +2,7 @@
 #pragma once
 
 #include "DGKernel.h"
+#include "EulerBase.h"
 
 class EulerFaceKernel;
 
@@ -9,7 +10,8 @@ template<>
 InputParameters validParams<EulerFaceKernel>();
 
 class EulerFaceKernel :
-public DGKernel
+public DGKernel,
+public EulerBase
 {
 public:
 	EulerFaceKernel(const std::string &name, InputParameters parameters);

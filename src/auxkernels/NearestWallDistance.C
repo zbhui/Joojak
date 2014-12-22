@@ -23,8 +23,7 @@ NearestWallDistance::NearestWallDistance(const std::string & name, InputParamete
  * them as "Elemental (Constant Monomial)" or "Nodal (First Lagrange)".  No changes to the
  * source are necessary to switch from one type or the other.
  */
-Real
-NearestWallDistance::computeValue()
+Real NearestWallDistance::computeValue()
 {
 	return -_grad_psi[_qp].size()+sqrt(_grad_psi[_qp].size_sq()+2*_psi[_qp]);
 }

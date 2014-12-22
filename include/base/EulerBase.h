@@ -13,16 +13,14 @@ class EulerBase;
 template<>
 InputParameters validParams<EulerBase>();
 
-/**
- * CFD base class.
- */
 class EulerBase
 {
 public:
-	EulerBase(const std::string & name, InputParameters parameters);
+  EulerBase(const std::string & name, InputParameters parameters);
   virtual ~EulerBase(){};
 
 protected:
+  int equationIndex(const std::string &var_name);
   Real pressure(Real *uh);
   Real pressureInfity();
   Real enthalpy(Real *uh);

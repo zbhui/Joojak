@@ -7,6 +7,8 @@ template<>
 InputParameters validParams<CFDPostprocessorAction>()
 {
   InputParameters params = validParams<Action>();
+  MooseEnum time_options("alive active");
+  params.addParam<MooseEnum>("time_type", time_options, "Whether to output the total elapsed or just the active time");
   return params;
 }
 
@@ -26,9 +28,12 @@ void CFDPostprocessorAction::act()
 	params = _factory.getValidParams("CFDResidual");
 	_problem->addPostprocessor("CFDResidual", "residual_initial", params);
 
-	params = _factory.getValidParams("RunTime");
-	params.set<MooseEnum>("time_type") = "alive";
-	_problem->addPostprocessor("RunTime", "run_time", params);
+	if(isParamValid("time_type"))
+	{
+		params = _factory.getValidParams("RunTime");
+		params.set<MooseEnum>("time_type") = getParam<MooseEnum>("time_type");
+		_problem->addPostprocessor("RunTime", "run_time", params);
+	}
 
 }
 

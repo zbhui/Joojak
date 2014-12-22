@@ -32,6 +32,7 @@
 []
 
 [CFDPostprocessor]
+  time_type = alive
 []
 
 # 网格

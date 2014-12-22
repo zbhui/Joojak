@@ -12,9 +12,6 @@
 #include "CFDKernelsAction.h"
 #include "CFDDGKernelsAction.h"
 #include "CFDPostprocessorAction.h"
-#include "CFDAction.h"
-#include "CFDMetaAction.h"
-#include "CFDMaterialAction.h"
 
 /// 单元积分
 #include "EulerCellKernel.h"
@@ -172,7 +169,6 @@ void
 JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 	/// 注册Action
-
 	syntax.registerActionSyntax("CFDAddVariablesAction", "CFDVariables", "add_variable");
 	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_variable");
 	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_kernel");

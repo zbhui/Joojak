@@ -149,3 +149,23 @@ Quaterniond EulerBase::earthFromWind()
 {
 	return earthFromBody()*bodyFromWind();
 }
+
+int EulerBase::equationIndex(const std::string &var_name)
+{
+	int eq = -1;
+	if(var_name == "rho")
+		eq = 0;
+	if(var_name == "momentum_x")
+		eq = 1;
+	if(var_name == "momentum_y")
+		eq = 2;
+	if(var_name == "momentum_z")
+		eq = 3;
+	if(var_name == "rhoe")
+		eq = 4;
+
+	if(eq < 0)
+		mooseError("不可知的变量名");
+
+	return eq;
+}

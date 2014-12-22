@@ -30,6 +30,7 @@ void CFDKernelsAction::act()
 
 	std::string cell_kernel_name = getParam<std::string>("type");
 	params = _factory.getValidParams(cell_kernel_name);
+    _app.parser().extractParams(_name, params);
 	for (int i = 0; i < _variables.size(); ++i)
 	{
 		params.set<NonlinearVariableName>("variable") = _variables[i];

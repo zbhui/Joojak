@@ -11,7 +11,7 @@ InputParameters validParams<CFDDGKernelsAction>();
 class CFDDGKernelsAction : public Action
 {
 public:
-	CFDDGKernelsAction(const std::string & name, InputParameters params);
+  CFDDGKernelsAction(const std::string & name, InputParameters params);
   virtual void act();
 
 protected:

@@ -72,6 +72,20 @@
   [../]
 []
 
+[AuxVariables]
+  [./proc_id]
+    order = FIRST
+    family = MONOMIAL
+  [../]
+[]
+
+[AuxKernels]
+  [./proc_id]
+    type = ProcessorIDAux
+    variable = proc_id
+    execute_on = 'initial timestep'
+  [../]
+[]
 
 [CFDVariables]
 []
@@ -99,6 +113,27 @@
 []
 
 [CFDPostprocessor]
+[]
+
+[Postprocessors]
+  [./force_total-x]
+    type = CFDForcePostprocessor
+    direction_by = x
+    force_type = total
+    boundary  = wall
+  [../]
+  [./force_total-y]
+    type = CFDForcePostprocessor
+    direction_by = y
+    force_type = total
+    boundary  = wall
+  [../]
+  [./force_total-z]
+    type = CFDForcePostprocessor
+    direction_by = z
+    force_type = total
+    boundary  = wall
+  [../]
 []
 
 [Materials]

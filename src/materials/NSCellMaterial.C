@@ -38,7 +38,7 @@ NSCellMaterial::NSCellMaterial(const std::string & name, InputParameters paramet
 
 void NSCellMaterial::computeQpProperties()
 {
-	if(_bnd) return;
+	if(_bnd || _neighbor) return;
 
 	resizeQpProperty();
 
@@ -92,7 +92,6 @@ void NSCellMaterial::resizeQpProperty()
 	{
 		_flux_jacobi_variable[_qp][p].resize(_n_equations);
 		_flux_jacobi_grad_variable[_qp][p].resize(_n_equations);
-
 	}
 
 }

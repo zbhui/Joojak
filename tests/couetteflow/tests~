@@ -4,9 +4,9 @@
     input = 'couetteflow.i'
     exodiff = 'couetteflow_exodus.e'
   [../]
-  [./test_couetteflow]
+  [./test_couetteflow_precondtion]
     type = 'Exodiff'
-    input = 'couetteflow.i'
-    exodiff = 'couetteflow_exodus.e'
+    input = 'couetteflow_precondtion.i'
+    exodiff = 'couetteflow_precondtion_exodus.e'
   [../]
 []

@@ -8,9 +8,6 @@ class CouetteFlowBase;
 template<>
 InputParameters validParams<CouetteFlowBase>();
 
-/**
- * CFD base class.
- */
 class CouetteFlowBase : public NSBase
 {
 public:
@@ -24,6 +21,5 @@ protected:
 	Real z_momentum(Real t, const Point &p);
 	Real total_energy(Real t, const Point &p);
 	Real temperature(const Point& p);
-
 };
 

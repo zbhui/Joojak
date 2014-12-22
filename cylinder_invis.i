@@ -31,7 +31,6 @@
     petsc_options_iname = '-ksp_type  -pc_type'
     petsc_options_value = 'gmres       bjacobi'
   [../]
-
 []
 
 [Executioner]
@@ -100,6 +99,7 @@
 []
 
 [CFDPostprocessor]
+  time_type = alive
 []
 
 [Materials]

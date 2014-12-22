@@ -1,17 +1,18 @@
 
+
 #include "KOBC.h"
 
 template<>
 InputParameters validParams<KOBC>()
 {
-	InputParameters params = validParams<CFDBC>();
+	InputParameters params = validParams<IntegratedBC>();
 	params += validParams<KOBase>();
 
 	return params;
 }
 
 KOBC::KOBC(const std::string & name, InputParameters parameters):
-		CFDBC(name, parameters),
+		IntegratedBC(name, parameters),
 		KOBase(name, parameters),
 		_flux(getMaterialProperty<std::vector<Real> >("flux")),
 		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable")),

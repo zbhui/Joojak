@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "CFDBC.h"
+#include "IntegratedBC.h"
 #include "KOBase.h"
 
 class KOBC;
@@ -10,7 +10,7 @@ template<>
 InputParameters validParams<KOBC>();
 
 class KOBC :
-public CFDBC,
+public IntegratedBC,
 public KOBase
 {
 public:

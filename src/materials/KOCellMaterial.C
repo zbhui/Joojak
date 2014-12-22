@@ -41,7 +41,7 @@ KOCellMaterial::KOCellMaterial(const std::string & name, InputParameters paramet
 
 void KOCellMaterial::computeQpProperties()
 {
-	if(_bnd) return;
+	if(_bnd || _neighbor) return;
 
 	resizeQpProperty();
 

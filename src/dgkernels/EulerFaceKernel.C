@@ -5,28 +5,19 @@ template<>
 InputParameters validParams<EulerFaceKernel>()
 {
 	  InputParameters params = validParams<DGKernel>();
+	  params += validParams<EulerBase>();
 	  return params;
 }
 EulerFaceKernel::EulerFaceKernel(const std::string & name, InputParameters parameters):
 		DGKernel(name, parameters),
+		EulerBase(name, parameters),
 		_flux(getNeighborMaterialProperty<std::vector<Real> >("flux")),
 		_jacobi_variable_ee(getNeighborMaterialProperty<std::vector<std::vector<Real> > >("face_jacobi_ee")),
 		_jacobi_variable_en(getNeighborMaterialProperty<std::vector<std::vector<Real> > >("face_jacobi_en")),
 		_jacobi_variable_ne(getNeighborMaterialProperty<std::vector<std::vector<Real> > >("face_jacobi_ne")),
 		_jacobi_variable_nn(getNeighborMaterialProperty<std::vector<std::vector<Real> > >("face_jacobi_nn"))
 {
-	std::string var_name = _var.name();
-
-	if(var_name == "rho")
-		_eq = 0;
-	if(var_name == "momentum_x")
-		_eq = 1;
-	if(var_name == "momentum_y")
-		_eq = 2;
-	if(var_name == "momentum_z")
-		_eq = 3;
-	if(var_name == "rhoe")
-		_eq = 4;
+    _eq = equationIndex(_var.name());
 }
 
 Real EulerFaceKernel::computeQpResidual(Moose::DGResidualType type)

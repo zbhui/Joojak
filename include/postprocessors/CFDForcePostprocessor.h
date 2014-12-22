@@ -18,20 +18,8 @@ public:
 	virtual void threadJoin(const UserObject &y);
 
 protected:
-	enum ForceType
-	{
-		form = 0,
-		friction = 1,
-		total = 2
-	};
-	enum Direction
-	{
-		x = 0,
-		y = 1,
-		z = 2
-	};
-	Direction _direction;
-	ForceType _force_type;
+	MooseEnum _direction;
+	MooseEnum _force_type;
 
 	int _n_equations;
 	std::vector<VariableValue*> _uh;

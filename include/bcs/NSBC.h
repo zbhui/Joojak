@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "CFDBC.h"
+#include "IntegratedBC.h"
 #include "NSBase.h"
 
 class NSBC;
@@ -10,7 +10,7 @@ template<>
 InputParameters validParams<NSBC>();
 
 class NSBC :
-public CFDBC,
+public IntegratedBC,
 public NSBase
 {
 public:

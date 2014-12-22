@@ -1,33 +1,37 @@
-# 全局变量
 [GlobalParams]
-
-  	
-[]
-
-[CFD]
   order = FIRST
   family = MONOMIAL
-  type = EULER
-  init_cond = IsoVortexIC
-  #aux_variables = 'pressure mach velocity_x velocity_y velocity_z'
-  boundary = 'left right bottom top'
-  [./Material]
-    [./cell_materical1]
-      block = 0
-      type = EulerCellMaterial
-      variables = 'rho momentum_x momentum_y momentum_z rhoe'
-    [../]
-    [./face_materical]
-      block = 0
-      type = EulerFaceMaterial
-      variables = 'rho momentum_x momentum_y momentum_z rhoe'
-    [../]
-    [./bnd_materical]
-      boundary = 'left right bottom top'
-      type = IsoVortexBndMaterial
-      variables = 'rho momentum_x momentum_y momentum_z rhoe'
-    [../]
-  [../]
+  	
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+[]
+
+
+[CFDVariables]
+[]
+
+[./CFDAuxVariables]
+  type = NSAuxVariable
+  aux_variables = 'pressure mach velocity_x velocity_y velocity_z'    
+[../]
+
+[CFDICs]
+  type = IsoVortexIC
+[]
+
+[CFDKernels]
+  type = EulerCellKernel
+[]
+
+[CFDDGKernels]
+  type = EulerFaceKernel
+[]
+
+[CFDBCs]
+  type = EulerBC
+    boundary = 'left right bottom top'
+[]
+
+[CFDPostprocessor]
 []
 
 # 网格
@@ -94,15 +98,22 @@
     type = Console	
     perf_log = true
     linear_residuals = true
-    nonlinear_residuals =  true	
   [../]
 []
 
+[Materials]
+  [./cell_materical]
+    block = 0
+    type = EulerCellMaterial
+  [../]
 
+  [./face_materical]
+    block = 0
+    type = EulerFaceMaterial
+  [../]
 
-
-
-
-
-
-
+  [./bnd_materical]
+    boundary = 'left right bottom top'
+    type = IsoVortexBndMaterial
+  [../]
+[]

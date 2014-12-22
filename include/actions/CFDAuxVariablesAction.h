@@ -11,7 +11,7 @@ InputParameters validParams<CFDAuxVariablesAction>();
 class CFDAuxVariablesAction : public Action
 {
 public:
-	CFDAuxVariablesAction(const std::string & name, InputParameters params);
+  CFDAuxVariablesAction(const std::string & name, InputParameters params);
   virtual void act();
 
 protected:

@@ -4,11 +4,13 @@ template<>
 InputParameters validParams<KOCellKernel>()
 {
   InputParameters params = validParams<Kernel>();
+  params += validParams<KOBase>();
   return params;
 }
 
 KOCellKernel::KOCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
+		KOBase(name, parameters),
 		_flux_term(getMaterialProperty<std::vector<RealVectorValue> >("flux_term")),
 		_source_term(getMaterialProperty<std::vector<Real> >("source_term")),
 		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("flux_term_jacobi_variable")),
@@ -16,22 +18,7 @@ KOCellKernel::KOCellKernel(const std::string & name, InputParameters parameters)
 		_source_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("source_term_jacobi_variable")),
 		_source_jacobi_grad_variable(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("source_term_jacobi_grad_variable"))
 {
-	std::string var_name = _var.name();
-
-	if(var_name == "rho")
-		_eq = 0;
-	if(var_name == "momentum_x")
-		_eq = 1;
-	if(var_name == "momentum_y")
-		_eq = 2;
-	if(var_name == "momentum_z")
-		_eq = 3;
-	if(var_name == "rhoe")
-		_eq = 4;
-	if(var_name == "rhok")
-		_eq = 5;
-	if(var_name == "rhoo")
-		_eq = 6;
+	_eq = equationIndex(_var.name());
 }
 
 Real KOCellKernel::computeQpResidual()

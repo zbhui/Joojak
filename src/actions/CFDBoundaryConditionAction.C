@@ -7,9 +7,9 @@ template<>
 InputParameters validParams<CFDBoundaryConditionAction>()
 {
   InputParameters params = validParams<Action>();
-  params.addRequiredParam<std::string>("type", "InitialCondition类型");
+  params.addRequiredParam<std::string>("type", "BoundaryCondition类型");
   params.addRequiredParam<std::vector<NonlinearVariableName> >("variables", "非线性变量");
-  params.addParam<std::vector<BoundaryName> >("boundary", "CFD边界");
+  params.addRequiredParam<std::vector<BoundaryName> >("boundary", "CFD边界");
   return params;
 }
 

@@ -4,27 +4,17 @@ template<>
 InputParameters validParams<EulerCellKernel>()
 {
   InputParameters params = validParams<Kernel>();
-//  params.addRequiredParam<std::string>("material", "单元的材料属性");
+  params += validParams<EulerBase>();
   return params;
 }
 
 EulerCellKernel::EulerCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
+		EulerBase(name, parameters),
 		_invis_term(getMaterialProperty<std::vector<RealVectorValue> >("cell_material")),
 		_jacobi(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("cell_jacobi_variable"))
 {
-	std::string var_name = _var.name();
-
-	if(var_name == "rho")
-		_eq = 0;
-	if(var_name == "momentum_x")
-		_eq = 1;
-	if(var_name == "momentum_y")
-		_eq = 2;
-	if(var_name == "momentum_z")
-		_eq = 3;
-	if(var_name == "rhoe")
-		_eq = 4;
+	_eq = equationIndex(_var.name());
 }
 
 Real EulerCellKernel::computeQpResidual()

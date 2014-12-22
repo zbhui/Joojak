@@ -9,9 +9,6 @@ class SAAuxVariable;
 template<>
 InputParameters validParams<SAAuxVariable>();
 
-/**
- * Coupled auxiliary value
- */
 class SAAuxVariable :
 public AuxKernel,
 public SABase

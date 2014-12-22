@@ -8,14 +8,10 @@ class IsoVortexBase;
 template<>
 InputParameters validParams<IsoVortexBase>();
 
-/**
- * CFD base class.
- */
 class IsoVortexBase : public EulerBase
 {
 public:
 	IsoVortexBase(const std::string & name, InputParameters parameters);
-
 	Real value(Real t, const Point &p, int eq);
 protected:
 	Real density(Real t, const Point &p);
