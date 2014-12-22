@@ -1,10 +1,8 @@
 [GlobalParams]
   order = FIRST
   family = MONOMIAL
-  	
-  mach = 0.1
-  reynolds = 40	
-  attack = 45
+  mach = 0.2
+  reynolds = 40
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
@@ -18,8 +16,6 @@
   
   boundary_id = '8 9'
   boundary_name = 'far_field wall'
-	
-  uniform_refine = 0 
 []
 
 [Preconditioning]

@@ -19,10 +19,10 @@
   [../]
 
   [./other]
-		type = NeumannBC
-		variable = u
-		boundary  = 'symmetric right top left'
-		value = 0
+    type = NeumannBC
+    variable = u
+    boundary  = 'symmetric right top left'
+    value = 0
   [../]
 []
 
@@ -35,9 +35,9 @@
 
 [Variables]
   [./u]
-		order = FIRST
+    order = FIRST
     family = LAGRANGE
-		initial_condition = 0
+    initial_condition = 0
   [../]
 []
 
@@ -63,6 +63,6 @@
 
 [Outputs]
   console = true
-	linear_residuals = true
-	nonlinear_residuals = true
+  linear_residuals = true
+  nonlinear_residuals = true
 []
