@@ -5,6 +5,19 @@
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
+[Mesh]
+  type = GeneratedMesh
+  dim = 2
+  nx = 10
+  ny = 10
+  xmin = -10
+  xmax = 0
+  ymin = -10
+  ymax = 0
+  block_id = '0'
+  block_name = 'fluid'
+  uniform_refine = 0
+[]
 
 [CFDVariables]
 []
@@ -35,20 +48,6 @@
   time_type = alive
 []
 
-# 网格
-[Mesh]
-  type = GeneratedMesh
-  dim = 2
-  nx = 10
-  ny = 10
-  xmin = -10
-  xmax = 0
-  ymin = -10
-  ymax = 0
-  block_id = '0'
-  block_name = 'fluid'
-  uniform_refine = 0
-[]
 
 [Preconditioning]
   [./SMP]

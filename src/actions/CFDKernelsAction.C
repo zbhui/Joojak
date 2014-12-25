@@ -22,6 +22,7 @@ void CFDKernelsAction::act()
 {
 	std::string time_kernel_name = "TimeDerivative";
 	InputParameters params = _factory.getValidParams(time_kernel_name);
+    _app.parser().extractParams(_name, params);
 	for (int i = 0; i < _variables.size(); ++i)
 	{
 		params.set<NonlinearVariableName>("variable") = _variables[i];

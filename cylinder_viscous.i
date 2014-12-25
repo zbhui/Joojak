@@ -27,7 +27,6 @@
     petsc_options_iname = '-ksp_type  -pc_type'
     petsc_options_value = 'gmres       lu'
   [../]
-
 []
 
 [Executioner]
