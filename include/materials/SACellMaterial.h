@@ -43,6 +43,10 @@ protected:
 	MaterialProperty<std::vector<std::vector<Real> > >& _source_jacobi_variable;
 	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _source_jacobi_grad_variable;
 
+    /// 势函数
+    VariableValue& _psi;
+    /// 势函数梯度
+    VariableGradient& _grad_psi;
 
 	void computeQpValue(Real *uh, RealGradient *duh);
 	void fluxTerm(RealVectorValue *flux_term, Real *source_term, Real *uh, RealGradient *duh);

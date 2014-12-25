@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kernel.h"
+#include "EulerBase.h"
 
 class EulerCellKernel;
 
@@ -8,7 +9,8 @@ template<>
 InputParameters validParams<EulerCellKernel>();
 
 class EulerCellKernel :
-public Kernel
+public Kernel,
+public EulerBase
 {
 public:
 	EulerCellKernel(const std::string & name, InputParameters parameters);

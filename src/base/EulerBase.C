@@ -5,7 +5,7 @@ template<>
 InputParameters validParams<EulerBase>()
 {
   InputParameters params = validParams<MooseObject>();
-  params.addRequiredParam<Real>("mach",     "马赫数");
+  params.addParam<Real>("mach",  0.2, "马赫数");
   params.addParam<Real>("gamma", 1.4, "比热比");
   params.addParam<Real>("attack", 0., "攻角");
   params.addParam<Real>("sideslip", 0., "侧滑角");
@@ -47,6 +47,10 @@ Real EulerBase::pressure(Real *uh)
 	return (_gamma-1) * (uh[4] - 0.5*(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0]);  //
 }
 
+Real EulerBase::pressureInfity()
+{
+	return 1.0/_gamma/_mach/_mach;
+}
 Real EulerBase::enthalpy(Real *uh)
 {
 	Real p = pressure(uh);
@@ -144,4 +148,24 @@ Quaterniond EulerBase::earthFromBody()
 Quaterniond EulerBase::earthFromWind()
 {
 	return earthFromBody()*bodyFromWind();
+}
+
+int EulerBase::equationIndex(const std::string &var_name)
+{
+	int eq = -1;
+	if(var_name == "rho")
+		eq = 0;
+	if(var_name == "momentum_x")
+		eq = 1;
+	if(var_name == "momentum_y")
+		eq = 2;
+	if(var_name == "momentum_z")
+		eq = 3;
+	if(var_name == "rhoe")
+		eq = 4;
+
+	if(eq < 0)
+		mooseError("不可知的变量名");
+
+	return eq;
 }

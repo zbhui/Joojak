@@ -5,7 +5,7 @@ template<>
 InputParameters validParams<NSBase>()
 {
   InputParameters params = validParams<EulerBase>();
-  params.addRequiredParam<Real>("reynolds", "雷诺数");
+  params.addParam<Real>("reynolds", 1, "雷诺数");
   params.addParam<Real>("prandtl", 0.72, "prandtl数");
   params.addParam<Real>("epsilon", 1, "对称项罚值，可以取1, 0 , -1，分别对应SIP, IIP, NIP");
   params.addParam<Real>("sigma", 1, "通量罚值，默认值为6");
@@ -112,4 +112,24 @@ void NSBase::stressTerm(Matrix3d &tau, Real* uh, RealGradient* duh)
 			tau(alpha,beta) = tmp(alpha, beta);
 		}
 	}
+}
+
+int NSBase::equationIndex(const std::string &var_name)
+{
+	int eq = -1;
+	if(var_name == "rho")
+		eq = 0;
+	if(var_name == "momentum_x")
+		eq = 1;
+	if(var_name == "momentum_y")
+		eq = 2;
+	if(var_name == "momentum_z")
+		eq = 3;
+	if(var_name == "rhoe")
+		eq = 4;
+
+	if(eq < 0)
+		mooseError("不可知的变量名");
+
+	return eq;
 }

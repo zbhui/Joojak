@@ -4,30 +4,19 @@
 template<>
 InputParameters validParams<EulerBC>()
 {
-	InputParameters params = validParams<CFDBC>();
+	InputParameters params = validParams<IntegratedBC>();
 	params += validParams<EulerBase>();
 
 	return params;
 }
 
 EulerBC::EulerBC(const std::string & name, InputParameters parameters):
-		CFDBC(name, parameters),
+		IntegratedBC(name, parameters),
 		EulerBase(name, parameters),
 		_flux(getMaterialProperty<std::vector<Real> >("flux")),
 		_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("bnd_jacobi_variable"))
 {
-	std::string var_name = _var.name();
-
-	if(var_name == "rho")
-		_eq = 0;
-	if(var_name == "momentum_x")
-		_eq = 1;
-	if(var_name == "momentum_y")
-		_eq = 2;
-	if(var_name == "momentum_z")
-		_eq = 3;
-	if(var_name == "rhoe")
-		_eq = 4;
+	_eq = equationIndex(_var.name());
 }
 
 Real EulerBC::computeQpResidual()

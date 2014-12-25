@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kernel.h"
+#include "NSBase.h"
 
 class NSCellKernel;
 
@@ -8,7 +9,8 @@ template<>
 InputParameters validParams<NSCellKernel>();
 
 class NSCellKernel :
-public Kernel
+public Kernel,
+public NSBase
 {
 public:
 	NSCellKernel(const std::string & name, InputParameters parameters);

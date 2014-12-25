@@ -14,7 +14,7 @@ SABase::SABase(const std::string& name, InputParameters parameters):
 		_cw2(0.3), _cw3(2.0), _cv1(7.1), _cv2(0.7), _cv3(0.9),
 		_ct1(1.0), _ct2(2.0), _ct3(1.2), _ct4(0.5),
 		_prandtl_turb(0.9),
-		_nu_infty(3.0)
+		_nu_infty(2.0)
 {
 	_cw1 = _cb1/_kappa/_kappa + (1+_cb2)/_sigma_sa;
 	_cw3_pow6 = _cw3*_cw3*_cw3*_cw3*_cw3*_cw3;
@@ -149,12 +149,14 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 		s_title = vorticity+(_cv2*_cv2*vorticity+_cv3*s_hat)*vorticity/((_cv3-2*_cv2)*vorticity-s_hat);
 //
 	Real r = std::min<Real>(s_hat/s_title/fv2, 10);
+//	Real r = s_hat/s_title/fv2;
+//	std::cout << r <<std::endl;
 	Real tmp_pow = r*r*r;
-	tmp_pow *= tmp_pow;
+	tmp_pow = tmp_pow*tmp_pow;
 	Real g = r+_cw2*(tmp_pow-r);
 	tmp_pow = g*g*g;
-	tmp_pow *= tmp_pow;
-	Real fw = g*(pow((1+_cw3_pow6)/(tmp_pow+_cw3_pow6),1./6));
+	tmp_pow = tmp_pow*tmp_pow;
+	Real fw = g*pow((1+_cw3_pow6)/(tmp_pow+_cw3_pow6),1./6);
 
 	component = 0;
 	source_term[component] = 0;

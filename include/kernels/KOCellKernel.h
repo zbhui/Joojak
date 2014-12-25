@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kernel.h"
+#include "KOBase.h"
 
 class KOCellKernel;
 
@@ -8,7 +9,8 @@ template<>
 InputParameters validParams<KOCellKernel>();
 
 class KOCellKernel :
-public Kernel
+public Kernel,
+public KOBase
 {
 public:
 	KOCellKernel(const std::string & name, InputParameters parameters);

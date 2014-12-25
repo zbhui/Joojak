@@ -16,6 +16,7 @@ public:
 	virtual ~KOBase(){};
 
 protected:
+	int equationIndex(const std::string &var_name);
 	Real eddyViscosity(Real *uh);
 	Real pressure(Real *uh);
 	Real turb_kinetic(Real *uh);

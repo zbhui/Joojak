@@ -4,14 +4,14 @@
 template<>
 InputParameters validParams<NSBC>()
 {
-	InputParameters params = validParams<CFDBC>();
+	InputParameters params = validParams<IntegratedBC>();
 	params += validParams<NSBase>();
 
 	return params;
 }
 
 NSBC::NSBC(const std::string & name, InputParameters parameters):
-		CFDBC(name, parameters),
+		IntegratedBC(name, parameters),
 		NSBase(name, parameters),
 		_flux(getMaterialProperty<std::vector<Real> >("flux")),
 		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable")),
@@ -22,25 +22,13 @@ NSBC::NSBC(const std::string & name, InputParameters parameters):
 		_penalty_jacobi_variable_ee(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_ee")),
 		_penalty_jacobi_variable_ne(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_ne"))
 {
-	std::string var_name = _var.name();
-
-	if(var_name == "rho")
-		_eq = 0;
-	if(var_name == "momentum_x")
-		_eq = 1;
-	if(var_name == "momentum_y")
-		_eq = 2;
-	if(var_name == "momentum_z")
-		_eq = 3;
-	if(var_name == "rhoe")
-		_eq = 4;
+	_eq = equationIndex(_var.name());
 }
 
 Real NSBC::computeQpResidual()
 {
 	Real CIP = computeCIP();
 	Real flux = _flux[_qp][_eq] ;
-//	flux += CIP*(_penalty[_qp][_eq])*_normals[_qp];
 	flux += CIP*(_penalty[_qp][_eq]+_penalty_neighbor[_qp][_eq])*_normals[_qp];
 	return  flux * _test[_i][_qp] + _epsilon * _penalty[_qp][_eq]* _grad_test[_i][_qp];
 }
@@ -53,7 +41,6 @@ Real NSBC::computeQpJacobian()
 	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
 	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q] + _penalty_jacobi_variable_ne[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
-//	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _epsilon*_penalty_jacobi_variable_ee[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
 
 	return r;
@@ -67,7 +54,6 @@ Real NSBC::computeQpOffDiagJacobian(unsigned int jvar)
 	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
 	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q] + _penalty_jacobi_variable_ne[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
-//	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _epsilon*_penalty_jacobi_variable_ee[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
 	return r;
 }

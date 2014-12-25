@@ -14,23 +14,7 @@ KOIC::KOIC(const std::string & name, InputParameters parameters) :
 		KOBase(name, parameters),
 		_velocity(1)
 {
-	std::string var_name = _var.name();
-
-
-	if(var_name == "rho")
-		_eq = 0;
-	if(var_name == "momentum_x")
-		_eq = 1;
-	if(var_name == "momentum_y")
-		_eq = 2;
-	if(var_name == "momentum_z")
-		_eq = 3;
-	if(var_name == "rhoe")
-		_eq = 4;
-	if(var_name == "rhok")
-		_eq = 5;
-	if(var_name == "rhoo")
-		_eq = 6;
+	_eq = equationIndex(_var.name());
 }
 
 Real KOIC::value(const Point & p)

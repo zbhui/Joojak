@@ -18,8 +18,8 @@ InputParameters validParams<CFDForcePostprocessor>()
 CFDForcePostprocessor::CFDForcePostprocessor(const std::string & name, InputParameters parameters) :
 		SideIntegralPostprocessor(name, parameters),
 		NSBase(name, parameters),
-		_direction((Direction)(int)parameters.get<MooseEnum>("direction_by")),
-		_force_type((ForceType)(int)parameters.get<MooseEnum>("force_type"))
+		_direction(getParam<MooseEnum>("direction_by")),
+		_force_type(getParam<MooseEnum>("force_type"))
 {
 	_n_equations = coupledComponents("variables");
 	for (int eq = 0; eq < _n_equations; ++eq)

@@ -15,20 +15,8 @@ NSAuxVariable::NSAuxVariable(const std::string & name, InputParameters parameter
     AuxKernel(name, parameters),
     NSBase(name, parameters)
 {
-	size_t n_equation = coupledComponents("variables");
-	for (size_t i = 0; i < n_equation; ++i)
-	{
-		_uh.push_back(&coupledValue("variables", i));
-	}
-
 }
 
-/**
- * Auxiliary Kernels override computeValue() instead of computeQpResidual().  Aux Variables
- * are calculated either one per elemenet or one per node depending on whether we declare
- * them as "Elemental (Constant Monomial)" or "Nodal (First Lagrange)".  No changes to the
- * source are necessary to switch from one type or the other.
- */
 Real NSAuxVariable::computeValue()
 {
 	Real uh[10];
@@ -55,8 +43,9 @@ Real NSAuxVariable::computeValue()
 
 void NSAuxVariable::valueAtCellPoint(Real *uh)
 {
-	for (size_t i = 0; i < _uh.size(); ++i)
+	size_t n_equation = coupledComponents("variables");
+	for (size_t eq = 0; eq < n_equation; ++eq)
 	{
-		uh[i] = (*_uh[i])[_qp];
+		uh[eq] = coupledValue("variables", eq)[_qp];
 	}
 }
