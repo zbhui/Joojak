@@ -108,6 +108,7 @@
 []
 
 [CFDPostprocessor]
+  time_type = alive
 []
 
 [Postprocessors]
