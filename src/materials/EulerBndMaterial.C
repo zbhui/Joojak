@@ -141,9 +141,13 @@ void EulerBndMaterial::fluxRiemann(Real *flux, Real* ul, Real* ur)
 	inviscousTerm(fr, ur);
 
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
-//	lam = 1.;
+	RealVectorValue vel_grid(1, 1, 0);
+	Real vgn = vel_grid*normal;
 	for (int eq = 0; eq < _n_equations; ++eq)
+	{
 		flux[eq] = 0.5*(fl[eq] + fr[eq])*normal + lam*(ul[eq] - ur[eq]);
+		flux[eq] += -vgn*(0.5*(ul[eq] + ur[eq])+fabs(vgn)*(ul[eq] - ur[eq]));
+	}
 }
 
 void EulerBndMaterial::wall(Real* ur)

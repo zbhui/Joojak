@@ -1,8 +1,9 @@
 [GlobalParams]
-  order = FIRST
+  order = SECOND
   family = MONOMIAL
   	
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  use_displaced_mesh = true
 []
 
 [Mesh]
@@ -17,6 +18,46 @@
   block_id = '0'
   block_name = 'fluid'
   uniform_refine = 0
+  displacements = 'disp_x disp_y'
+[]
+
+
+[AuxVariables]
+  [./disp_x]
+    order = FIRST
+    family = LAGRANGE
+  [../]
+  [./disp_y]
+    order = FIRST
+    family = LAGRANGE
+  [../]
+[]
+
+[AuxKernels]
+  [./disp_x]
+    type = FunctionAux
+    function = func_disp_x
+    variable = disp_x
+  [../]
+  [./disp_y]
+    type = FunctionAux
+    function = func_disp_y
+    variable = disp_y
+  [../]
+[]
+[Functions]
+  [./func_disp_x]
+    type = ParsedFunction
+    value = t
+  [../]
+  [./func_disp_y]
+    type = ParsedFunction
+    value = t
+  [../]
+[]
+
+[Problem]
+  kernel_coverage_check = false
 []
 
 [CFDVariables]
@@ -63,9 +104,9 @@
   type = Transient
   solve_type = NEWTON
   scheme = 'crank-nicolson'
-  dt = 0.002
+  dt = 0.02
   end_time = 1
-  num_steps = 10
+  num_steps = 100
   l_tol = 1e-04
   l_max_its = 10
   nl_max_its = 10
@@ -89,15 +130,14 @@
 [Outputs]
   [./exodus]
     type = Exodus
-    output_initial = true
+    output_on = 'timestep_begin'
     interval = 1 				
-    oversample = true
     refinements = 0
   [../]
   [./console]
     type = Console	
     perf_log = true
-    linear_residuals = true
+    output_on = linear
   [../]
 []
 
@@ -105,6 +145,8 @@
   [./cell_materical]
     block = 0
     type = EulerCellMaterial
+    disp_x = disp_x
+    disp_y = disp_y
   [../]
 
   [./face_materical]
