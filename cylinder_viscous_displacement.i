@@ -4,6 +4,8 @@
   mach = 0.2
   reynolds = 40
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  use_displaced_mesh = true
+  velocity = 0
 []
 
 [Mesh]
@@ -16,6 +18,41 @@
   
   boundary_id = '8 9'
   boundary_name = 'far_field wall'
+  displacements = 'disp_x disp_y'
+[]
+
+[AuxVariables]
+  [./disp_x]
+    order = FIRST
+    family = LAGRANGE
+  [../]
+  [./disp_y]
+    order = FIRST
+    family = LAGRANGE
+  [../]
+[]
+
+[AuxKernels]
+  [./disp_x]
+    type = FunctionAux
+    function = func_disp_x
+    variable = disp_x
+  [../]
+  [./disp_y]
+    type = FunctionAux
+    function = func_disp_y
+    variable = disp_y
+  [../]
+[]
+[Functions]
+  [./func_disp_x]
+    type = ParsedFunction
+    value = t
+  [../]
+  [./func_disp_y]
+    type = ParsedFunction
+    value = 0
+  [../]
 []
 
 [Preconditioning]
@@ -38,16 +75,13 @@
   l_max_its = 100
  	
   nl_max_its = 100
-  nl_rel_tol = 1e-04
+  nl_rel_tol = 1e-03
   #nl_abs_tol = 1e-05
-
-  picard_max_its = 10
-  picard_abs_tol = 1e-9
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 100
-    ratio = 2
+    dt = 1
+    ratio = 1
     step = 2
     max_dt = 100	
   [../]
@@ -151,7 +185,7 @@
   [../]
   [./wall_material]
     boundary = wall
-    bc_type = adiabatic_wall
+    bc_type = isothermal_wall
     type = NSBndMaterial
   [../]
 []

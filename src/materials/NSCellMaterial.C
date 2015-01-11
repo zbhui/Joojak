@@ -101,8 +101,9 @@ void NSCellMaterial::fluxTerm(RealVectorValue* flux_term, Real* uh, RealGradient
 	RealVectorValue invis_term[10], viscous_term[10];
 	inviscousTerm(invis_term, uh);
 	viscousTerm(viscous_term, uh, duh);
+	RealVectorValue vel_grid(1, 0, 0);
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
-		flux_term[eq] = invis_term[eq] - viscous_term[eq];
+		flux_term[eq] = invis_term[eq] - viscous_term[eq] - uh[eq]*vel_grid;
 	}
 }

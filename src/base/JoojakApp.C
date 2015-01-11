@@ -18,6 +18,8 @@
 #include "NSCellKernel.h"
 #include "KOCellKernel.h"
 
+#include "EmptyTimeDerivative.h"
+#include "ElasticityKernel.h"
 
 /// 面积分
 #include "EulerFaceKernel.h"
@@ -40,6 +42,7 @@
 
 /// 辅助kernel
 #include "NSAuxVariable.h"
+#include "EmptyTimeDerivative.h"
 
 /// 材料属性
 #include "EulerCellMaterial.h"
@@ -56,6 +59,7 @@
 #include "KOFaceMaterial.h"
 #include "KOBndMaterial.h"
 
+#include "LinearElasticityMaterial.h"
 /// 时间步长增加策略
 #include "RatioTimeStepper.h"
 
@@ -123,6 +127,9 @@ JoojakApp::registerObjects(Factory & factory)
 	registerKernel(NSCellKernel);
 	registerKernel(KOCellKernel);
 
+	registerKernel(EmptyTimeDerivative);
+	registerKernel(ElasticityKernel);
+
 	/// 注册DGKernel
 	registerDGKernel(EulerFaceKernel);
 	registerDGKernel(NSFaceKernel);
@@ -142,6 +149,8 @@ JoojakApp::registerObjects(Factory & factory)
 	registerMaterial(KOCellMaterial);
 	registerMaterial(KOFaceMaterial);
 	registerMaterial(KOBndMaterial);
+
+    registerMaterial(LinearElasticityMaterial);
 
 	/// 注册函数
 	registerFunction(IsoVortexExact);

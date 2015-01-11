@@ -155,9 +155,12 @@ void NSBndMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, 
 	viscousTerm(vfr, ur, dur);
 
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
+	RealVectorValue vel_grid(1, 0, 0);
+	Real vgn = vel_grid*_normals[_qp];
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfl[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
+		flux[eq] += -vgn*(0.5*(ul[eq] + ur[eq])+fabs(vgn)*(ul[eq] - ur[eq]));
 	}
 }
 
@@ -179,10 +182,11 @@ void NSBndMaterial::isothermalWall(Real *ur, RealGradient *dur, Real *ul, RealGr
     Real twall = 1.;
     Real pre = pressure(ul);
 
+	RealVectorValue vel_grid(1, 0, 0);
     ur[0] = ul[0];
-    ur[1] = 0.;
-    ur[2] = 0.;
-    ur[3] = 0.;
+    ur[1] = ur[0]*vel_grid(0);
+    ur[2] = ur[0]*vel_grid(1);
+    ur[3] = ur[0]*vel_grid(2);
     ur[4] = ul[0]*twall/_gamma/(_gamma-1)/_mach/_mach;
 }
 
@@ -191,10 +195,11 @@ void NSBndMaterial::adiabaticWall(Real* ur, RealGradient* dur, Real* ul, RealGra
 	for (int eq = 0; eq < _n_equations; ++eq)
 		dur[eq] = dul[eq];
 
+	RealVectorValue vel_grid(1, 0, 0);
     ur[0] = ul[0];
-    ur[1] = 0.;
-    ur[2] = 0.;
-    ur[3] = 0.;
+    ur[1] = ur[0]*vel_grid(0);
+    ur[2] = ur[0]*vel_grid(1);
+    ur[3] = ur[0]*vel_grid(2);
     ur[4] = ul[4];
 }
 
@@ -205,7 +210,8 @@ void NSBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 
 	const Point &normal = _normals[_qp];
 
-	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+//	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel_inf(0, 0 ,0);
 	if(_current_elem->dim() == 2)
 		vel_inf(2) = 0.;
 
@@ -215,7 +221,8 @@ void NSBndMaterial::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealG
 	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
 //	Real vel = vel_left.norm();
 	Real vel = vel_inf.norm();
-	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
+//	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
+	Real cl = sqrt(fabs(_gamma * p_inf /rho_inf));
 //	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
 	Real vn = vel_inf(0)*normal(0)+vel_inf(1)*normal(1)+vel_inf(2)*normal(2);
 
