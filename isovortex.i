@@ -17,6 +17,7 @@
   ymax = 0
   block_id = '0'
   block_name = 'fluid'
+  #second_order = true
   uniform_refine = 0
   displacements = 'disp_x disp_y'
 []
@@ -106,7 +107,7 @@
   scheme = 'crank-nicolson'
   dt = 0.02
   end_time = 1
-  num_steps = 100
+  num_steps = 5
   l_tol = 1e-04
   l_max_its = 10
   nl_max_its = 10

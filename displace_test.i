@@ -3,87 +3,109 @@
 []
 
 [Mesh]
-  type = GeneratedMesh
+  file = ./grids/cylinder_fine.msh
   dim = 2
-  nx = 10
-  ny = 10
-  xmin = -10
-  xmax = 0
-  ymin = -10
-  ymax = 0
-  block_id = '0'
+  
+  block_id = 10
   block_name = 'fluid'
-  uniform_refine = 0
+  
+  boundary_id = '8 9'
+  boundary_name = 'far_field wall'
   displacements = 'disp_x disp_y'
 []
 
-[Kernels]
-  [./disp_x_time]
-    type = EmptyTimeDerivative
-    variable = disp_x
-  [../]
-  [./disp_y_time]
-    type = EmptyTimeDerivative
-    variable = disp_y
+[Variables]
+  [./disp_x]
+    order = FIRST
+    family = LAGRANGE
   [../]
 
-  [./disp_x_space]
-    type = ElasticityKernel
-    variable = disp_x
+  [./disp_y]
+    order = FIRST
+    family = LAGRANGE
   [../]
-  [./disp_y_space]
-    type = ElasticityKernel
+[]
+
+[Kernels]
+  [./solid_x]
+    type = SolidMechX
+    variable = disp_x
+    y = disp_y
+  [../]
+
+  [./solid_y]
+    type = SolidMechY
     variable = disp_y
+    x = disp_x
+  [../]
+[]
+
+[Functions]
+  [./func_x]
+    type = ParsedFunction
+    value = 1.6*y
+  [../]
+  [./func_y]
+    type = ParsedFunction
+    value = 0
   [../]
 []
 
 [BCs]
-  [./disp_x_bc]
-    type = DirichletBC
-    value = 1
+  [./wall_x]
+    type = FunctionDirichletBC
     variable = disp_x
-    boundary = left
+    boundary = wall
+    function = func_x
   [../]
-  [./disp_y_bc]
-    type = DirichletBC
-    value = 0
+
+  [./wall_y]
+    type = FunctionDirichletBC
     variable = disp_y
-    boundary = left
+    boundary = wall
+    function = func_y
+  [../]
+
+
+[]
+
+[Materials]
+  [./constant]
+    type = LinearElasticityMaterial
+    block = fluid
+    youngs_modulus = 1
+    poissons_ratio = 0.3
+  [../]
+[]
+
+[Preconditioning]
+  [./SMP]
+    type = SMP
+    full = true
+    petsc_options_iname = '-ksp_type  -pc_type'
+    petsc_options_value = 'gmres       lu'
   [../]
 []
 
 [Executioner]
-  type = Transient
-  solve_type = NEWTON
-  scheme = 'crank-nicolson'
-  dt = 0.02
-  end_time = 1
-  num_steps = 100
-  l_tol = 1e-04
-  l_max_its = 10
-  nl_max_its = 10
+  type = Steady
+
+  #Preconditioned JFNK (default)
+  solve_type = 'newton'
+  l_tol = 1e-03
+  l_max_its = 100
+  nl_max_its = 100
   nl_rel_tol = 1e-08
 []
 
-
 [Outputs]
-  [./exodus]
-    type = Exodus
-  [../]
+  file_base = out
+  interval = 1
+  exodus = true
+  output_on = 'initial timestep_end'
   [./console]
-    type = Console	
+    type = Console
     perf_log = true
-    output_on = linear
-  [../]
-[]
-
-[Materials]
-  [./cell_materical]
-    block = 0
-    type = LinearElasticityMaterial
-    youngs_modulus = 1
-    poissons_ratio = 0.25
-    disp_x = disp_x
-    disp_y = disp_y
+    output_on = 'timestep_end failed nonlinear linear'
   [../]
 []

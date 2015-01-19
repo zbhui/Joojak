@@ -6,8 +6,7 @@
 class LinearElasticityMaterial : public Material
 {
 public:
-  LinearElasticityMaterial(const std::string & name,
-                           InputParameters parameters);
+  LinearElasticityMaterial(const std::string & name, InputParameters parameters);
 
 protected:
   virtual void computeProperties();

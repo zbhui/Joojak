@@ -15,6 +15,7 @@ public:
 
 protected:
   MaterialProperty<RealTensorValue> & _stress;
+  int _component;
 
   virtual Real computeQpResidual();
 
