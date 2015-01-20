@@ -20,7 +20,7 @@ protected:
 	Real eddyViscosity(Real *uh);
 	virtual void inviscousTerm(RealVectorValue* inviscous_term, Real* uh);
 	virtual void viscousAndSourceTerm(RealVectorValue *viscous_term, Real* source_term, Real *uh, RealGradient *duh, Real d);
-	virtual void viscousTerm(RealVectorValue *viscous_term, Real *uh, RealGradient *duh);
+	virtual void viscousTerm(RealVectorValue *viscous_term, Real *uh, RealGradient *duh, Real* source_term = NULL, Real d = 0);
 //	virtual void sourceTerm(Real* source_term, Real* uh, RealGradient* duh, Real d);
 protected:
 	Real _cb1, _cb2, _sigma_sa, _kappa;

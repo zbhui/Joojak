@@ -128,7 +128,8 @@ void SACellMaterial::fluxTerm(RealVectorValue* flux_term, Real *source_term, Rea
 	RealVectorValue invis_term[10], viscous_term[10];
 	Real d = distance();
 	inviscousTerm(invis_term, uh);
-	viscousAndSourceTerm(viscous_term, source_term, uh, duh, d);
+//	viscousAndSourceTerm(viscous_term, source_term, uh, duh, d);
+	viscousTerm(viscous_term, uh, duh, source_term, d);
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		flux_term[eq] = invis_term[eq] - viscous_term[eq];

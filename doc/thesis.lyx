@@ -615,7 +615,7 @@ Wilcox(2006)
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\frac{\partial\rho e}{\partial t}+\frac{\partial((\rho h+\frac{2}{3}\rho k)u_{\beta})}{\partial x_{\beta}}-\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial k}{\partial x_{\beta}}\right]=0
+\frac{\partial\rho e}{\partial t}+\frac{\partial((\rho h+\frac{2}{3}\rho k)u_{\beta})}{\partial x_{\beta}}-\frac{\partial(u_{\alpha}\overline{\tau}_{\alpha\beta}-\overline{q}_{\beta})}{\partial x_{\beta}}-\frac{\partial}{\partial x_{\beta}}\left[(\mu+\sigma_{k}\mu_{t})\frac{\partial h}{\partial x_{\beta}}\right]=0
 \]
 
 \end_inset

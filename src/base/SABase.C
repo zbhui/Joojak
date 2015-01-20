@@ -14,7 +14,7 @@ SABase::SABase(const std::string& name, InputParameters parameters):
 		_cw2(0.3), _cw3(2.0), _cv1(7.1), _cv2(0.7), _cv3(0.9),
 		_ct1(1.0), _ct2(2.0), _ct3(1.2), _ct4(0.5),
 		_prandtl_turb(0.9),
-		_nu_infty(2.0)
+		_nu_infty(3.0)
 {
 	_cw1 = _cb1/_kappa/_kappa + (1+_cb2)/_sigma_sa;
 	_cw3_pow6 = _cw3*_cw3*_cw3*_cw3*_cw3*_cw3;
@@ -67,7 +67,7 @@ void SABase::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 
 void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_term, Real* uh, RealGradient* duh, Real d)
 {
-	Real rho = uh[0];
+	Real rho(uh[0]);
 	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
 	RealGradient grad_rho(duh[0]);
 	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
@@ -78,32 +78,26 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 			temp(i,j) = velocity(i)*grad_rho(j);
 		}
 	}
-	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
-	RealTensor tau = velocity_tensor + velocity_tensor.transpose();
-	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
-	Real lamdiv = 2./3. * div;
+	RealTensor velocity_tensor((momentum_tensor - temp)/rho);
+	RealTensor tau(velocity_tensor + velocity_tensor.transpose());
+	Real lamdiv = 2./3. * velocity_tensor.tr();
 	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
 
 	Real mu = physicalViscosity(uh);
 	Real X = uh[5]/mu;
 	Real psi(X);
-	if (X <= 10)
+	if (X < 10)
 		psi = 0.05*log(1+exp(20*X));
 	else
 		psi = X;
 
 	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
-	Real mu_turb = uh[5]*fv1;
-//	Real mu_turb = mu*psi*fv1;
-
-	if(uh[5] < 0)
-		mu_turb = 0.;
+	Real mu_turb = std::max<Real>(0., uh[5]*fv1);
 
 	tau *= (mu+mu_turb)/_reynolds;
 
-	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
-	grad_enthalpy *= (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma);
-	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0]/_reynolds;
+	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/uh[0] - velocity_tensor.transpose() * velocity;
+	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
 
 	int component = 0;
 	viscous_term[component](0) = 0.;
@@ -126,19 +120,18 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 	viscous_term[component](2) = tau(2, 2);
 
 	component = 4;
-	RealVectorValue vel_tau = tau * velocity + grad_enthalpy ;
+	RealVectorValue vel_tau(tau * velocity + (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma)*grad_enthalpy);
 	viscous_term[component](0) = vel_tau(0);
 	viscous_term[component](1) = vel_tau(1);
 	viscous_term[component](2) = vel_tau(2);
 
 	component = 5;
-	viscous_term[component](0) = mu*(1+psi)*grad_nu(0);
-	viscous_term[component](1) = mu*(1+psi)*grad_nu(1);
-	viscous_term[component](2) = mu*(1+psi)*grad_nu(2);
+	viscous_term[component](0) = mu*(1+psi)/_sigma_sa*grad_nu(0)/_reynolds;
+	viscous_term[component](1) = mu*(1+psi)/_sigma_sa*grad_nu(1)/_reynolds;
+	viscous_term[component](2) = mu*(1+psi)/_sigma_sa*grad_nu(2)/_reynolds;
 
-	RealTensor omega =  (velocity_tensor - velocity_tensor.transpose())/2.;
-	Real vorticity = sqrt(2*omega.size_sq());
-
+	RealTensor omega((velocity_tensor - velocity_tensor.transpose())/2.);
+	Real vorticity = sqrt(2*omega.size_sq())+1E-04;
 
 	Real fv2, s_title, s_hat;
 	fv2 = 1-psi/(1+psi*fv1);
@@ -147,16 +140,14 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 		s_title = vorticity+s_hat;
 	else
 		s_title = vorticity+(_cv2*_cv2*vorticity+_cv3*s_hat)*vorticity/((_cv3-2*_cv2)*vorticity-s_hat);
-//
-	Real r = std::min<Real>(s_hat/s_title/fv2, 10);
+
+	Real r = std::min<Real>((s_hat)/((s_title*fv2)), 10);
 //	Real r = s_hat/s_title/fv2;
-//	std::cout << r <<std::endl;
-	Real tmp_pow = r*r*r;
-	tmp_pow = tmp_pow*tmp_pow;
-	Real g = r+_cw2*(tmp_pow-r);
-	tmp_pow = g*g*g;
-	tmp_pow = tmp_pow*tmp_pow;
-	Real fw = g*pow((1+_cw3_pow6)/(tmp_pow+_cw3_pow6),1./6);
+//	std::cout << r  <<std::endl;
+	Real r6 = r*r*r*r*r*r;
+	Real g = r+_cw2*(r6-r);
+	Real g6 = g*g*g*g*g*g;
+	Real fw = g*pow((1+_cw3_pow6)/(g6+_cw3_pow6),1./6);
 
 	component = 0;
 	source_term[component] = 0;
@@ -175,13 +166,13 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 
 	component = 5;
 	source_term[component] = _cb1*s_title*mu*psi
-						   + 1./_sigma_sa/_reynolds*_cb2*rho*grad_nu.size_sq()
+						   + _cb2/_sigma_sa/_reynolds*rho*grad_nu.size_sq()
 						   - _cw1/_reynolds/rho*fw*(mu*mu*psi*psi/d/d);
 }
 
-void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* duh)
+void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* duh, Real* source_term, Real d)
 {
-	Real rho = uh[0];
+	Real rho(uh[0]);
 	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
 	RealGradient grad_rho(duh[0]);
 	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
@@ -192,31 +183,26 @@ void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* 
 			temp(i,j) = velocity(i)*grad_rho(j);
 		}
 	}
-	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
-	RealTensor tau = velocity_tensor + velocity_tensor.transpose();
-	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
-	Real lamdiv = 2./3. * div;
+	RealTensor velocity_tensor((momentum_tensor - temp)/rho);
+	RealTensor tau(velocity_tensor + velocity_tensor.transpose());
+	Real lamdiv = 2./3. * velocity_tensor.tr();
 	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
 
 	Real mu = physicalViscosity(uh);
 	Real X = uh[5]/mu;
 	Real psi(X);
-	if (X <= 10)
+	if (X < 10)
 		psi = 0.05*log(1+exp(20*X));
 	else
 		psi = X;
 
 	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
-	Real mu_turb = uh[5]*fv1;
-//	Real mu_turb = mu*psi*fv1;
-	if(uh[5] < 0)
-		mu_turb = 0.;
+	Real mu_turb = std::max<Real>(0., uh[5]*fv1);
 
 	tau *= (mu+mu_turb)/_reynolds;
 
-	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
-	grad_enthalpy *= (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma);
-	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0]/_reynolds;
+	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/uh[0] - velocity_tensor.transpose() * velocity;
+	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
 
 	int component = 0;
 	viscous_term[component](0) = 0.;
@@ -239,77 +225,60 @@ void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* 
 	viscous_term[component](2) = tau(2, 2);
 
 	component = 4;
-	RealVectorValue vel_tau = tau * velocity + grad_enthalpy ;
+	RealVectorValue vel_tau(tau * velocity + (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma)*grad_enthalpy);
 	viscous_term[component](0) = vel_tau(0);
 	viscous_term[component](1) = vel_tau(1);
 	viscous_term[component](2) = vel_tau(2);
 
 	component = 5;
-	viscous_term[component](0) = mu*(1+psi)*grad_nu(0);
-	viscous_term[component](1) = mu*(1+psi)*grad_nu(1);
-	viscous_term[component](2) = mu*(1+psi)*grad_nu(2);
-}
+//	viscous_term[component](0) = mu*(1+psi)/_sigma_sa*grad_nu(0)/_reynolds;
+//	viscous_term[component](1) = mu*(1+psi)/_sigma_sa*grad_nu(1)/_reynolds;
+//	viscous_term[component](2) = mu*(1+psi)/_sigma_sa*grad_nu(2)/_reynolds;
+	viscous_term[component](0) = (mu + uh[5])/_sigma_sa*grad_nu(0)/_reynolds;
+	viscous_term[component](1) = (mu + uh[5])/_sigma_sa*grad_nu(1)/_reynolds;
+	viscous_term[component](2) = (mu + uh[5])/_sigma_sa*grad_nu(2)/_reynolds;
 
-//void SABase::sourceTerm(Real* source_term, Real* uh, RealGradient* duh, Real d)
-//{
-//	Real rho = uh[0];
-//	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
-//	RealGradient grad_rho(duh[0]);
-//	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
-//	RealTensor temp;
-//	for (int i = 0; i < 3; ++i) {
-//		for (int j = 0; j < 3; ++j)
-//		{
-//			temp(i,j) = velocity(i)*grad_rho(j);
-//		}
-//	}
-//	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
-//	RealTensor omega =  (velocity_tensor - velocity_tensor.transpose())/2.;
-//	Real vorticity = sqrt(2*omega.size_sq());
-//
-//	Real mu = physicalViscosity(uh);
-//	Real X = uh[5]/mu;
-//	Real psi;
-//	if (X <= 10)
-//		psi = 0.05*log(1+exp(20*X));
-//	else
-//		psi = X;
-//
-//	Real fv1, fv2, s_title, s_hat;
-//	fv1 = pow(psi,3)/(pow(psi,3)+pow(_cv1,3));
-//	fv2 = 1-psi/(1+psi*fv1);
-//	s_hat = mu*psi/(_reynolds*rho*_kappa*_kappa*d*d)*fv2;
-//	if(s_hat >= -_cv2*vorticity)
-//		s_title = vorticity+s_hat;
-//	else
-//		s_title = vorticity+(_cv2*_cv2*vorticity+_cv3*s_hat)*vorticity/((_cv3-2*_cv2)*vorticity-s_hat);
-//
-//	Real r = std::min<Real>(s_hat/s_title/fv2, 10);
-//	Real g = r+_cw2*(pow(r,6)-r);
-//	Real fw = g*(pow((1+pow(_cw3, 6))/(pow(g,6)+pow(_cw3, 6)),1./6));
-//
-//	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
-//
-//	int component = 0;
-//	source_term[component] = 0;
-//
-//	component = 1;
-//	source_term[component] = 0;
-//
-//	component = 2;
-//	source_term[component] = 0;
-//
-//	component = 3;
-//	source_term[component] = 0;
-//
-//	component = 4;
-//	source_term[component] = 0.;
-//
-//	component = 5;
-//	source_term[component] = _cb1*s_title*mu*psi
-//						   + 1./_sigma_sa/_reynolds*_cb2*rho*grad_nu.size_sq()
-//						   - _cw1/_reynolds/rho*fw*(mu*mu*psi*psi/d/d);
-//}
+	if(source_term == NULL) return;
+
+	RealTensor omega((velocity_tensor - velocity_tensor.transpose())/2.);
+	Real vorticity = sqrt(2*omega.size_sq())+1E-04;
+
+	Real fv2, s_title, s_hat;
+	fv2 = 1-psi/(1+psi*fv1);
+	s_hat = mu*psi/(_reynolds*rho*_kappa*_kappa*d*d)*fv2;
+	if(s_hat >= -_cv2*vorticity)
+		s_title = vorticity+s_hat;
+	else
+		s_title = vorticity+(_cv2*_cv2*vorticity+_cv3*s_hat)*vorticity/((_cv3-2*_cv2)*vorticity-s_hat);
+
+	Real r = std::min<Real>((s_hat)/((s_title*fv2)), 10);
+//	Real r = s_hat/s_title/fv2;
+//	std::cout << r  <<std::endl;
+	Real r6 = r*r*r*r*r*r;
+	Real g = r+_cw2*(r6-r);
+	Real g6 = g*g*g*g*g*g;
+	Real fw = g*pow((1+_cw3_pow6)/(g6+_cw3_pow6),1./6);
+
+	component = 0;
+	source_term[component] = 0;
+
+	component = 1;
+	source_term[component] = 0;
+
+	component = 2;
+	source_term[component] = 0;
+
+	component = 3;
+	source_term[component] = 0;
+
+	component = 4;
+	source_term[component] = 0.;
+
+	component = 5;
+	source_term[component] = _cb1*s_title*mu*psi
+						   + _cb2/_sigma_sa/_reynolds*rho*grad_nu.size_sq()
+						   - _cw1/_reynolds/rho*fw*(mu*mu*psi*psi/d/d);
+}
 
 Real SABase::eddyViscosity(Real* uh)
 {
