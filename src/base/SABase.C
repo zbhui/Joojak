@@ -14,7 +14,7 @@ SABase::SABase(const std::string& name, InputParameters parameters):
 		_cw2(0.3), _cw3(2.0), _cv1(7.1), _cv2(0.7), _cv3(0.9),
 		_ct1(1.0), _ct2(2.0), _ct3(1.2), _ct4(0.5),
 		_prandtl_turb(0.9),
-		_nu_infty(2.0)
+		_nu_infty(5.0)
 {
 	_cw1 = _cb1/_kappa/_kappa + (1+_cb2)/_sigma_sa;
 	_cw3_pow6 = _cw3*_cw3*_cw3*_cw3*_cw3*_cw3;
@@ -103,7 +103,7 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 
 	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
 	grad_enthalpy *= (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma);
-	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0]/_reynolds;
+	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
 
 	int component = 0;
 	viscous_term[component](0) = 0.;
@@ -132,9 +132,9 @@ void SABase::viscousAndSourceTerm(RealVectorValue* viscous_term, Real* source_te
 	viscous_term[component](2) = vel_tau(2);
 
 	component = 5;
-	viscous_term[component](0) = mu*(1+psi)*grad_nu(0);
-	viscous_term[component](1) = mu*(1+psi)*grad_nu(1);
-	viscous_term[component](2) = mu*(1+psi)*grad_nu(2);
+	viscous_term[component](0) = mu*(1+psi)*grad_nu(0)/_reynolds;
+	viscous_term[component](1) = mu*(1+psi)*grad_nu(1)/_reynolds;
+	viscous_term[component](2) = mu*(1+psi)*grad_nu(2)/_reynolds;
 
 	RealTensor omega =  (velocity_tensor - velocity_tensor.transpose())/2.;
 	Real vorticity = sqrt(2*omega.size_sq());
@@ -216,7 +216,7 @@ void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* 
 
 	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
 	grad_enthalpy *= (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma);
-	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0]/_reynolds;
+	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
 
 	int component = 0;
 	viscous_term[component](0) = 0.;
@@ -245,9 +245,9 @@ void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* 
 	viscous_term[component](2) = vel_tau(2);
 
 	component = 5;
-	viscous_term[component](0) = mu*(1+psi)*grad_nu(0);
-	viscous_term[component](1) = mu*(1+psi)*grad_nu(1);
-	viscous_term[component](2) = mu*(1+psi)*grad_nu(2);
+	viscous_term[component](0) = mu*(1+psi)*grad_nu(0)/_reynolds;
+	viscous_term[component](1) = mu*(1+psi)*grad_nu(1)/_reynolds;
+	viscous_term[component](2) = mu*(1+psi)*grad_nu(2)/_reynolds;
 }
 
 //void SABase::sourceTerm(Real* source_term, Real* uh, RealGradient* duh, Real d)
