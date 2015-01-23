@@ -168,14 +168,10 @@ void NSFaceMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul,
 	viscousTerm(vfl, ul, dul);
 	viscousTerm(vfr, ur, dur);
 
-	const Point &normal = _normals[_qp];
 	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
-	RealVectorValue vel_grid(1, 0, 0);
-	Real vgn = vel_grid*normal;
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
-		flux[eq] += -vgn*(0.5*(ul[eq] + ur[eq])+fabs(vgn)*(ul[eq] - ur[eq]));
 	}
 }
 

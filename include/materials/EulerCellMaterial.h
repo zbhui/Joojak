@@ -37,10 +37,6 @@ protected:
 	std::vector<VariableValue*> _uh;
 	MaterialProperty<std::vector<RealVectorValue> > & _invis_term;
 	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _jacobi;
-	VariableValue &_disp_x;
-	VariableValue &_disp_y;
-	VariableValue &_disp_old_x;
-	VariableValue &_disp_old_y;
+
 	void computeQpValue(Real *uh);
-	void fluxTerm(RealVectorValue *flux_term, Real *uh);
 };
