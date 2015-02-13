@@ -231,12 +231,9 @@ void SABase::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* 
 	viscous_term[component](2) = vel_tau(2);
 
 	component = 5;
-//	viscous_term[component](0) = mu*(1+psi)/_sigma_sa*grad_nu(0)/_reynolds;
-//	viscous_term[component](1) = mu*(1+psi)/_sigma_sa*grad_nu(1)/_reynolds;
-//	viscous_term[component](2) = mu*(1+psi)/_sigma_sa*grad_nu(2)/_reynolds;
-	viscous_term[component](0) = (mu + uh[5])/_sigma_sa*grad_nu(0)/_reynolds;
-	viscous_term[component](1) = (mu + uh[5])/_sigma_sa*grad_nu(1)/_reynolds;
-	viscous_term[component](2) = (mu + uh[5])/_sigma_sa*grad_nu(2)/_reynolds;
+	viscous_term[component](0) = mu*(1+psi)/_sigma_sa*grad_nu(0)/_reynolds;
+	viscous_term[component](1) = mu*(1+psi)/_sigma_sa*grad_nu(1)/_reynolds;
+	viscous_term[component](2) = mu*(1+psi)/_sigma_sa*grad_nu(2)/_reynolds;
 
 	if(source_term == NULL) return;
 
