@@ -36,6 +36,8 @@ protected:
 	/// 积分点上的变量值
 	std::vector<VariableValue*> _ul;
 	std::vector<VariableValue*> _ur;
+	std::vector<VariableGradient*> _grad_ul;
+	std::vector<VariableGradient*> _grad_ur;
 
 	MaterialProperty<std::vector<Real> > & _flux;
 	MaterialProperty<std::vector<std::vector<Real> > > & _jacobi_variable_ee;
@@ -45,6 +47,10 @@ protected:
 
 	virtual void computeQpLeftValue(Real *ul);
 	virtual void computeQpRightValue(Real *ur);
+	virtual void computeQpLeftGradValue(RealGradient *ul);
+	virtual void computeQpRightGradValue(RealGradient *ul);
+	virtual void artificalViscousTerm(RealVectorValue *viscous_term, Real *uh, RealGradient *duh);
+	Real artificalViscous(Real* uh);
 
-	void fluxRiemann(Real *flux, Real *ul, Real *ur);
+	void fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur);
 };

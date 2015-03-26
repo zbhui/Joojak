@@ -19,6 +19,7 @@ EulerCellKernel::EulerCellKernel(const std::string & name, InputParameters param
 
 Real EulerCellKernel::computeQpResidual()
 {
+//	return -(_invis_term[_qp][_eq]*_grad_test[_i][_qp] - 0.0001*_grad_u[_qp]*_grad_test[_i][_qp]);
 	return -(_invis_term[_qp][_eq]*_grad_test[_i][_qp]);
 }
 

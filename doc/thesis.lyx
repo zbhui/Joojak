@@ -1309,7 +1309,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename ../../待发表/任意网格上单项式基函数的间断Galerkin格式/mapping.png
+	filename mapping.png
 	lyxscale 60
 	width 12cm
 
@@ -2297,7 +2297,83 @@ RANS方程边界
 \end_layout
 
 \begin_layout Section
-人工粘性限制器
+基于人工粘性的激波捕捉方法
+\end_layout
+
+\begin_layout Standard
+发展高效、可靠、鲁棒的激波捕捉方法式DG格式研究的热点和难点。当前，有三种方式处理激波问题：（1）限制器；（2）加权重构；（3）人工粘性。
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\mathcal{F}^{\epsilon}(\boldsymbol{u},\nabla\boldsymbol{u})=\epsilon(\boldsymbol{u})\nabla\boldsymbol{u}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\epsilon(\boldsymbol{u})$
+\end_inset
+
+的构造如下：
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\epsilon(\boldsymbol{u})=C_{\epsilon}h^{2}f_{p}(\boldsymbol{u}_{h})|d_{p}(\boldsymbol{u}_{h})|
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $f_{p}(\boldsymbol{u}_{h})$
+\end_inset
+
+为开关函数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f_{p}(\boldsymbol{u}_{h})=\frac{h|\nabla p|}{p}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $d_{p}(\boldsymbol{u}_{h})$
+\end_inset
+
+为侦测函数
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+d_{p}(\boldsymbol{u}_{h})=\sum_{m}\frac{\partial p}{\partial u_{m}}\frac{(\nabla\cdot\mathcal{F}^{c})_{m}}{p}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $C_{\epsilon}$
+\end_inset
+
+为可调参数。
 \end_layout
 
 \begin_layout Chapter
@@ -2840,6 +2916,18 @@ u_{q}=u_{qj}\phi_{j}
 
 \begin_layout Section
 自适应判据
+\end_layout
+
+\begin_layout Itemize
+Feature-based
+\end_layout
+
+\begin_layout Itemize
+Residual-based
+\end_layout
+
+\begin_layout Itemize
+Adjoint-based
 \end_layout
 
 \begin_layout Section
