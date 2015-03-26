@@ -146,8 +146,6 @@
   [./cell_materical]
     block = 0
     type = EulerCellMaterial
-    disp_x = disp_x
-    disp_y = disp_y
   [../]
 
   [./face_materical]

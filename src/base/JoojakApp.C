@@ -1,5 +1,7 @@
+
 #include "Moose.h"
 #include "JoojakApp.h"
+#include "JoojakRevision.h"
 #include "AppFactory.h"
 #include "ActionFactory.h"
 #include "Syntax.h"
@@ -103,14 +105,26 @@ JoojakApp::~JoojakApp()
 {
 }
 
-void
-JoojakApp::registerApps()
+void JoojakApp::printHeader()
+{
+	std::string line("*********************************\n\n");
+	Moose::out << COLOR_CYAN << line << COLOR_DEFAULT;
+	Moose::out << "计算流体力学间断有限元计算器 JOOJAK \n\n";
+	Moose::out << "Joojak version: " <<  COLOR_MAGENTA << JOOJAK_REVISION << COLOR_DEFAULT << std::endl;
+	Moose::out << COLOR_CYAN << line << COLOR_DEFAULT;
+}
+
+void JoojakApp::run()
+{
+	printHeader();
+	MooseApp::run();
+}
+void JoojakApp::registerApps()
 {
   registerApp(JoojakApp);
 }
 
-void
-JoojakApp::registerObjects(Factory & factory)
+void JoojakApp::registerObjects(Factory & factory)
 {
 	/// 注册初始条件
 	registerInitialCondition(IsoVortexIC);
@@ -176,8 +190,7 @@ JoojakApp::registerObjects(Factory & factory)
 	registerSAObjects(factory);
 }
 
-void
-JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 	/// 注册Action
 	syntax.registerActionSyntax("CFDAddVariablesAction", "CFDVariables", "add_variable");
