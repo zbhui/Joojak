@@ -80,6 +80,8 @@
 
 #include "SAInclude.h"
 
+#include "BuildSideSetFromBlock.h"
+
 template<>
 InputParameters validParams<JoojakApp>()
 {
@@ -186,6 +188,8 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerVectorPostprocessor(PressureAndSkinFrictionCoeff);
 
 	registerExecutioner(SteadyTransientExecutioner);
+
+	registerMeshModifier(BuildSideSetFromBlock);
 
 	registerSAObjects(factory);
 }
