@@ -14,6 +14,7 @@
 #include "CFDKernelsAction.h"
 #include "CFDDGKernelsAction.h"
 #include "CFDPostprocessorAction.h"
+#include "CommonPostProcessorAction.h"
 
 /// 单元积分
 #include "EulerCellKernel.h"
@@ -205,6 +206,7 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	syntax.registerActionSyntax("CFDKernelsAction", "CFDKernels", "add_kernel");
 	syntax.registerActionSyntax("CFDDGKernelsAction", "CFDDGKernels", "add_dg_kernel");
 	syntax.registerActionSyntax("CFDPostprocessorAction", "CFDPostprocessor", "add_postprocessor");
+	syntax.registerActionSyntax("CommonPostProcessorAction", "Postprocessors", "add_postprocessor");
 
 	registerAction(CFDAddVariablesAction, "add_variable");
 	registerAction(CFDAuxVariablesAction, "add_aux_variable");
@@ -214,6 +216,7 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	registerAction(CFDKernelsAction, "add_kernel");
 	registerAction(CFDDGKernelsAction, "add_dg_kernel");
 	registerAction(CFDPostprocessorAction, "add_postprocessor");
+	registerAction(CommonPostProcessorAction, "add_postprocessor");
 }
 
 void JoojakApp::registerSAObjects(Factory & factory)
