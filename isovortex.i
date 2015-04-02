@@ -86,9 +86,6 @@
     boundary = 'left right bottom top'
 []
 
-[CFDPostprocessor]
-  time_type = alive
-[]
 
 
 [Preconditioning]
@@ -122,12 +119,6 @@
 
 
 [Postprocessors]
-  alive_time = true
-  [./l2_err]
-    type = ElementL2Error
-    variable = rho
-    function = exact_rho
-  [../] 
 []
 
 [Outputs]

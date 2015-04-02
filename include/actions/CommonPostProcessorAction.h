@@ -11,7 +11,7 @@ public:
   virtual void act();
 
 private:
-  InputParameters _action_params;
+  void create(std::string type);
 };
 
 template<>

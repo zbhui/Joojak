@@ -72,6 +72,7 @@
 #include "CFDForcePostprocessor.h"
 #include "BumpElementL2Error.h"
 #include "NumTimeStep.h"
+#include "VariableResidual.h"
 
 /// VectorPostProcessor
 #include "PressureAndSkinFrictionCoeff.h"
@@ -185,6 +186,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
 	registerPostprocessor(NumTimeStep);
+	registerPostprocessor(VariableResidual);
 
 	registerVectorPostprocessor(PressureAndSkinFrictionCoeff);
 
