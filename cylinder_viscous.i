@@ -1,5 +1,4 @@
 [GlobalParams]
-  order = FIRST
   family = MONOMIAL
   mach = 0.2
   reynolds = 40
@@ -17,6 +16,18 @@
   boundary_id = '8 9'
   boundary_name = 'far_field wall'
 []
+
+[CLawSolver]
+  active = EulerProblem
+  [./EulerProblem]  # 加入Variable, Kernel, DGKernel. 创建一个CLawBase
+    type = Euler
+    order = FIRST
+    family = MONOMIAL
+    #variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  [../]
+
+[]
+
 
 [Preconditioning]
   [./SMP]
@@ -40,9 +51,6 @@
   nl_max_its = 100
   nl_rel_tol = 1e-04
   #nl_abs_tol = 1e-05
-
-  picard_max_its = 10
-  picard_abs_tol = 1e-9
 
   [./TimeStepper]
     type = RatioTimeStepper
@@ -85,33 +93,13 @@
   [../]
 []
 
-[CFDVariables]
-[]
-
-[./CFDAuxVariables]
-  type = NSAuxVariable
-  aux_variables = 'pressure mach velocity_x velocity_y velocity_z'    
-[../]
-
 [CFDICs]
   type = CFDPassFlowIC
-[]
-
-[CFDKernels]
-  type = NSCellKernel
-[]
-
-[CFDDGKernels]
-  type = NSFaceKernel
 []
 
 [CFDBCs]
   type = NSBC
   boundary = '8 9' 
-[]
-
-[CFDPostprocessor]
-  time_type = alive
 []
 
 [Postprocessors]

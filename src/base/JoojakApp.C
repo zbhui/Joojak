@@ -15,6 +15,7 @@
 #include "CFDDGKernelsAction.h"
 #include "CFDPostprocessorAction.h"
 #include "CommonPostProcessorAction.h"
+#include "AddCLawAction.h"
 
 /// 单元积分
 #include "EulerCellKernel.h"
@@ -72,6 +73,7 @@
 #include "CFDForcePostprocessor.h"
 #include "BumpElementL2Error.h"
 #include "NumTimeStep.h"
+#include "VariableResidual.h"
 
 /// VectorPostProcessor
 #include "PressureAndSkinFrictionCoeff.h"
@@ -185,6 +187,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(CFDForcePostprocessor);
 	registerPostprocessor(BumpElementL2Error);
 	registerPostprocessor(NumTimeStep);
+	registerPostprocessor(VariableResidual);
 
 	registerVectorPostprocessor(PressureAndSkinFrictionCoeff);
 
@@ -207,6 +210,8 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	syntax.registerActionSyntax("CFDDGKernelsAction", "CFDDGKernels", "add_dg_kernel");
 	syntax.registerActionSyntax("CFDPostprocessorAction", "CFDPostprocessor", "add_postprocessor");
 	syntax.registerActionSyntax("CommonPostProcessorAction", "Postprocessors", "add_postprocessor");
+	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*");
+//	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*", "add_kernel");
 
 	registerAction(CFDAddVariablesAction, "add_variable");
 	registerAction(CFDAuxVariablesAction, "add_aux_variable");
@@ -217,6 +222,12 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	registerAction(CFDDGKernelsAction, "add_dg_kernel");
 	registerAction(CFDPostprocessorAction, "add_postprocessor");
 	registerAction(CommonPostProcessorAction, "add_postprocessor");
+	registerAction(AddCLawAction, "add_variable");
+	registerAction(AddCLawAction, "add_kernel");
+	registerAction(AddCLawAction, "add_dg_kernel");
+
+
+
 }
 
 void JoojakApp::registerSAObjects(Factory & factory)
