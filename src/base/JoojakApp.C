@@ -83,7 +83,12 @@
 
 #include "SAInclude.h"
 
+/// mesh modifier
 #include "BuildSideSetFromBlock.h"
+
+/// problem
+#include "CLawProblem.h"
+#include "NavierStokesProblem.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -115,14 +120,16 @@ void JoojakApp::printHeader()
 	std::string line("*********************************\n\n");
 	Moose::out << COLOR_CYAN << line << COLOR_DEFAULT;
 	Moose::out << "计算流体力学间断有限元计算器 JOOJAK \n\n";
-	Moose::out << "Joojak version: " <<  COLOR_MAGENTA << JOOJAK_REVISION << COLOR_DEFAULT << std::endl;
+	Moose::out << "Joojak version: " <<  COLOR_MAGENTA << JOOJAK_REVISION << COLOR_DEFAULT << std::endl << std::endl;
 	Moose::out << COLOR_CYAN << line << COLOR_DEFAULT;
 }
 
 void JoojakApp::run()
 {
 	printHeader();
-	MooseApp::run();
+	setupOptions();
+	runInputFile();
+	executeExecutioner();
 }
 void JoojakApp::registerApps()
 {
@@ -195,6 +202,9 @@ void JoojakApp::registerObjects(Factory & factory)
 
 	registerMeshModifier(BuildSideSetFromBlock);
 
+	registerProblem(CLawProblem);
+	registerProblem(NavierStokesProblem);
+
 	registerSAObjects(factory);
 }
 
@@ -210,7 +220,9 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	syntax.registerActionSyntax("CFDDGKernelsAction", "CFDDGKernels", "add_dg_kernel");
 	syntax.registerActionSyntax("CFDPostprocessorAction", "CFDPostprocessor", "add_postprocessor");
 	syntax.registerActionSyntax("CommonPostProcessorAction", "Postprocessors", "add_postprocessor");
-	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*");
+//	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*");
+	syntax.registerActionSyntax("AddCLawAction", "Problem");
+
 //	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*", "add_kernel");
 
 	registerAction(CFDAddVariablesAction, "add_variable");

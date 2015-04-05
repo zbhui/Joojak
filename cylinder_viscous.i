@@ -17,17 +17,12 @@
   boundary_name = 'far_field wall'
 []
 
-[CLawSolver]
-  active = EulerProblem
-  [./EulerProblem]  # 加入Variable, Kernel, DGKernel. 创建一个CLawBase
-    type = Euler
-    order = FIRST
-    family = MONOMIAL
-    #variables = 'rho momentum_x momentum_y momentum_z rhoe'
-  [../]
-
+[Problem]
+  type = NavierStokesProblem
+  order = FIRST
+  family = MONOMIAL
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
-
 
 [Preconditioning]
   [./SMP]
@@ -66,8 +61,6 @@
     type = Exodus
     output_initial = true
     interval = 1 					
-    oversample = true
-    refinements = 0
   [../]
 	
   [./console]
@@ -89,7 +82,6 @@
   [./proc_id]
     type = ProcessorIDAux
     variable = proc_id
-    execute_on = 'initial timestep'
   [../]
 []
 
