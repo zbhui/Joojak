@@ -2,16 +2,11 @@
 #pragma once
 
 #include "CFDInitialCondition.h"
-#include "EulerBase.h"
+//#include "NavierStokesProblem.h"
 
-class CFDPassFlowIC;
+class NavierStokesProblem;
 
-template<>
-InputParameters validParams<CFDPassFlowIC>();
-
-class CFDPassFlowIC :
-public CFDInitialCondition,
-public EulerBase
+class CFDPassFlowIC : public CFDInitialCondition
 {
 public:
 
@@ -19,6 +14,8 @@ public:
 
 private:
   Real _velocity;
+  NavierStokesProblem &_na_problem;
+
 protected:
   virtual Real density(const Point &p);
   virtual Real x_momentum(const Point &p);
@@ -26,3 +23,6 @@ protected:
   virtual Real z_momentum(const Point &p);
   virtual Real total_energy(const Point &p);
 };
+
+template<>
+InputParameters validParams<CFDPassFlowIC>();

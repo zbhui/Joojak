@@ -22,7 +22,60 @@
   order = FIRST
   family = MONOMIAL
   variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  mach = 0.2
+  reynolds = 40
 []
+
+[CFDICs]
+  type = CFDPassFlowIC 
+  velocity = 1
+[]
+
+
+[Postprocessors]
+  [./force_total-x]
+    type = CFDForcePostprocessor
+    direction_by = x
+    force_type = total
+    boundary  = wall
+  [../]
+  [./force_total-y]
+    type = CFDForcePostprocessor
+    direction_by = y
+    force_type = total
+    boundary  = wall
+  [../]
+  [./force_total-z]
+    type = CFDForcePostprocessor
+    direction_by = z
+    force_type = total
+    boundary  = wall
+  [../]
+[]
+
+[Materials]
+  [./cell_material]
+    block = 10
+    type = NSCellMaterial
+  [../]
+  [./face_material]
+    block = 10
+    type = NSFaceMaterial
+  [../]
+  [./far_field_material]
+    boundary = far_field
+    bc_type = far_field
+    type = NSBndMaterial
+  [../]
+  [./wall_material]
+    boundary = wall
+    bc_type = adiabatic_wall
+    type = NSBndMaterial
+  [../]
+[]
+
+
+
 
 [Preconditioning]
   [./SMP]
@@ -68,71 +121,6 @@
     perf_log = true
     linear_residuals = true
     nonlinear_residuals =  true	
-  [../]
-[]
-
-[AuxVariables]
-  [./proc_id]
-    order = FIRST
-    family = MONOMIAL
-  [../]
-[]
-
-[AuxKernels]
-  [./proc_id]
-    type = ProcessorIDAux
-    variable = proc_id
-  [../]
-[]
-
-[CFDICs]
-  type = CFDPassFlowIC
-[]
-
-[CFDBCs]
-  type = NSBC
-  boundary = '8 9' 
-[]
-
-[Postprocessors]
-  [./force_total-x]
-    type = CFDForcePostprocessor
-    direction_by = x
-    force_type = total
-    boundary  = wall
-  [../]
-  [./force_total-y]
-    type = CFDForcePostprocessor
-    direction_by = y
-    force_type = total
-    boundary  = wall
-  [../]
-  [./force_total-z]
-    type = CFDForcePostprocessor
-    direction_by = z
-    force_type = total
-    boundary  = wall
-  [../]
-[]
-
-[Materials]
-  [./cell_material]
-    block = 10
-    type = NSCellMaterial
-  [../]
-  [./face_material]
-    block = 10
-    type = NSFaceMaterial
-  [../]
-  [./far_field_material]
-    boundary = far_field
-    bc_type = far_field
-    type = NSBndMaterial
-  [../]
-  [./wall_material]
-    boundary = wall
-    bc_type = adiabatic_wall
-    type = NSBndMaterial
   [../]
 []
 

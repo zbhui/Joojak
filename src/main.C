@@ -7,7 +7,15 @@
 // Create a performance log
 PerfLog Moose::perf_log("Joojak");
 
-// Begin the main program.
+/*
+     _             _       _
+    | | ___   ___ (_) __ _| | __
+ _  | |/ _ \ / _ \| |/ _` | |/ /
+| |_| | (_) | (_) | | (_| |   <
+ \___/ \___/ \___// |\__,_|_|\_\
+                |__/
+*/
+
 int main(int argc, char *argv[])
 {
   // Initialize MPI, solvers and MOOSE

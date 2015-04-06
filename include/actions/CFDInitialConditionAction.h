@@ -15,5 +15,4 @@ public:
   virtual void act();
 
 protected:
-  std::vector<NonlinearVariableName> _variables;
 };

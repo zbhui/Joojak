@@ -15,4 +15,6 @@ CLawProblem::CLawProblem(const std::string & name, InputParameters params) :
 {
 	std::cout << "配置文件：" << _app.getInputFileName() << std::endl;
 	std::cout << params <<std::endl;
+
+//    _mesh.printInfo();
 }

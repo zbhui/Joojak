@@ -26,19 +26,29 @@ AddCLawAction::AddCLawAction(const std::string & name, InputParameters params) :
 	_variables(getParam<std::vector<NonlinearVariableName> >("variables")),
 	_type(getParam<std::string>("type"))
 {
-}
 
+}
 void AddCLawAction::act()
 {
 	if(_current_task == "add_variable")
-		AddVariable();
+		addVariable();
 	else if(_current_task == "add_kernel")
-		AddKernel();
+		addKernel();
 	else if(_current_task == "add_dg_kernel")
-		AddDGKernel();
+		addDGKernel();
+	else if(_current_task == "add_aux_variable")
+		addAuxVariable();
+	else if(_current_task == "add_aux_kernel")
+		addAuxKernel();
+	else if(_current_task == "add_bc")
+		addBoundaryCondition();
+	else
+	{
+		mooseError("未定义task: " << _current_task);
+	}
 }
 
-void AddCLawAction::AddVariable()
+void AddCLawAction::addVariable()
 {
 	Real scale_factor = isParamValid("scaling") ? getParam<Real>("scaling") : 1;
 	FEType fe_type(Utility::string_to_enum<Order>(getParam<MooseEnum>("order")),
@@ -49,7 +59,7 @@ void AddCLawAction::AddVariable()
 	}
 }
 
-void AddCLawAction::AddKernel()
+void AddCLawAction::addKernel()
 {
 	std::string time_kernel_name = "TimeDerivative";
 	InputParameters params = _factory.getValidParams(time_kernel_name);
@@ -68,7 +78,7 @@ void AddCLawAction::AddKernel()
 	}
 }
 
-void AddCLawAction::AddDGKernel()
+void AddCLawAction::addDGKernel()
 {
 	std::string face_kernel_name = "NSFaceKernel";
 	InputParameters params = _factory.getValidParams(face_kernel_name);
@@ -79,10 +89,35 @@ void AddCLawAction::AddDGKernel()
 	}
 }
 
-void AddCLawAction::AddAuxVariable()
+void AddCLawAction::addAuxVariable()
 {
+	FEType fe_type(Utility::string_to_enum<Order>("CONSTANT"), Utility::string_to_enum<FEFamily>("MONOMIAL"));
+
+	_problem->addAuxVariable("proc_id", fe_type);
 }
 
-void AddCLawAction::AddAuxKernel()
+void AddCLawAction::addAuxKernel()
 {
+	InputParameters params = _factory.getValidParams("ProcessorIDAux");
+	params.set<AuxVariableName>("variable") = "proc_id";
+	_problem->addAuxKernel("ProcessorIDAux", "proc_id", params);
 }
+
+void AddCLawAction::addBoundaryCondition()
+{
+    std::vector<BoundaryName> boundary;
+    std::set<boundary_id_type> boundary_id =  _mesh->meshBoundaryIds();
+    for (std::set<boundary_id_type>::const_iterator itor = boundary_id.begin(); itor != boundary_id.end(); ++itor)
+    	boundary.push_back(_mesh->getMesh().get_boundary_info().sideset_name(*itor));
+
+	std::string boun_cond_name = "NSBC";
+    InputParameters params = _factory.getValidParams(boun_cond_name);
+    params.set<std::vector<BoundaryName> >("boundary") = boundary;
+
+	for (int i = 0; i < _variables.size(); ++i)
+	{
+	    params.set<NonlinearVariableName>("variable") = _variables[i];
+	    _problem->addBoundaryCondition(boun_cond_name, _variables[i]+"_bc", params);
+	}
+}
+

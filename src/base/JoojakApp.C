@@ -122,6 +122,17 @@ void JoojakApp::printHeader()
 	Moose::out << "计算流体力学间断有限元计算器 JOOJAK \n\n";
 	Moose::out << "Joojak version: " <<  COLOR_MAGENTA << JOOJAK_REVISION << COLOR_DEFAULT << std::endl << std::endl;
 	Moose::out << COLOR_CYAN << line << COLOR_DEFAULT;
+
+//
+//	std::string joojak =
+//			std::string("		     _             _       _\n")+
+//			std::string("		    | | ___   ___ (_) __ _| | __\n")+
+//			std::string("		 _  | |/ _ \ / _ \| |/ _` | |/ /\n")+
+//			std::string("		| |_| | (_) | (_) | | (_| |   <\n")+
+//			std::string("		 \___/ \___/ \___// |\__,_|_|\_\\n")+
+//			std::string("		                |__/\n");
+//
+//Moose::out << joojak << std::endl;
 }
 
 void JoojakApp::run()
@@ -211,32 +222,36 @@ void JoojakApp::registerObjects(Factory & factory)
 void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 	/// 注册Action
-	syntax.registerActionSyntax("CFDAddVariablesAction", "CFDVariables", "add_variable");
+//	syntax.registerActionSyntax("CFDAddVariablesAction", "CFDVariables", "add_variable");
 	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_variable");
 	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_kernel");
 	syntax.registerActionSyntax("CFDInitialConditionAction", "CFDICs", "add_ic");
-	syntax.registerActionSyntax("CFDBoundaryConditionAction", "CFDBCs", "add_bc");
-	syntax.registerActionSyntax("CFDKernelsAction", "CFDKernels", "add_kernel");
-	syntax.registerActionSyntax("CFDDGKernelsAction", "CFDDGKernels", "add_dg_kernel");
-	syntax.registerActionSyntax("CFDPostprocessorAction", "CFDPostprocessor", "add_postprocessor");
+//	syntax.registerActionSyntax("CFDBoundaryConditionAction", "CFDBCs", "add_bc");
+//	syntax.registerActionSyntax("CFDKernelsAction", "CFDKernels", "add_kernel");
+//	syntax.registerActionSyntax("CFDDGKernelsAction", "CFDDGKernels", "add_dg_kernel");
+//	syntax.registerActionSyntax("CFDPostprocessorAction", "CFDPostprocessor", "add_postprocessor");
 	syntax.registerActionSyntax("CommonPostProcessorAction", "Postprocessors", "add_postprocessor");
 //	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*");
 	syntax.registerActionSyntax("AddCLawAction", "Problem");
 
 //	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*", "add_kernel");
 
-	registerAction(CFDAddVariablesAction, "add_variable");
-	registerAction(CFDAuxVariablesAction, "add_aux_variable");
-	registerAction(CFDAuxVariablesAction, "add_aux_kernel");
+//	registerAction(CFDAddVariablesAction, "add_variable");
+//	registerAction(CFDAuxVariablesAction, "add_aux_variable");
+//	registerAction(CFDAuxVariablesAction, "add_aux_kernel");
 	registerAction(CFDInitialConditionAction, "add_ic");
-	registerAction(CFDBoundaryConditionAction, "add_bc");
-	registerAction(CFDKernelsAction, "add_kernel");
-	registerAction(CFDDGKernelsAction, "add_dg_kernel");
+//	registerAction(CFDBoundaryConditionAction, "add_bc");
+//	registerAction(CFDKernelsAction, "add_kernel");
+//	registerAction(CFDDGKernelsAction, "add_dg_kernel");
 	registerAction(CFDPostprocessorAction, "add_postprocessor");
+
 	registerAction(CommonPostProcessorAction, "add_postprocessor");
 	registerAction(AddCLawAction, "add_variable");
 	registerAction(AddCLawAction, "add_kernel");
 	registerAction(AddCLawAction, "add_dg_kernel");
+	registerAction(AddCLawAction, "add_aux_variable");
+	registerAction(AddCLawAction, "add_aux_kernel");
+	registerAction(AddCLawAction, "add_bc");
 
 
 

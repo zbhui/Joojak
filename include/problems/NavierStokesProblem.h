@@ -2,13 +2,30 @@
 #pragma once
 
 #include "CLawProblem.h"
+#include "Eigen/Geometry"
+using Eigen::Quaterniond;
 
 class NavierStokesProblem : public CLawProblem
 {
 public:
 	NavierStokesProblem(const std::string & name, InputParameters params);
 
-protected:
+	int equationIndex(const std::string &var_name);
+	Real pressure(Real *uh);
+	Real pressureInfity();
+	Real enthalpy(Real *uh);
+	Real temperature(Real  *uh);
+	Real mach_local(Real *uh);
+	Real acous(Real *uh);
+	Real maxEigenValue(Real *uh, const Point &normal);
+	void eigenValue(Real *lam, Real *uh, const Point &normal);
+	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
+	virtual void inviscousTerm(std::vector<RealVectorValue> &inviscous_term, Real *uh);
+	virtual Quaterniond bodyFromWind();
+	virtual Quaterniond earthFromBody();
+	virtual Quaterniond earthFromWind();
+
+public:
 	Real _mach;
 	Real _gamma;
 	Real _reynolds;

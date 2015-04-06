@@ -10,11 +10,12 @@ public:
   virtual void act();
 
 private:
-  void AddVariable();
-  void AddKernel();
-  void AddDGKernel();
-  void AddAuxVariable();
-  void AddAuxKernel();
+  void addVariable();
+  void addKernel();
+  void addDGKernel();
+  void addAuxVariable();
+  void addAuxKernel();
+  void addBoundaryCondition();
 protected:
   std::vector<NonlinearVariableName> _variables;
   std::string _type;

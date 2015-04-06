@@ -1,20 +1,23 @@
 
 #include "CFDPassFlowIC.h"
+#include "NavierStokesProblem.h"
+#include "Eigen/Geometry"
+using namespace Eigen;
 
 template<>
 InputParameters validParams<CFDPassFlowIC>()
 {
 	InputParameters params = validParams<CFDInitialCondition>();
-	params += validParams<EulerBase>();
     params.addParam<Real>("velocity", 1.0, "均匀流速度");
     return params;
 }
 
 CFDPassFlowIC::CFDPassFlowIC(const std::string & name, InputParameters parameters) :
     CFDInitialCondition(name, parameters),
-    EulerBase(name, parameters),
-    _velocity(getParam<Real>("velocity"))
-{}
+    _velocity(getParam<Real>("velocity")),
+	_na_problem(static_cast<NavierStokesProblem&>(_fe_problem))
+{
+}
 
 Real CFDPassFlowIC::density(const Point &p)
 {
@@ -23,19 +26,19 @@ Real CFDPassFlowIC::density(const Point &p)
 
 Real CFDPassFlowIC::x_momentum(const Point &p)
 {
-	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
+	Vector3d vel = _velocity*(_na_problem.earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(0);
 }
 
 Real CFDPassFlowIC::y_momentum(const Point &p)
 {
-	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
+	Vector3d vel = _velocity*(_na_problem.earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(1);
 }
 
 Real CFDPassFlowIC::z_momentum(const Point &p)
 {
-	Vector3d vel = _velocity*(earthFromWind()*Vector3d::UnitX());
+	Vector3d vel = _velocity*(_na_problem.earthFromWind()*Vector3d::UnitX());
 	if(_current_elem->dim() == 2)
 		return 0.;
 	else if(_current_elem->dim() == 3)
@@ -49,6 +52,6 @@ Real CFDPassFlowIC::z_momentum(const Point &p)
 
 Real CFDPassFlowIC::total_energy(const Point &p)
 {
-	Real pre = 1./_gamma/_mach/_mach;
-	return pre/(_gamma-1) + 0.5*density(p)*(_velocity*_velocity);
+	Real pre = 1./_na_problem._gamma/_na_problem._mach/_na_problem._mach;
+	return pre/(_na_problem._gamma-1) + 0.5*density(p)*(_velocity*_velocity);
 }
