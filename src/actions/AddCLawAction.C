@@ -69,7 +69,7 @@ void AddCLawAction::addKernel()
 		_problem->addKernel(time_kernel_name, _variables[i] + "_time", params);
 	}
 
-	std::string cell_kernel_name = "NSCellKernel";
+	std::string cell_kernel_name = "CLawCellKernel";
 	params = _factory.getValidParams(cell_kernel_name);
 	for (int i = 0; i < _variables.size(); ++i)
 	{
@@ -80,7 +80,7 @@ void AddCLawAction::addKernel()
 
 void AddCLawAction::addDGKernel()
 {
-	std::string face_kernel_name = "NSFaceKernel";
+	std::string face_kernel_name = "CLawFaceKernel";
 	InputParameters params = _factory.getValidParams(face_kernel_name);
 	for (int i = 0; i < _variables.size(); ++i)
 	{

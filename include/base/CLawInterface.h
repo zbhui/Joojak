@@ -4,7 +4,7 @@
 
 #include "InputParameters.h"
 
-class CLawBase;
+class CLawProblem;
 
 class CLawInterface
 {
@@ -17,5 +17,5 @@ public:
 	void sourceTerm();
 
 protected:
-	CLawBase &_claw_base;
+	CLawProblem &_claw_problem;
 };

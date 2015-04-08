@@ -18,6 +18,7 @@
 #include "AddCLawAction.h"
 
 /// 单元积分
+#include "CLawCellKernel.h"
 #include "EulerCellKernel.h"
 #include "NSCellKernel.h"
 #include "KOCellKernel.h"
@@ -26,6 +27,7 @@
 #include "ElasticityKernel.h"
 
 /// 面积分
+#include "CLawFaceKernel.h"
 #include "EulerFaceKernel.h"
 #include "NSFaceKernel.h"
 #include "KOFaceKernel.h"
@@ -160,6 +162,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerBoundaryCondition(KOBC);
 
 	/// 注册Kernel
+	registerKernel(CLawCellKernel);
 	registerKernel(EulerCellKernel);
 	registerKernel(NSCellKernel);
 	registerKernel(KOCellKernel);
@@ -168,6 +171,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerKernel(ElasticityKernel);
 
 	/// 注册DGKernel
+	registerDGKernel(CLawFaceKernel);
 	registerDGKernel(EulerFaceKernel);
 	registerDGKernel(NSFaceKernel);
 	registerDGKernel(KOFaceKernel);
