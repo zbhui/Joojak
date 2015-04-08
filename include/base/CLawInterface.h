@@ -12,8 +12,8 @@ public:
 	CLawInterface(InputParameters &parameter);
 	~CLawInterface(){}
 
-	void convertionTerm();
-	void diffusionTerm();
+	void convertionTerm(RealVectorValue *inviscous_term, Real *uh);
+	void diffusionTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
 	void sourceTerm();
 
 protected:

@@ -15,7 +15,7 @@ template<>
 InputParameters validParams<NSFaceMaterial>()
 {
   InputParameters params = validParams<Material>();
-  params += validParams<NSBase>();
+//  params += validParams<NSBase>();
   params.addRequiredCoupledVar("variables", "守恒变量");
 
   return params;
@@ -23,7 +23,10 @@ InputParameters validParams<NSFaceMaterial>()
 
 NSFaceMaterial::NSFaceMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
-		NSBase(name, parameters),
+		CLawInterface(parameters),
+		_current_elem_volume(_assembly.elemVolume()),
+		_neighbor_elem_volume(_assembly.neighborVolume()),
+		_current_side_volume(_assembly.sideElemVolume()),
 		_flux(declareProperty<std::vector<Real> >("flux")),
 		_flux_jacobi_variable_ee(declareProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable_ee")),
 		_flux_jacobi_variable_en(declareProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable_en")),
@@ -55,10 +58,13 @@ NSFaceMaterial::NSFaceMaterial(const std::string & name, InputParameters paramet
 			_grad_ur.push_back(_is_implicit ? &val.gradSlnNeighbor(): &val.gradSlnOldNeighbor());
 		}
 	}
+	_ds = 1E-08;
 }
 
 void NSFaceMaterial::computeQpProperties()
 {
+//	const double h_elem = (_current_elem_volume+_neighbor_elem_volume)/_current_side_volume * 1./std::pow(elem_b_order, 2.)/2.;
+
 	if(_bnd && _neighbor)
 	{
 		resizeQpProperty();
@@ -163,12 +169,12 @@ void NSFaceMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul,
 {
 	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
 
-	inviscousTerm(ifl, ul);
-	inviscousTerm(ifr, ur);
-	viscousTerm(vfl, ul, dul);
-	viscousTerm(vfr, ur, dur);
+	convertionTerm(ifl, ul);
+	convertionTerm(ifr, ur);
+	diffusionTerm(vfl, ul, dul);
+	diffusionTerm(vfr, ur, dur);
 
-	Real lam = (maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
+	Real lam = 1;//(maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
@@ -181,8 +187,8 @@ void NSFaceMaterial::penaltyTerm(RealVectorValue* penalty, RealVectorValue* pena
 	for (int eq = 0; eq < _n_equations; ++eq)
 		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
 
-	viscousTerm(penalty, ul, duh);
-	viscousTerm(penalty_neighbor, ur, duh);
+	diffusionTerm(penalty, ul, duh);
+	diffusionTerm(penalty_neighbor, ur, duh);
 }
 
 void NSFaceMaterial::resizeQpProperty()

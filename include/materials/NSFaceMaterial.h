@@ -12,19 +12,16 @@
 #pragma once
 
 #include "Material.h"
-#include "NSBase.h"
+#include "CLawInterface.h"
 
 class NSFaceMaterial;
 
 template<>
 InputParameters validParams<NSFaceMaterial>();
 
-/**
- * Euler流体的材料属性
- */
 class NSFaceMaterial :
 public Material,
-public NSBase
+public CLawInterface
 {
 public:
 	NSFaceMaterial(const std::string & name, InputParameters parameters);
@@ -32,6 +29,12 @@ public:
 protected:
 	virtual void resizeQpProperty();
 	virtual void computeQpProperties();
+
+	const Real & _current_elem_volume;
+	const Real & _neighbor_elem_volume;
+	const Real & _current_side_volume;
+	Real _ds;
+//	const int & _var_order;
 
 	int _n_equations;
 	/// 积分点上的变量值

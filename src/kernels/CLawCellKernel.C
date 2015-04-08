@@ -11,13 +11,11 @@ InputParameters validParams<CLawCellKernel>()
 CLawCellKernel::CLawCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
 		CLawInterface(parameters),
-//		_claw_problem(static_cast<CLawProblem&>(_fe_problem)),
 		_eq(_claw_problem.equationIndex((_var.name()))),
 		_flux_term(getMaterialProperty<std::vector<RealVectorValue> >("flux_term")),
 		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("flux_term_jacobi_variable")),
 		_flux_jacobi_grad_variable(getMaterialProperty<std::vector<std::vector<RealTensorValue> > >("flux_term_jacobi_grad_variable"))
 {
-//	_eq = equationIndex(_var.name());
 }
 
 Real CLawCellKernel::computeQpResidual()

@@ -11,6 +11,7 @@ public:
 	NavierStokesProblem(const std::string & name, InputParameters params);
 
 	int equationIndex(const std::string &var_name);
+	Real physicalViscosity(Real *uh);
 	Real pressure(Real *uh);
 	Real pressureInfity();
 	Real enthalpy(Real *uh);
@@ -19,8 +20,10 @@ public:
 	Real acous(Real *uh);
 	Real maxEigenValue(Real *uh, const Point &normal);
 	void eigenValue(Real *lam, Real *uh, const Point &normal);
-	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
 	virtual void inviscousTerm(std::vector<RealVectorValue> &inviscous_term, Real *uh);
+	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
+	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
+
 	virtual Quaterniond bodyFromWind();
 	virtual Quaterniond earthFromBody();
 	virtual Quaterniond earthFromWind();

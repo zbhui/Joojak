@@ -7,14 +7,14 @@ CLawInterface::CLawInterface(InputParameters& parameter):
 {
 }
 
-void CLawInterface::convertionTerm()
+void CLawInterface::convertionTerm(RealVectorValue *inviscous_term, Real *uh)
 {
-//	_claw_base.convertionTerm();
+	_claw_problem.inviscousTerm(inviscous_term, uh);
 }
 
-void CLawInterface::diffusionTerm()
+void CLawInterface::diffusionTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh)
 {
-//	_claw_base.diffusionTerm();
+	_claw_problem.viscousTerm(viscous_term, uh, duh);
 }
 
 void CLawInterface::sourceTerm()
