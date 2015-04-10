@@ -3,6 +3,7 @@
 #pragma once
 
 #include "InputParameters.h"
+#include "Assembly.h"
 
 class CLawProblem;
 
@@ -18,4 +19,7 @@ public:
 
 protected:
 	CLawProblem &_claw_problem;
+	std::vector<VariableName> _variables;
+	int _var_order;
+	THREAD_ID _tid;
 };

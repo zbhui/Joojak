@@ -61,6 +61,7 @@
 #include "NSBndMaterial.h"
 #include "CouetteFlowBndMaterial.h"
 
+#include "CLawFaceMaterial.h"
 #include "KOCellMaterial.h"
 #include "KOFaceMaterial.h"
 #include "KOBndMaterial.h"
@@ -193,6 +194,7 @@ void JoojakApp::registerObjects(Factory & factory)
 
     registerMaterial(LinearElasticityMaterial);
 
+    registerMaterial(CLawFaceMaterial);
 	/// 注册函数
 	registerFunction(IsoVortexExact);
 	registerFunction(CouetteFlowExact);

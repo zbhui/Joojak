@@ -60,7 +60,7 @@
   [../]
   [./face_material]
     block = 10
-    type = NSFaceMaterial
+    type = CLawFaceMaterial
   [../]
   [./far_field_material]
     boundary = far_field
