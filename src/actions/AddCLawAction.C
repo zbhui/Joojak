@@ -17,7 +17,7 @@ InputParameters validParams<AddCLawAction>()
   params.addParam<std::string>("type", " ");
   params.addParam<MooseEnum>("family", families, "Specifies the family of FE shape functions to use for this variable");
   params.addParam<MooseEnum>("order", orders,  "Specifies the order of the FE shape function to use for this variable (additional orders not listed are allowed)");
-  params.addParam<std::vector<NonlinearVariableName> >("variables", "rho momentum_x momentum_y momentum_z rhoe" "非线性变量");
+  params.addRequiredParam<std::vector<NonlinearVariableName> >("variables", "非线性变量");
   return params;
 }
 

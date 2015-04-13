@@ -22,7 +22,8 @@ protected:
 	const Real & _current_side_volume;
 	Real _ds;
 	Real _sigma;
-	int _n_equations;
+	Real _epsilon;
+//	int _n_equations;
 	/// 积分点上的变量值
 	vector<VariableValue*> _ul;
 	vector<VariableValue*> _ur;

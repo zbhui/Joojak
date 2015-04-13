@@ -5,8 +5,9 @@ template<>
 InputParameters validParams<CLawFaceMaterial>()
 {
   InputParameters params = validParams<Material>();
-  params.addRequiredCoupledVar("variables", "守恒变量");
-
+  params.addParam<Real>("ds", 1.490116119384766e-08, "微扰量");
+  params.addParam<Real>("sigma", 6, "通量罚值，默认值为6");
+  params.addParam<Real>("epsilon", 1, "对称项罚值，可以取1, 0 , -1，分别对应SIP, IIP, NIP");
   return params;
 }
 
@@ -16,37 +17,36 @@ CLawFaceMaterial::CLawFaceMaterial(const std::string & name, InputParameters par
 		_current_elem_volume(_assembly.elemVolume()),
 		_neighbor_elem_volume(_assembly.neighborVolume()),
 		_current_side_volume(_assembly.sideElemVolume()),
+		_ds(getParam<Real>("ds")),
+		_sigma(getParam<Real>("sigma")),
+		_epsilon(getParam<Real>("epsilon")),
 		_flux(declareProperty<std::vector<Real> >("flux")),
 		_flux_jacobi_variable_ee(declareProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable_ee")),
 		_flux_jacobi_variable_en(declareProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable_en")),
 		_flux_jacobi_grad_variable_ee(declareProperty<std::vector<std::vector<RealGradient> > >("flux_jacobi_grad_variable_ee")),
 		_flux_jacobi_grad_variable_en(declareProperty<std::vector<std::vector<RealGradient> > >("flux_jacobi_grad_variable_en")),
 
-		_lift(declareProperty<std::vector<RealVectorValue> >("penalty")),
-		_lift_jacobi_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_ee")),
-		_lift_jacobi_variable_neighbor(declareProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_en"))
+		_lift(declareProperty<std::vector<RealVectorValue> >("lift")),
+		_lift_jacobi_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_ee")),
+		_lift_jacobi_variable_neighbor(declareProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_en"))
 {
-	_n_equations = coupledComponents("variables");
-
 	if(_bnd && _neighbor)
 	{
 		for (int eq = 0; eq < _n_equations; ++eq)
 		{
-			MooseVariable &val = *getVar("variables", eq);
+			MooseVariable &val = getVariable(eq);
+			mooseAssert(val.order() == _var_order, "变量的阶不同");
+
 			_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
 			_ur.push_back(_is_implicit ? &val.slnNeighbor() : &val.slnOldNeighbor());
 			_grad_ul.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
 			_grad_ur.push_back(_is_implicit ? &val.gradSlnNeighbor(): &val.gradSlnOldNeighbor());
 		}
 	}
-	_ds = 1E-08;
-	_sigma = 6.;
 }
 
 void CLawFaceMaterial::computeQpProperties()
 {
-//	const double h_elem = (_current_elem_volume+_neighbor_elem_volume)/_current_side_volume * 1./std::pow(elem_b_order, 2.)/2.;
-
 	if(_bnd && _neighbor)
 	{
 		resizeQpProperty();
@@ -54,7 +54,7 @@ void CLawFaceMaterial::computeQpProperties()
 		Real ul[10], ur[10], ur_new[10];
 		RealGradient dul[10], dur[10];
 		Real flux_new[10];
-		RealVectorValue penalty_new[10], penalty_neighbor_new[10];
+		RealVectorValue lift_new[10], penalty_neighbor_new[10];
 		RealVectorValue vis_term_left[10], vis_term_right[10], vis_term_new[10];
 
 		computeQpLeftValue(ul);
@@ -68,24 +68,24 @@ void CLawFaceMaterial::computeQpProperties()
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			ul[q] += _ds;
-			liftOperator(penalty_new, ul, ur);
+			liftOperator(lift_new, ul, ur);
 			fluxTerm(flux_new, ul, ur, dul, dur);
 			for (int p = 0; p < _n_equations; ++p)
 			{
 				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
 				_flux_jacobi_variable_ee[_qp][p][q] = tmp;
-				_lift_jacobi_variable[_qp][p][q] = (penalty_new[p] - _lift[_qp][p])/_ds;
+				_lift_jacobi_variable[_qp][p][q] = (lift_new[p] - _lift[_qp][p])/_ds;
 			}
 			ul[q] -= _ds;
 
 			ur[q] += _ds;
-			liftOperator(penalty_new, ul, ur);
+			liftOperator(lift_new, ul, ur);
 			fluxTerm(flux_new, ul, ur, dul, dur);
 			for (int p = 0; p < _n_equations; ++p)
 			{
 				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
 				_flux_jacobi_variable_en[_qp][p][q] = tmp;
-				_lift_jacobi_variable_neighbor[_qp][p][q] = (penalty_new[p] - _lift[_qp][p])/_ds;
+				_lift_jacobi_variable_neighbor[_qp][p][q] = (lift_new[p] - _lift[_qp][p])/_ds;
 			}
 			ur[q] -= _ds;
 

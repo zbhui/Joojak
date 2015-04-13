@@ -18,16 +18,18 @@ protected:
 	MaterialProperty<std::vector<std::vector<RealGradient> > > & _flux_jacobi_grad_variable_ee;
 	MaterialProperty<std::vector<std::vector<RealGradient> > > & _flux_jacobi_grad_variable_en;
 
-	MaterialProperty<std::vector<RealVectorValue> > & _penalty;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > > & _penalty_jacobi_variable_ee;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > > & _penalty_jacobi_variable_en;
+	MaterialProperty<std::vector<RealVectorValue> > & _lift;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > > & _lift_jacobi_variable_ee;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > > & _lift_jacobi_variable_en;
 
 	virtual Real computeQpResidual(Moose::DGResidualType type);
 	virtual Real computeQpJacobian(Moose::DGJacobianType type);
 	virtual Real computeQpOffDiagJacobian(Moose::DGJacobianType type, unsigned int jvar);
 
 	int _eq;
-	Real _epsilon;
+
+private:
+	Real computeQpJacobian(int p, int q, Moose::DGJacobianType type);
 };
 
 template<>

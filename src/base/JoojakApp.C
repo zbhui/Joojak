@@ -228,27 +228,13 @@ void JoojakApp::registerObjects(Factory & factory)
 void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 	/// 注册Action
-//	syntax.registerActionSyntax("CFDAddVariablesAction", "CFDVariables", "add_variable");
 	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_variable");
 	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_kernel");
 	syntax.registerActionSyntax("CFDInitialConditionAction", "CFDICs", "add_ic");
-//	syntax.registerActionSyntax("CFDBoundaryConditionAction", "CFDBCs", "add_bc");
-//	syntax.registerActionSyntax("CFDKernelsAction", "CFDKernels", "add_kernel");
-//	syntax.registerActionSyntax("CFDDGKernelsAction", "CFDDGKernels", "add_dg_kernel");
-//	syntax.registerActionSyntax("CFDPostprocessorAction", "CFDPostprocessor", "add_postprocessor");
 	syntax.registerActionSyntax("CommonPostProcessorAction", "Postprocessors", "add_postprocessor");
-//	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*");
 	syntax.registerActionSyntax("AddCLawAction", "Problem");
 
-//	syntax.registerActionSyntax("AddCLawAction", "CLawSolver/*", "add_kernel");
-
-//	registerAction(CFDAddVariablesAction, "add_variable");
-//	registerAction(CFDAuxVariablesAction, "add_aux_variable");
-//	registerAction(CFDAuxVariablesAction, "add_aux_kernel");
 	registerAction(CFDInitialConditionAction, "add_ic");
-//	registerAction(CFDBoundaryConditionAction, "add_bc");
-//	registerAction(CFDKernelsAction, "add_kernel");
-//	registerAction(CFDDGKernelsAction, "add_dg_kernel");
 	registerAction(CFDPostprocessorAction, "add_postprocessor");
 
 	registerAction(CommonPostProcessorAction, "add_postprocessor");
