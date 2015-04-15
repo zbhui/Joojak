@@ -11,7 +11,8 @@ InputParameters validParams<CLawProblem>()
 }
 
 CLawProblem::CLawProblem(const std::string & name, InputParameters params) :
-    FEProblem(name, params)
+    FEProblem(name, params),
+	_n_equations(0)
 {
 	std::cout << "配置文件：" << _app.getInputFileName() << std::endl;
 	std::cout << params <<std::endl;

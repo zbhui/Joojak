@@ -14,7 +14,6 @@ InputParameters validParams<AddCLawAction>()
   MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
   MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
   InputParameters params = validParams<Action>();
-  params.addParam<std::string>("type", " ");
   params.addParam<MooseEnum>("family", families, "Specifies the family of FE shape functions to use for this variable");
   params.addParam<MooseEnum>("order", orders,  "Specifies the order of the FE shape function to use for this variable (additional orders not listed are allowed)");
   params.addRequiredParam<std::vector<NonlinearVariableName> >("variables", "非线性变量");
@@ -23,8 +22,7 @@ InputParameters validParams<AddCLawAction>()
 
 AddCLawAction::AddCLawAction(const std::string & name, InputParameters params) :
     Action(name, params),
-	_variables(getParam<std::vector<NonlinearVariableName> >("variables")),
-	_type(getParam<std::string>("type"))
+	_variables(getParam<std::vector<NonlinearVariableName> >("variables"))
 {
 
 }
@@ -110,7 +108,7 @@ void AddCLawAction::addBoundaryCondition()
     for (std::set<boundary_id_type>::const_iterator itor = boundary_id.begin(); itor != boundary_id.end(); ++itor)
     	boundary.push_back(_mesh->getMesh().get_boundary_info().sideset_name(*itor));
 
-	std::string boun_cond_name = "NSBC";
+	std::string boun_cond_name = "CLawBoundaryCondition";
     InputParameters params = _factory.getValidParams(boun_cond_name);
     params.set<std::vector<BoundaryName> >("boundary") = boundary;
 

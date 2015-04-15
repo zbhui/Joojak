@@ -56,7 +56,7 @@
 [Materials]
   [./cell_material]
     block = 10
-    type = NSCellMaterial
+    type = CLawCellMaterial
   [../]
   [./face_material]
     block = 10

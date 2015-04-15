@@ -12,6 +12,12 @@ public:
 
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh){};
 	virtual void viscousTerm(RealVectorValue *viscous_term, Real* uh, RealGradient *duh){};
+	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, const Point &normal){};
+
+	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, MooseEnum _bc_type){};
+
+protected:
+	int _n_equations;
 };
 
 template<>

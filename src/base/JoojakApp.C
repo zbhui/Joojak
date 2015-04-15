@@ -41,6 +41,7 @@
 #include "EulerBC.h"
 #include "NSBC.h"
 #include "KOBC.h"
+#include "CLawBoundaryCondition.h"
 
 /// 函数
 #include "IsoVortexExact.h"
@@ -62,6 +63,7 @@
 #include "CouetteFlowBndMaterial.h"
 
 #include "CLawFaceMaterial.h"
+#include "CLawCellMaterial.h"
 #include "KOCellMaterial.h"
 #include "KOFaceMaterial.h"
 #include "KOBndMaterial.h"
@@ -161,6 +163,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerBoundaryCondition(EulerBC);
 	registerBoundaryCondition(NSBC);
 	registerBoundaryCondition(KOBC);
+	registerBoundaryCondition(CLawBoundaryCondition);
 
 	/// 注册Kernel
 	registerKernel(CLawCellKernel);
@@ -195,6 +198,7 @@ void JoojakApp::registerObjects(Factory & factory)
     registerMaterial(LinearElasticityMaterial);
 
     registerMaterial(CLawFaceMaterial);
+    registerMaterial(CLawCellMaterial);
 	/// 注册函数
 	registerFunction(IsoVortexExact);
 	registerFunction(CouetteFlowExact);

@@ -18,8 +18,6 @@ private:
   void addBoundaryCondition();
 protected:
   std::vector<NonlinearVariableName> _variables;
-  std::string _type;
-
 };
 
 template<>

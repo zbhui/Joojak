@@ -20,14 +20,24 @@ public:
 	Real acous(Real *uh);
 	Real maxEigenValue(Real *uh, const Point &normal);
 	void eigenValue(Real *lam, Real *uh, const Point &normal);
+
 	virtual void inviscousTerm(std::vector<RealVectorValue> &inviscous_term, Real *uh);
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
 	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
+	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, const Point &normal);
+	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, MooseEnum _bc_type);
 
 	virtual Quaterniond bodyFromWind();
 	virtual Quaterniond earthFromBody();
 	virtual Quaterniond earthFromWind();
 
+private:
+	void isothermalWall(Real *ur,  Real *ul, Point &normal);
+//	void isothermalWall(Real *ur,  Real *ul, Point &normal);
+//	void isothermalWall(Real *ur,  Real *ul, Point &normal);
+//	void isothermalWall(Real *ur,  Real *ul, Point &normal);
+//	void isothermalWall(Real *ur,  Real *ul, Point &normal);
+//	void isothermalWall(Real *ur,  Real *ul, Point &normal);
 public:
 	Real _mach;
 	Real _gamma;

@@ -39,6 +39,11 @@ MooseVariable& CLawInterface::getVariable(const std::string var_name)
 	return _claw_problem.getVariable(_tid, var_name);
 }
 
+void CLawInterface::fluxRiemann(Real* flux, Real* ul, Real* ur, const Point &normal)
+{
+	_claw_problem.fluxRiemann(flux, ul, ur, normal);
+}
+
 MooseVariable& CLawInterface::getVariable(int eq)
 {
 	return _claw_problem.getVariable(_tid, _variables[eq]);
