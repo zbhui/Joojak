@@ -15,10 +15,8 @@ CLawBoundaryCondition::CLawBoundaryCondition(const std::string & name, InputPara
 		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable")),
 		_flux_jacobi_grad_variable(getMaterialProperty<std::vector<std::vector<RealGradient> > >("flux_jacobi_grad_variable")),
 
-		_penalty(getMaterialProperty<std::vector<RealVectorValue> >("penalty")),
-		_penalty_neighbor(getMaterialProperty<std::vector<RealVectorValue> >("penalty_neighbor")),
-		_penalty_jacobi_variable_ee(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_ee")),
-		_penalty_jacobi_variable_ne(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("penalty_jacobi_variable_ne")),
+		_lift(getMaterialProperty<std::vector<RealVectorValue> >("lift")),
+		_lift_jacobi_variable(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_ee")),
 		_eq(equationIndex(_var.name())),
 		_epsilon(1),
 		_sigma(6)
@@ -29,8 +27,8 @@ Real CLawBoundaryCondition::computeQpResidual()
 {
 	Real CIP = computeCIP();
 	Real flux = _flux[_qp][_eq] ;
-	flux += CIP*(_penalty[_qp][_eq]+_penalty_neighbor[_qp][_eq])*_normals[_qp];
-	return  flux * _test[_i][_qp] + _epsilon * _penalty[_qp][_eq]* _grad_test[_i][_qp];
+	flux += CIP*(_lift[_qp][_eq]+_lift[_qp][_eq])*_normals[_qp];
+	return  flux * _test[_i][_qp] + _epsilon * _lift[_qp][_eq]* _grad_test[_i][_qp];
 }
 
 Real CLawBoundaryCondition::computeQpJacobian()
@@ -40,8 +38,8 @@ Real CLawBoundaryCondition::computeQpJacobian()
 	int p(_eq), q(_eq);
 	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
-	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q] + _penalty_jacobi_variable_ne[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
-	r += _epsilon*_penalty_jacobi_variable_ee[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
+	r += CIP*(_lift_jacobi_variable[_qp][p][q] + _lift_jacobi_variable[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
+	r += _epsilon*_lift_jacobi_variable[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
 
 	return r;
 }
@@ -53,8 +51,9 @@ Real CLawBoundaryCondition::computeQpOffDiagJacobian(unsigned int jvar)
 	int p(_eq), q(jvar);
 	r =  _flux_jacobi_variable[_qp][p][q]*_phi[_j][_qp]*_test[_i][_qp];
 	r += _flux_jacobi_grad_variable[_qp][p][q]*_grad_phi[_j][_qp]*_test[_i][_qp];
-	r += CIP*(_penalty_jacobi_variable_ee[_qp][p][q] + _penalty_jacobi_variable_ne[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
-	r += _epsilon*_penalty_jacobi_variable_ee[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
+	r += CIP*(_lift_jacobi_variable[_qp][p][q] + _lift_jacobi_variable[_qp][p][q])*_normals[_qp]*_phi[_j][_qp]*_test[_i][_qp];
+	r += _epsilon*_lift_jacobi_variable[_qp][p][q]*_grad_test[_i][_qp]*_phi[_j][_qp];
+
 	return r;
 }
 

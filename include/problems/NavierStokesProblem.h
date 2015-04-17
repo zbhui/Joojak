@@ -25,7 +25,7 @@ public:
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
 	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, const Point &normal);
-	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, MooseEnum _bc_type);
+	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
 
 	virtual Quaterniond bodyFromWind();
 	virtual Quaterniond earthFromBody();
@@ -33,6 +33,8 @@ public:
 
 private:
 	void isothermalWall(Real *ur,  Real *ul, Point &normal);
+	void farField(Real *ur,  Real *ul, Point &normal);
+
 //	void isothermalWall(Real *ur,  Real *ul, Point &normal);
 //	void isothermalWall(Real *ur,  Real *ul, Point &normal);
 //	void isothermalWall(Real *ur,  Real *ul, Point &normal);
@@ -52,6 +54,8 @@ public:
 
 	Real _ref_length;
 	Real _ref_area;
+
+	MooseEnum _bc_types;
 };
 
 template<>

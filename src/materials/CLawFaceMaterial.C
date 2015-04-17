@@ -28,7 +28,8 @@ CLawFaceMaterial::CLawFaceMaterial(const std::string & name, InputParameters par
 
 		_lift(declareProperty<std::vector<RealVectorValue> >("lift")),
 		_lift_jacobi_variable(declareProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_ee")),
-		_lift_jacobi_variable_neighbor(declareProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_en"))
+		_lift_jacobi_variable_neighbor(declareProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_en")),
+		_face_material_data(declareProperty<CLawFaceMaterialData>("face_material_data"))
 {
 	if(_bnd && _neighbor)
 	{
@@ -62,10 +63,8 @@ void CLawFaceMaterial::computeQpProperties()
 		computeQpLeftGradValue(dul);
 		computeQpRightGradValue(dur);
 
-		QpValue qp_value;
-		fillQpValue(qp_value);
-		computeQpLift(&_lift[_qp][0], qp_value);
-		computeQpFlux(&_flux[_qp][0], qp_value);
+		liftOperator(&_lift[_qp][0], ul, ur);
+		fluxTerm(&_flux[_qp][0], ul, ur, dul, dur);
 
 		for (int q = 0; q < _n_equations; ++q)
 		{

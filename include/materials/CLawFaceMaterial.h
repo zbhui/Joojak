@@ -6,6 +6,33 @@
 
 using std::vector;
 
+class CLawProblem;
+
+class CLawFaceMaterialData
+{
+public:
+	void update(CLawProblem & claw_problem);
+	void setProblem(CLawProblem & claw_problem, Real ds);
+
+private:
+	void computeQpValue(RealVectorValue *flux_term);
+	CLawProblem * _claw_problem;
+	int _n_equations;
+	Real _ds;
+
+public:
+	Point normal;
+	Real ul[10], ur[10], u_bar[10], u_diff[10];
+	RealGradient dul[10], dur[10], duh[10];
+	Real inv_flux[10], vis_flux[10], flux[10];
+	Real _flux[10];
+	Real _flux_jacobi_variable_ee[10][10];
+	Real _flux_jacobi_variable_en[10][10];
+	RealVectorValue lift[10];
+	RealVectorValue _lift_jacobi_variable[10][10];
+	RealVectorValue _lift_jacobi_variable_neighbor[10][10];
+};
+
 class CLawFaceMaterial :
 public Material,
 public CLawInterface
@@ -65,6 +92,7 @@ protected:
 	MaterialProperty<vector<RealVectorValue> > & _lift;
 	MaterialProperty<vector<vector<RealVectorValue> > > & _lift_jacobi_variable;
 	MaterialProperty<vector<vector<RealVectorValue> > > & _lift_jacobi_variable_neighbor;
+	MaterialProperty<CLawFaceMaterialData> &_face_material_data;
 
 	virtual void computeQpLeftValue(Real *ul);
 	virtual void computeQpRightValue(Real *ur);

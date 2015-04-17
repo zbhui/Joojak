@@ -16,9 +16,6 @@ public:
 
 protected:
 	int _eq;
-	MaterialProperty<std::vector<RealVectorValue> > &_flux_term;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > >& _flux_jacobi_variable;
-	MaterialProperty<std::vector<std::vector<RealTensorValue> > >& _flux_jacobi_grad_variable;
 	MaterialProperty<CLawCellMaterialData > &_cell_material_data;
 
 	virtual Real computeQpResidual();

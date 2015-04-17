@@ -65,12 +65,12 @@
   [./far_field_material]
     boundary = far_field
     bc_type = far_field
-    type = NSBndMaterial
+    type = CLawBoundaryMaterial
   [../]
   [./wall_material]
     boundary = wall
-    bc_type = adiabatic_wall
-    type = NSBndMaterial
+    bc_type = isothermal_wall
+    type = CLawBoundaryMaterial
   [../]
 []
 

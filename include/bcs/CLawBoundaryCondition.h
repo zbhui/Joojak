@@ -15,10 +15,8 @@ protected:
 	MaterialProperty<std::vector<Real> > & _flux;
 	MaterialProperty<std::vector<std::vector<Real> > > &_flux_jacobi_variable;
 	MaterialProperty<std::vector<std::vector<RealGradient> > > &_flux_jacobi_grad_variable;
-	MaterialProperty<std::vector<RealVectorValue> > & _penalty;
-	MaterialProperty<std::vector<RealVectorValue> > & _penalty_neighbor;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > > &_penalty_jacobi_variable_ee;
-	MaterialProperty<std::vector<std::vector<RealVectorValue> > > &_penalty_jacobi_variable_ne;
+	MaterialProperty<std::vector<RealVectorValue> > & _lift;
+	MaterialProperty<std::vector<std::vector<RealVectorValue> > > &_lift_jacobi_variable;
 
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();

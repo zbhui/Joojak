@@ -64,6 +64,7 @@
 
 #include "CLawFaceMaterial.h"
 #include "CLawCellMaterial.h"
+#include "CLawBoundaryMaterial.h"
 #include "KOCellMaterial.h"
 #include "KOFaceMaterial.h"
 #include "KOBndMaterial.h"
@@ -199,6 +200,7 @@ void JoojakApp::registerObjects(Factory & factory)
 
     registerMaterial(CLawFaceMaterial);
     registerMaterial(CLawCellMaterial);
+    registerMaterial(CLawBoundaryMaterial);
 	/// 注册函数
 	registerFunction(IsoVortexExact);
 	registerFunction(CouetteFlowExact);

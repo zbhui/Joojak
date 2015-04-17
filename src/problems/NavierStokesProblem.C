@@ -1,4 +1,5 @@
 
+#include "Conversion.h"
 #include "NavierStokesProblem.h"
 
 #include "MooseApp.h"
@@ -38,9 +39,11 @@ NavierStokesProblem::NavierStokesProblem(const std::string & name, InputParamete
 	_roll(getParam<Real>("roll")*libMesh::pi/180),
 
 	_ref_length(getParam<Real>("ref_length")),
-	_ref_area(getParam<Real>("ref_area"))
+	_ref_area(getParam<Real>("ref_area")),
+	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))  // 边界条件的类型，可以增加
 {
 	_n_equations = 5;
+
 }
 
 Real NavierStokesProblem::pressure(Real *uh)
@@ -242,32 +245,42 @@ void NavierStokesProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, const Poin
 	}
 }
 
-void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, MooseEnum _bc_type)
+void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type)
 {
-//	switch (_bc_type)
+	if(bc_type == "isothermal_wall")
+	{
+		isothermalWall(ur, ul, normal);
+		return;
+	}
+//	if(_bc_type == "adiabatic_wall")
 //	{
-//		case "isothermal_wall":
-//			isothermalWall(ur, ul, normal);
-//			break;
-//		case "adiabatic_wall":
-//			isothermalWall(ur, ul, normal);
-//			break;
-//		case "far_field":
-//			isothermalWall(ur, ul, normal);
-//			break;
-//		case "symmetric":
-//			isothermalWall(ur, ul, normal);
-//			break;
-//		case "pressure_out":
-//			isothermalWall(ur, ul, normal);
-//			break;
-//		case "none":
-//			isothermalWall(ur, ul, normal);
-//			break;
-//		default:
-//			mooseError(_bc_type<<"未定义的边界条件类型");
-//			break;
+//		adiabaticWall(ur, dur, ul, dul);
+//		return;
 //	}
+	if(bc_type == "far_field")
+	{
+		farField(ur, ul, normal);
+		return;
+	}
+//	if(_bc_type == "symmetric")
+//	{
+//		symmetric(ur, dur, ul, dul);
+//		return;
+//	}
+//	if(_bc_type == "pressure_out")
+//	{
+//		symmetric(ur, dur, ul, dul);
+//		return;
+//	}
+//	if(_bc_type == "none")
+//	{
+//		for (int eq = 0; eq < _n_equations; ++eq)
+//			ur[eq] = (*_ul[eq])[_qp];
+//
+//		return;
+//	}
+
+	mooseError( bc_type << "未定义的边界条件类型");
 }
 
 void NavierStokesProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
@@ -355,96 +368,92 @@ void NavierStokesProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
 //	}
 //}
 //
-//void NavierStokesProblem::farField(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
-//{
-//	for (int eq = 0; eq < _n_equations; ++eq)
-//		dur[eq] = dul[eq];
-//
-//	const Point &normal = _normals[_qp];
-//
-//	Real rhoR, uR, vR, wR, pR;
-//	Real rhoL, uL, vL, wL, pL;
-//	Real cR, cL, cb;
-//	Real vnR, vnL, vnb;
-//	Real vel, s;
-//	Real Rp, Rm;
-//
-//	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
-//	if(_current_elem->dim() == 2)
-//		vel_inf(2) = 0.;
-//	uR = vel_inf(0);
-//	vR = vel_inf(1);
-//	wR = vel_inf(2);
-//
-//	Real lam[3];
-//	eigenValue(lam, ul, normal);
-//
-//	rhoR = 1.0;
-//
-//	pR = 1 / _gamma /_mach / _mach;
-//	cR = sqrt(fabs(_gamma * pR / rhoR));
-//	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
-//
-//	rhoL = ul[0];
-//	uL = ul[1] / rhoL;
-//	vL = ul[2] / rhoL;
-//	wL = ul[3] / rhoL;
-//	vel = sqrt(uL * uL + vL * vL + wL * wL);
-//	pL = pressure(ul);
-//	cL = sqrt(fabs(_gamma * pL / rhoL));
-//	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
-//
-//	if(lam[1] < 0)  // 入口
-//	{
-//		if (vel > cL) //超音速
-//		{
-//			ur[0] = rhoR;
-//			ur[1] = rhoR * uR;
-//			ur[2] = rhoR * vR;
-//			ur[3] = rhoR * wR;
-//			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
-//		}
-//		else	//亚音速
-//		{
-//			s = pR / pow(rhoR, _gamma);
-//			Rp = -vnR + 2.0 * cR / (_gamma - 1);
-//			Rm = -vnL - 2.0 * cL / (_gamma - 1);
-//			vnb = -(Rp + Rm) / 2.0;
-//			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-//
-//			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-//			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
-//			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
-//			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
-//			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-//		}
-//	}
-//	else  //出口
-//	{
-//		if (vel > cL) //超音速
-//		{
-//			ur[0] = ul[0];
-//			ur[1] = ul[1];
-//			ur[2] = ul[2];
-//			ur[3] = ul[3];
-//			ur[4] = ul[4];
-//		}
-//		else	//亚音速
-//		{
-//			s = pL / pow(rhoL, _gamma);
-//			Rp = vnL + 2 * cL / (_gamma - 1);
-//			Rm = vnR - 2 * cR / (_gamma - 1);
-//			vnb = (Rp + Rm) / 2.0;
-//			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-//
-//			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-//			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
-//			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
-//			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
-//			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-//		}
-//	}
-//}
+void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
+{
+	Real rhoR, uR, vR, wR, pR;
+	Real rhoL, uL, vL, wL, pL;
+	Real cR, cL, cb;
+	Real vnR, vnL, vnb;
+	Real vel, s;
+	Real Rp, Rm;
+
+	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+	if(_mesh.dimension() == 2)
+		vel_inf(2) = 0.;
+
+	uR = vel_inf(0);
+	vR = vel_inf(1);
+	wR = vel_inf(2);
+
+	Real lam[3];
+	eigenValue(lam, ul, normal);
+
+	rhoR = 1.0;
+
+	pR = 1 / _gamma /_mach / _mach;
+	cR = sqrt(fabs(_gamma * pR / rhoR));
+	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
+
+	rhoL = ul[0];
+	uL = ul[1] / rhoL;
+	vL = ul[2] / rhoL;
+	wL = ul[3] / rhoL;
+	vel = sqrt(uL * uL + vL * vL + wL * wL);
+	pL = pressure(ul);
+	cL = sqrt(fabs(_gamma * pL / rhoL));
+	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
+
+	if(lam[1] < 0)  // 入口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = rhoR;
+			ur[1] = rhoR * uR;
+			ur[2] = rhoR * vR;
+			ur[3] = rhoR * wR;
+			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
+		}
+		else	//亚音速
+		{
+			s = pR / pow(rhoR, _gamma);
+			Rp = -vnR + 2.0 * cR / (_gamma - 1);
+			Rm = -vnL - 2.0 * cL / (_gamma - 1);
+			vnb = -(Rp + Rm) / 2.0;
+			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+
+			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
+			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
+			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
+			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+		}
+	}
+	else  //出口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = ul[4];
+		}
+		else	//亚音速
+		{
+			s = pL / pow(rhoL, _gamma);
+			Rp = vnL + 2 * cL / (_gamma - 1);
+			Rm = vnR - 2 * cR / (_gamma - 1);
+			vnb = (Rp + Rm) / 2.0;
+			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+
+			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
+			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
+			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
+			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+		}
+	}
+}
 //
 //
 //void NavierStokesProblem::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
