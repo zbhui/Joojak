@@ -12,6 +12,9 @@ CLawInterface::CLawInterface(InputParameters& parameter):
 {
 	if(_n_equations > 10)
 		mooseError("当前支持方程个数不超过10");
+
+	if(this->_n_equations != _claw_problem._n_equations)
+		mooseError("参数文件中指定的变量个数和问题的变量数数目不同，检查Problem block下的参数" << _claw_problem.name());
 }
 
 void CLawInterface::convertionTerm(RealVectorValue *inviscous_term, Real *uh)

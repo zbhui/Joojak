@@ -40,10 +40,11 @@ NavierStokesProblem::NavierStokesProblem(const std::string & name, InputParamete
 
 	_ref_length(getParam<Real>("ref_length")),
 	_ref_area(getParam<Real>("ref_area")),
-	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))  // 边界条件的类型，可以增加
+	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
 {
 	_n_equations = 5;
-
+	if(_n_equations == 0)
+		mooseError("没有指定问题方程个数" << name);
 }
 
 Real NavierStokesProblem::pressure(Real *uh)
@@ -238,8 +239,8 @@ void NavierStokesProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, const Poin
 	inviscousTerm(ifl, ul);
 	inviscousTerm(ifr, ur);
 
-	Real lam = 1;//(maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
-	for (int eq = 0; eq < _n_equations; ++eq)
+	Real lam = (maxEigenValue(ul, normal) + maxEigenValue(ur, normal))/2.;
+	for (int eq = 0; eq < 5; ++eq)
 	{
 		flux[eq] = 0.5*(ifl[eq] + ifr[eq])*normal + lam*(ul[eq] - ur[eq]);
 	}
