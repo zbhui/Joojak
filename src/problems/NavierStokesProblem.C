@@ -39,8 +39,8 @@ NavierStokesProblem::NavierStokesProblem(const std::string & name, InputParamete
 	_roll(getParam<Real>("roll")*libMesh::pi/180),
 
 	_ref_length(getParam<Real>("ref_length")),
-	_ref_area(getParam<Real>("ref_area")),
-	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
+	_ref_area(getParam<Real>("ref_area"))
+//	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
 {
 	_n_equations = 5;
 	if(_n_equations == 0)
@@ -182,6 +182,57 @@ void NavierStokesProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, R
 
 }
 
+void NavierStokesProblem::viscousTermAdiabatic(RealVectorValue* viscous_term, Real* uh, RealGradient* duh)
+{
+	Real rho = uh[0];
+	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
+	RealGradient grad_rho(duh[0]);
+	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
+	RealTensor temp;
+	for (int alpha = 0; alpha < 3; ++alpha) {
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			temp(alpha,beta) = velocity(alpha)*grad_rho(beta);
+		}
+	}
+	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
+	RealTensor tau = velocity_tensor + velocity_tensor.transpose();
+	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
+	Real lamdiv = 2./3. * div;
+	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
+	Real mu = physicalViscosity(uh);
+	tau *= mu/_reynolds;
+
+	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
+	grad_enthalpy *= (mu/_reynolds)*(_gamma/_prandtl);
+
+	int component = 0;
+	viscous_term[component](0) = 0.;
+	viscous_term[component](1) = 0.;
+	viscous_term[component](2) = 0.;
+
+	component = 1;
+	viscous_term[component](0) = tau(0, 0);
+	viscous_term[component](1) = tau(0, 1);
+	viscous_term[component](2) = tau(0, 2);
+
+	component = 2;
+	viscous_term[component](0) = tau(1, 0);
+	viscous_term[component](1) = tau(1, 1);
+	viscous_term[component](2) = tau(1, 2);
+
+	component = 3;
+	viscous_term[component](0) = tau(2, 0);
+	viscous_term[component](1) = tau(2, 1);
+	viscous_term[component](2) = tau(2, 2);
+
+	component = 4;
+	RealVectorValue vel_tau = tau * velocity  ;
+	viscous_term[component](0) = vel_tau(0);
+	viscous_term[component](1) = vel_tau(1);
+	viscous_term[component](2) = vel_tau(2);
+}
+
 void NavierStokesProblem::inviscousTerm(std::vector<RealVectorValue>& inviscous_term, Real* uh)
 {
 	inviscousTerm(&inviscous_term[0], uh);
@@ -212,38 +263,19 @@ Real NavierStokesProblem::physicalViscosity(Real* uh)
 	return 1.0;
 }
 
-int NavierStokesProblem::equationIndex(const std::string &var_name)
-{
-	int eq = -1;
-	if(var_name == "rho")
-		eq = 0;
-	if(var_name == "momentum_x")
-		eq = 1;
-	if(var_name == "momentum_y")
-		eq = 2;
-	if(var_name == "momentum_z")
-		eq = 3;
-	if(var_name == "rhoe")
-		eq = 4;
-
-	if(eq < 0)
-		mooseError("不可知的变量名");
-
-	return eq;
-}
-
-void NavierStokesProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, const Point &normal)
+void NavierStokesProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &normal)
 {
 	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
+	Real uh[5];
 
 	inviscousTerm(ifl, ul);
 	inviscousTerm(ifr, ur);
 
-	Real lam = (maxEigenValue(ul, normal) + maxEigenValue(ur, normal))/2.;
-	for (int eq = 0; eq < 5; ++eq)
-	{
-		flux[eq] = 0.5*(ifl[eq] + ifr[eq])*normal + lam*(ul[eq] - ur[eq]);
-	}
+	for (int eq = 0; eq < _n_equations; ++eq)
+		uh[eq] = (ul[eq]+ur[eq])/2;
+
+	for (int eq = 0; eq < _n_equations; ++eq)
+		flux[eq] = 0.5*(ifl[eq] + ifr[eq])*normal + maxEigenValue(uh, normal)*(ul[eq] - ur[eq]);
 }
 
 void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type)
@@ -253,11 +285,11 @@ void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, s
 		isothermalWall(ur, ul, normal);
 		return;
 	}
-//	if(_bc_type == "adiabatic_wall")
-//	{
-//		adiabaticWall(ur, dur, ul, dul);
-//		return;
-//	}
+	if(bc_type == "adiabatic_wall")
+	{
+		adiabaticWall(ur, ul, normal);
+		return;
+	}
 	if(bc_type == "far_field")
 	{
 		farField(ur, ul, normal);
@@ -284,6 +316,37 @@ void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, s
 	mooseError( bc_type << "未定义的边界条件类型");
 }
 
+void NavierStokesProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Real* ul, RealGradient* dul, Point& normal, Real penalty, std::string bc_type)
+{
+	Real ur[10];
+	RealGradient dur[10];
+	RealVectorValue ifl[10], ifr[10], vfl[10], vfr[10];
+
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
+
+	boundaryCondition(ur, ul, normal, bc_type);
+	computeLift(lift, ul, ur, normal);
+
+	if(bc_type == "adiabatic_wall")
+	{
+		viscousTermAdiabatic(vfl, ul, dul);
+		viscousTermAdiabatic(vfr, ur, dur);
+	}
+	else
+	{
+		viscousTerm(vfl, ul, dul);
+		viscousTerm(vfr, ur, dur);
+	}
+
+	fluxRiemann(flux, ul, ur, normal);
+
+	for (int eq = 0; eq < _n_equations; ++eq)
+	{
+		flux[eq] -= 0.5*((vfl[eq]+vfr[eq])-penalty*lift[eq])*normal;
+	}
+}
+
 void NavierStokesProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
 {
     Real twall = 1.;
@@ -296,17 +359,15 @@ void NavierStokesProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
     ur[4] = ul[0]*twall/_gamma/(_gamma-1)/_mach/_mach;
 }
 
-//void NavierStokesProblem::adiabaticWall(Real* ur, RealGradient* dur, Real* ul, RealGradient* dul)
-//{
-//	for (int eq = 0; eq < _n_equations; ++eq)
-//		dur[eq] = dul[eq];
-//
-//    ur[0] = ul[0];
-//    ur[1] = 0.;
-//    ur[2] = 0.;
-//    ur[3] = 0.;
-//    ur[4] = ul[4];
-//}
+
+void NavierStokesProblem::adiabaticWall(Real *ur,  Real *ul, Point &normal)
+{
+    ur[0] = ul[0];
+    ur[1] = 0.;
+    ur[2] = 0.;
+    ur[3] = 0.;
+    ur[4] = ul[4];
+}
 //
 //void NavierStokesProblem::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 //{
@@ -455,6 +516,8 @@ void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
 		}
 	}
 }
+
+
 //
 //
 //void NavierStokesProblem::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)

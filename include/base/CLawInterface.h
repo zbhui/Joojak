@@ -15,9 +15,6 @@ public:
 	CLawInterface(InputParameters &parameter);
 	~CLawInterface(){}
 
-	int equationIndex(const std::string& var_name);
-
-	MooseVariable & getVariable(const std::string var_name);
 	MooseVariable & getVariable(int eq);
 protected:
 	CLawProblem &_claw_problem;

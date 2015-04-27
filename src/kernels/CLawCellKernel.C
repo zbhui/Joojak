@@ -5,13 +5,14 @@ template<>
 InputParameters validParams<CLawCellKernel>()
 {
   InputParameters params = validParams<Kernel>();
+  params.addRequiredParam<int>("component", "Kernel component");
   return params;
 }
 
 CLawCellKernel::CLawCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
 		CLawInterface(parameters),
-		_eq(equationIndex((_var.name()))),
+		_eq(getParam<int>("component")),
 		_cell_material_data(getMaterialProperty<CLawCellMaterialData>("cell_material_data"))
 {
 }

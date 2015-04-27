@@ -72,6 +72,7 @@ void AddCLawAction::addKernel()
 	for (int i = 0; i < _variables.size(); ++i)
 	{
 		params.set<NonlinearVariableName>("variable") = _variables[i];
+		params.set<int>("component") = i;
 		_problem->addKernel(cell_kernel_name, _variables[i] + "_space", params);
 	}
 }
@@ -116,6 +117,7 @@ void AddCLawAction::addBoundaryCondition()
 	for (int i = 0; i < _variables.size(); ++i)
 	{
 	    params.set<NonlinearVariableName>("variable") = _variables[i];
+		params.set<int>("component") = i;
 	    _problem->addBoundaryCondition(boun_cond_name, _variables[i]+"_bc", params);
 	}
 }

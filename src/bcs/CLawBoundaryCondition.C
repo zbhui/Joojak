@@ -5,6 +5,7 @@ template<>
 InputParameters validParams<CLawBoundaryCondition>()
 {
 	InputParameters params = validParams<IntegratedBC>();
+	params.addRequiredParam<int>("component", "BC component");
 	return params;
 }
 
@@ -17,7 +18,7 @@ CLawBoundaryCondition::CLawBoundaryCondition(const std::string & name, InputPara
 
 		_lift(getMaterialProperty<std::vector<RealVectorValue> >("lift")),
 		_lift_jacobi_variable(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable")),
-		_eq(equationIndex(_var.name()))
+		_eq(getParam<int>("component"))
 {
 }
 

@@ -4,13 +4,43 @@
 \begin_header
 \textclass scrbook
 \begin_preamble
-%\usepackage{fontspec}
-%\setromanfont{AR PL ShanHeiSun Uni}%字体来自Adobe Reader 8.0 OpenType，可以选用任何系统已有的字体
-%中文断行 
-%\XeTeXlinebreaklocale "zh"
-%\XeTeXlinebreakskip = 0pt plus 1pt 
-\usepackage{CJK}
-\usepackage{indentfirst}
+\usepackage[BoldFont,SlantFont,CJKnumber,fallback]{xeCJK}%使用TexLive自带的xeCJK宏包，并启用加粗、斜体、CJK数字和备用字体选项
+\setmainfont{DejaVu Serif}%西文衬线字体 DejaVu 
+\setsansfont{DejaVu Sans}%西文无衬线字体 
+\setmonofont{DejaVu Sans Mono}%西文等宽字体
+\setCJKmainfont{方正书宋_GBK} %中文衬线字体 
+\setCJKsansfont{方正黑体_GBK} %中文衬线字体 
+\setCJKmonofont{方正细黑一_GBK} %中文衬线字体 
+
+
+\renewcommand{\tablename}{表} 
+\renewcommand{\figurename}{图} 
+
+%\punctstyle{banjiao}%半角字符，逗号和句号只占一个字符位
+%其他中文设置 使用XeCJK无需再设置中文断行和弹性间距%
+%\XeTeXlinebreaklocale “zh”%中文断行
+%\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt%左右弹性间距
+%\usepackage{indentfirst}
+\setlength{\parindent}{2em}%缩进两个字符
+
+
+%编号语言、样式设置%
+\numberwithin{equation}{section}%设置公式按章节进行编号
+\numberwithin{figure}{section}% 按章节编号
+%\numberwithin{figure}{subsection}% 按子章节编号
+
+%\usetheme{Luebeck}
+% or AnnArbor, Antibes,Bergen, Berkeley, Berlin, Boadilla,
+%CambridgeUS, Copenhagen, Darmstadt, default, Dresden,
+%Frankfurt, Goettingen, Hannover, Ilmenau, JuanLesPins,
+%Luebeck, Madrid, Malmoe, Marburg, Montpellier, PaloAlto,
+%Pittsburgh, Rochester, Singapore, Szeged, Stockton,
+%boxes, Warsaw...
+ 
+%\usecolortheme{beaver}
+%albatross, orchid, beaver, rose, beetle, seagull, crane.
+%seahorse, default, sidebartab, dolphin , structure
+%dove, whale, fly, wolverine, lily
 \end_preamble
 \use_default_options true
 \begin_modules
@@ -27,7 +57,7 @@ figs-within-sections
 \font_sans default
 \font_typewriter default
 \font_default_family default
-\use_non_tex_fonts false
+\use_non_tex_fonts true
 \font_sc false
 \font_osf false
 \font_sf_scale 100
@@ -35,14 +65,23 @@ figs-within-sections
 \font_cjk gbsn
 
 \graphics default
-\default_output_format default
+\default_output_format pdf4
 \output_sync 0
 \bibtex_command default
 \index_command default
 \float_placement h
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle false
 \papersize default
 \use_geometry true
 \use_amsmath 1
@@ -76,22 +115,6 @@ figs-within-sections
 
 \begin_body
 
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-CJKindent
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Title
 DG
 \end_layout
@@ -102,10 +125,6 @@ LatexCommand tableofcontents
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
@@ -2979,6 +2998,10 @@ Reynolds输运方程
 \end_layout
 
 \begin_layout Standard
+方腔流
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float figure
 placement H
 wide false
@@ -3076,6 +3099,10 @@ status open
 
 \begin_layout Section
 NACA0012翼型绕流
+\end_layout
+
+\begin_layout Standard
+NACA0012
 \end_layout
 
 \begin_layout Standard
@@ -6582,14 +6609,14 @@ Euler角（摘自wiki）
 
 \begin_layout Subsection
 地面坐标系（Earth-surface inertial reference frame）
-\begin_inset Formula $\boldsymbol{S}{}_{\text{g}}-O_{\text{g}}x_{\text{g}}y_{\text{g}}z_{\text{g}}$
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
-地面坐标系也称为惯性坐标系，定义如下：
+地面坐标系，
+\begin_inset Formula $\boldsymbol{S}{}_{\text{g}}-O_{\text{g}}x_{\text{g}}y_{\text{g}}z_{\text{g}}$
+\end_inset
+
+，也称为惯性坐标系，定义如下：
 \end_layout
 
 \begin_layout Enumerate
@@ -6635,14 +6662,13 @@ Euler角（摘自wiki）
 
 \begin_layout Subsection
 机体坐标系（aircraft-body coordinate frame）
-\begin_inset Formula $\boldsymbol{S}{}_{\text{b}}-O_{\text{b}}x_{\text{b}}y_{\text{b}}z_{\text{b}}$
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
-定义如下：
+\begin_inset Formula $\boldsymbol{S}{}_{\text{b}}-O_{\text{b}}x_{\text{b}}y_{\text{b}}z_{\text{b}}$
+\end_inset
+
+，定义如下：
 \end_layout
 
 \begin_layout Enumerate
@@ -6680,14 +6706,13 @@ Euler角（摘自wiki）
 
 \begin_layout Subsection
 气流坐标系（wind coordinate frame）
-\begin_inset Formula $\boldsymbol{S}{}_{\text{a}}-O_{\text{a}}x_{\text{a}}y_{\text{a}}z_{\text{a}}$
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
-定义如下：
+\begin_inset Formula $\boldsymbol{S}{}_{\text{a}}-O_{\text{a}}x_{\text{a}}y_{\text{a}}z_{\text{a}}$
+\end_inset
+
+，定义如下：
 \end_layout
 
 \begin_layout Enumerate

@@ -42,7 +42,7 @@
   [../]
   [./wall_material]
     boundary = wall
-    bc_type = isothermal_wall
+    bc_type = adiabatic_wall
     type = CLawBoundaryMaterial
   [../]
 []
