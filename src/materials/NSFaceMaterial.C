@@ -167,28 +167,32 @@ void NSFaceMaterial::computeQpRightGradValue(RealGradient *ur)
 
 void NSFaceMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
 {
-	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
+//	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
+//
+//	inviscousTerm(ifl, ul);
+//	inviscousTerm(ifr, ur);
+//	viscousTerm(vfl, ul, dul);
+//	viscousTerm(vfr, ur, dur);
+//
+//	Real lam = 1;//(maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
+//	for (int eq = 0; eq < _n_equations; ++eq)
+//	{
+//		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
+//	}
 
-	convertionTerm(ifl, ul);
-	convertionTerm(ifr, ur);
-	diffusionTerm(vfl, ul, dul);
-	diffusionTerm(vfr, ur, dur);
-
-	Real lam = 1;//(maxEigenValue(ul, _normals[_qp]) + maxEigenValue(ur, _normals[_qp]))/2.;
-	for (int eq = 0; eq < _n_equations; ++eq)
-	{
-		flux[eq] = 0.5*(ifl[eq] + ifr[eq] - (vfl[eq]+vfr[eq]))*_normals[_qp] + lam*(ul[eq] - ur[eq]);
-	}
+	mooseError("该段代码已经废弃");
 }
 
 void NSFaceMaterial::penaltyTerm(RealVectorValue* penalty, RealVectorValue* penalty_neighbor, Real* ul, Real* ur)
 {
-	RealGradient duh[10];
-	for (int eq = 0; eq < _n_equations; ++eq)
-		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
+//	RealGradient duh[10];
+//	for (int eq = 0; eq < _n_equations; ++eq)
+//		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
+//
+//	viscousTerm(penalty, ul, duh);
+//	viscousTerm(penalty_neighbor, ur, duh);
 
-	diffusionTerm(penalty, ul, duh);
-	diffusionTerm(penalty_neighbor, ur, duh);
+	mooseError("该段代码已经废弃");
 }
 
 void NSFaceMaterial::resizeQpProperty()

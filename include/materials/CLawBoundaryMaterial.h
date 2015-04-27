@@ -22,9 +22,13 @@ public:
 	CLawBoundaryMaterial(const std::string & name, InputParameters parameters);
 
 protected:
-//	MooseEnum _bc_type;
 	std::string _bc_type;
-	int _n_equations;
+	const Real & _current_elem_volume;
+	const Real & _neighbor_elem_volume;
+	const Real & _current_side_volume;
+	Real _ds;
+	Real _sigma;
+	Real _epsilon;
 
 	std::vector<VariableValue*> _ul;
 	std::vector<VariableGradient*> _grad_ul;
@@ -37,10 +41,7 @@ protected:
 	virtual void computeQpProperties();
 	virtual void resizeQpProperty();
 	virtual void computeQpLeftValue(Real *ul, RealGradient *dul);
-	virtual void computeQpRightValue(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul);
-
-	void fluxTerm(Real *flux, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
-	void liftOperator(RealVectorValue *lift, Real *ul, Real *ur);
+	void computeQpFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul);
 };
 
 template<>

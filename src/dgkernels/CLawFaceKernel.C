@@ -6,6 +6,7 @@ template<>
 InputParameters validParams<CLawFaceKernel>()
 {
 	  InputParameters params = validParams<DGKernel>();
+	  params.addRequiredParam<int>("component", "DGKernel component");
 	  return params;
 }
 CLawFaceKernel::CLawFaceKernel(const std::string & name, InputParameters parameters):
@@ -20,7 +21,8 @@ CLawFaceKernel::CLawFaceKernel(const std::string & name, InputParameters paramet
 		_lift(getNeighborMaterialProperty<std::vector<RealVectorValue> >("lift")),
 		_lift_jacobi_variable_ee(getNeighborMaterialProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_ee")),
 		_lift_jacobi_variable_en(getNeighborMaterialProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_en")),
-		_eq(equationIndex(_var.name()))
+//		_eq(equationIndex(_var.name()))
+		_eq(getParam<int>("component"))
 {
 }
 

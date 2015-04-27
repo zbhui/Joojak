@@ -5,6 +5,7 @@ template<>
 InputParameters validParams<CLawCellMaterial>()
 {
   InputParameters params = validParams<Material>();
+  params.addRequiredCoupledVar("variables", "守恒变量");
   params.addParam<Real>("ds", 1.490116119384766e-08, "微扰量");
   return params;
 }

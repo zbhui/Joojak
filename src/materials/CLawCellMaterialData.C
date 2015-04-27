@@ -36,11 +36,13 @@ void CLawCellMaterialData::update(CLawProblem & claw_problem)
 
 void CLawCellMaterialData::computeQpValue(RealVectorValue *flux_term)
 {
-	RealVectorValue inv_term[10], vis_term[10];
-	_claw_problem->inviscousTerm(inv_term, uh);
-	_claw_problem->viscousTerm(vis_term, uh, duh);
-	for (int eq = 0; eq < _n_equations; ++eq)
-		flux_term[eq] = inv_term[eq] - vis_term[eq];
+//	RealVectorValue inv_term[10], vis_term[10];
+//	_claw_problem->inviscousTerm(inv_term, uh);
+//	_claw_problem->viscousTerm(vis_term, uh, duh);
+//	for (int eq = 0; eq < _n_equations; ++eq)
+//		flux_term[eq] = inv_term[eq] - vis_term[eq];
+
+	_claw_problem->computeCellFlux(flux_term, uh, duh);
 }
 
 void CLawCellMaterialData::setProblem(CLawProblem& claw_problem, Real ds)

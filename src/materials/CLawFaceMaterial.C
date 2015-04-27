@@ -1,5 +1,6 @@
 
 #include "CLawFaceMaterial.h"
+#include "CLawProblem.h"
 
 template<>
 InputParameters validParams<CLawFaceMaterial>()
@@ -55,22 +56,16 @@ void CLawFaceMaterial::computeQpProperties()
 		Real ul[10], ur[10], ur_new[10];
 		RealGradient dul[10], dur[10];
 		Real flux_new[10];
-		RealVectorValue lift_new[10], penalty_neighbor_new[10];
+		RealVectorValue lift_new[10];
 		RealVectorValue vis_term_left[10], vis_term_right[10], vis_term_new[10];
 
-		computeQpLeftValue(ul);
-		computeQpRightValue(ur);
-		computeQpLeftGradValue(dul);
-		computeQpRightGradValue(dur);
+		computeQpValue(ul, ur, dul, dur);
 
-		liftOperator(&_lift[_qp][0], ul, ur);
-		fluxTerm(&_flux[_qp][0], ul, ur, dul, dur);
-
+		computeQpFlux(&_flux[_qp][0], &_lift[_qp][0], ul, ur, dul, dur);
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			ul[q] += _ds;
-			liftOperator(lift_new, ul, ur);
-			fluxTerm(flux_new, ul, ur, dul, dur);
+			computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
 			for (int p = 0; p < _n_equations; ++p)
 			{
 				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
@@ -80,8 +75,7 @@ void CLawFaceMaterial::computeQpProperties()
 			ul[q] -= _ds;
 
 			ur[q] += _ds;
-			liftOperator(lift_new, ul, ur);
-			fluxTerm(flux_new, ul, ur, dul, dur);
+			computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
 			for (int p = 0; p < _n_equations; ++p)
 			{
 				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
@@ -94,7 +88,7 @@ void CLawFaceMaterial::computeQpProperties()
 			for (int q = 0; q < _n_equations; ++q)
 			{
 				dul[q](beta) += _ds;
-				fluxTerm(flux_new, ul, ur, dul, dur);
+				computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
 				for (int p = 0; p < _n_equations; ++p)
 				{
 					Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
@@ -103,7 +97,7 @@ void CLawFaceMaterial::computeQpProperties()
 				dul[q](beta) -= _ds;
 
 				dur[q](beta) += _ds;
-				fluxTerm(flux_new, ul, ur, dul, dur);
+				computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
 				for (int p = 0; p < _n_equations; ++p)
 				{
 					Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
@@ -112,48 +106,27 @@ void CLawFaceMaterial::computeQpProperties()
 				dur[q](beta) -= _ds;
 			}
 		}
-
-		addPenalty();
 	}
 
 }
 
-void CLawFaceMaterial::computeQpLeftValue(Real* ul)
+void CLawFaceMaterial::computeQpValue(Real *ul, Real *ur, RealGradient *dul, RealGradient *dur)
 {
-	for (int eq = 0; eq < _n_equations; ++eq)
-		ul[eq] = (*_ul[eq])[_qp];
-}
-
-void CLawFaceMaterial::computeQpRightValue(Real* ur)
-{
-	for (int eq = 0; eq < _n_equations; ++eq)
-		ur[eq] = (*_ur[eq])[_qp];
-}
-
-void CLawFaceMaterial::computeQpLeftGradValue(RealGradient *ul)
-{
-	for (int eq = 0; eq < _n_equations; ++eq)
-		ul[eq] = (*_grad_ul[eq])[_qp];
-}
-
-void CLawFaceMaterial::computeQpRightGradValue(RealGradient *ur)
-{
-	for (int eq = 0; eq < _n_equations; ++eq)
-		ur[eq] = (*_grad_ur[eq])[_qp];
-}
-
-void CLawFaceMaterial::fluxTerm(Real *flux, Real* ul, Real* ur, RealGradient *dul, RealGradient *dur)
-{
-	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
-
-	diffusionTerm(vfl, ul, dul);
-	diffusionTerm(vfr, ur, dur);
-
-	fluxRiemann(flux, ul, ur, _normals[_qp]);
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
-		flux[eq] -= 0.5*((vfl[eq]+vfr[eq]))*_normals[_qp];
+		ul[eq] = (*_ul[eq])[_qp];
+		ur[eq] = (*_ur[eq])[_qp];
+		dul[eq] = (*_grad_ul[eq])[_qp];
+		dur[eq] = (*_grad_ur[eq])[_qp];
 	}
+}
+
+void CLawFaceMaterial::computeQpFlux(Real* flux, RealVectorValue* lift, Real* ul, Real* ur, RealGradient* dul, RealGradient* dur)
+{
+	Real h_face = (_current_elem_volume+_neighbor_elem_volume)/_current_side_volume /2.;
+	Real penalty = _sigma*_var_order*_var_order/h_face;
+	Point normal = _normals[_qp];
+	_claw_problem.computeFaceFlux(flux, lift, ul, ur, dul, dur, normal, penalty);
 }
 
 void CLawFaceMaterial::resizeQpProperty()
@@ -180,68 +153,3 @@ void CLawFaceMaterial::resizeQpProperty()
 	}
 }
 
-void CLawFaceMaterial::liftOperator(RealVectorValue* lift, Real* ul, Real* ur)
-{
-	RealGradient duh[10];
-	Real uh[10];
-	for (int eq = 0; eq < _n_equations; ++eq)
-	{
-		duh[eq] = (ul[eq]-ur[eq])/2.*_normals[_qp];
-		uh[eq] = (ul[eq]+ur[eq])/2;
-	}
-
-	diffusionTerm(lift, uh, duh);
-}
-
-void CLawFaceMaterial::fillQpValue(QpValue &qp_value)
-{
-	for (int eq = 0; eq < _n_equations; ++eq)
-	{
-		qp_value.ul[eq] = (*_ul[eq])[_qp];
-		qp_value.ur[eq] = (*_ur[eq])[_qp];
-		qp_value.dul[eq] = (*_grad_ul[eq])[_qp];
-		qp_value.dur[eq] = (*_grad_ur[eq])[_qp];
-		qp_value.duh[eq] = (qp_value.ul[eq]-qp_value.ur[eq])/2.*_normals[_qp];
-		qp_value.u_bar[eq] = (qp_value.ul[eq]+qp_value.ur[eq])/2;
-	}
-}
-
-void CLawFaceMaterial::computeQpLift(QpValue &qp_value)
-{
-	diffusionTerm(qp_value.lift, qp_value.u_bar, qp_value.duh);
-}
-
-void CLawFaceMaterial::computeQpLift(RealVectorValue* lift, QpValue& qp_value)
-{
-	diffusionTerm(lift, qp_value.u_bar, qp_value.duh);
-}
-
-void CLawFaceMaterial::computeQpFlux(Real* flux, QpValue& qp_value)
-{
-	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
-
-	diffusionTerm(vfl, qp_value.ul, qp_value.dul);
-	diffusionTerm(vfr, qp_value.ur, qp_value.dur);
-
-	fluxRiemann(flux, qp_value.ul, qp_value.ur, _normals[_qp]);
-	for (int eq = 0; eq < _n_equations; ++eq)
-	{
-		flux[eq] -= 0.5*((vfl[eq]+vfr[eq]))*_normals[_qp];
-	}
-}
-
-void CLawFaceMaterial::addPenalty()
-{
-
-	Real h_face = (_current_elem_volume+_neighbor_elem_volume)/_current_side_volume /2.;
-	Real penalty = _sigma*_var_order*_var_order/h_face;
-	for (int p = 0; p < _n_equations; ++p)
-	{
-		_flux[_qp][p] += penalty*_lift[_qp][p]*_normals[_qp];
-		for (int q = 0; q < _n_equations; ++q)
-		{
-			_flux_jacobi_variable_ee[_qp][p][q] += penalty*_lift_jacobi_variable[_qp][p][q]*_normals[_qp];
-			_flux_jacobi_variable_en[_qp][p][q] += penalty*_lift_jacobi_variable_neighbor[_qp][p][q]*_normals[_qp];
-		}
-	}
-}

@@ -15,11 +15,6 @@ public:
 	CLawInterface(InputParameters &parameter);
 	~CLawInterface(){}
 
-	void convertionTerm(RealVectorValue *inviscous_term, Real *uh);
-	void diffusionTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
-	void sourceTerm();
-
-	void fluxRiemann(Real* flux, Real* ul, Real* ur, const Point &normal);
 	int equationIndex(const std::string& var_name);
 
 	MooseVariable & getVariable(const std::string var_name);

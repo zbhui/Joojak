@@ -17,20 +17,20 @@ CLawInterface::CLawInterface(InputParameters& parameter):
 		mooseError("参数文件中指定的变量个数和问题的变量数数目不同，检查Problem block下的参数" << _claw_problem.name());
 }
 
-void CLawInterface::convertionTerm(RealVectorValue *inviscous_term, Real *uh)
-{
-	_claw_problem.inviscousTerm(inviscous_term, uh);
-}
-
-void CLawInterface::diffusionTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh)
-{
-	_claw_problem.viscousTerm(viscous_term, uh, duh);
-}
-
-void CLawInterface::sourceTerm()
-{
-//	_claw_base.sourceTerm();
-}
+//void CLawInterface::inviscousTerm(RealVectorValue *inviscous_term, Real *uh)
+//{
+//	_claw_problem.inviscousTerm(inviscous_term, uh);
+//}
+//
+//void CLawInterface::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh)
+//{
+//	_claw_problem.viscousTerm(viscous_term, uh, duh);
+//}
+//
+//void CLawInterface::sourceTerm()
+//{
+////	_claw_base.sourceTerm();
+//}
 
 int CLawInterface::equationIndex(const std::string& var_name)
 {
@@ -40,11 +40,6 @@ int CLawInterface::equationIndex(const std::string& var_name)
 MooseVariable& CLawInterface::getVariable(const std::string var_name)
 {
 	return _claw_problem.getVariable(_tid, var_name);
-}
-
-void CLawInterface::fluxRiemann(Real* flux, Real* ul, Real* ur, const Point &normal)
-{
-	_claw_problem.fluxRiemann(flux, ul, ur, normal);
 }
 
 MooseVariable& CLawInterface::getVariable(int eq)

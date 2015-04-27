@@ -16,8 +16,7 @@ public:
 	Real pressureInfity();
 	Real enthalpy(Real *uh);
 	Real temperature(Real  *uh);
-	Real mach_local(Real *uh);
-	Real acous(Real *uh);
+	Real localMach(Real *uh);
 	Real maxEigenValue(Real *uh, const Point &normal);
 	void eigenValue(Real *lam, Real *uh, const Point &normal);
 
@@ -26,6 +25,7 @@ public:
 	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, const Point &normal);
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
+//	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, Point &normal, Real penalty, std::string bc_type);
 
 	virtual Quaterniond bodyFromWind();
 	virtual Quaterniond earthFromBody();

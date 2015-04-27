@@ -22,10 +22,10 @@ protected:
 	virtual Real computeQpJacobian();
 	virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
-	Real computeCIP();
+private:
+	Real computeQpJacobian(int p, int q);
+
 	int _eq;
-	Real _epsilon;
-	Real _sigma;
 };
 
 template<>

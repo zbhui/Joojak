@@ -68,7 +68,7 @@ Real NavierStokesProblem::temperature(Real* uh)
 	return _gamma*_mach*_mach*p/uh[0];
 }
 
-Real NavierStokesProblem::mach_local(Real* uh)
+Real NavierStokesProblem::localMach(Real* uh)
 {
 	Real vel = std::sqrt(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0];
 	Real c = std::sqrt(temperature(uh))/_mach;

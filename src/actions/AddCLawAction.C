@@ -83,6 +83,7 @@ void AddCLawAction::addDGKernel()
 	for (int i = 0; i < _variables.size(); ++i)
 	{
 		params.set<NonlinearVariableName>("variable") = _variables[i];
+		params.set<int>("component") = i;
 		_problem->addDGKernel(face_kernel_name, _variables[i] + "_dg", params);
 	}
 }

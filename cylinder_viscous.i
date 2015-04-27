@@ -1,10 +1,3 @@
-[GlobalParams]
-  family = MONOMIAL
-  mach = 0.2
-  reynolds = 40
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
-[]
-
 [Mesh]
   type = FileMesh
   file = grids/cylinder_fine.msh
@@ -32,31 +25,11 @@
 []
 
 
-[Postprocessors]
-  [./force_total-x]
-    type = CFDForcePostprocessor
-    direction_by = x
-    force_type = total
-    boundary  = wall
-  [../]
-  [./force_total-y]
-    type = CFDForcePostprocessor
-    direction_by = y
-    force_type = total
-    boundary  = wall
-  [../]
-  [./force_total-z]
-    type = CFDForcePostprocessor
-    direction_by = z
-    force_type = total
-    boundary  = wall
-  [../]
-[]
-
 [Materials]
   [./cell_material]
     block = 10
     type = CLawCellMaterial
+    variables = 'rho momentum_x momentum_y momentum_z rhoe' 
   [../]
   [./face_material]
     block = 10
@@ -74,7 +47,8 @@
   [../]
 []
 
-
+[Postprocessors]
+[]
 
 
 [Preconditioning]
@@ -112,15 +86,13 @@
 [Outputs]
   [./exodus]
     type = Exodus
-    output_initial = true
     interval = 1 					
   [../]
 	
   [./console]
     type = Console	
     perf_log = true
-    linear_residuals = true
-    nonlinear_residuals =  true	
+    output_on = 'linear nonlinear'
   [../]
 []
 
