@@ -105,3 +105,9 @@ void CLawProblem::boundaryCondition(Real* ur, Real* ul, Point& normal, std::stri
 {
 	mooseError("CLawProblem::boundaryCondition，需要子类填充.");
 }
+
+Real CLawProblem::initialCondition(int eq)
+{
+	mooseError("CLawProblem::initialCondition，需要子类填充.");
+}
+

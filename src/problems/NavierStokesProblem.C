@@ -39,7 +39,8 @@ NavierStokesProblem::NavierStokesProblem(const std::string & name, InputParamete
 	_roll(getParam<Real>("roll")*libMesh::pi/180),
 
 	_ref_length(getParam<Real>("ref_length")),
-	_ref_area(getParam<Real>("ref_area"))
+	_ref_area(getParam<Real>("ref_area")),
+	_attitude(Attitude(_attack, _sideslip, _pitch, _yaw, _roll))
 //	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
 {
 	_n_equations = 5;
@@ -439,7 +440,8 @@ void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
 	Real vel, s;
 	Real Rp, Rm;
 
-	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+//	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
+	Vector3d vel_inf = _attitude.earthFromWind()*Vector3d::UnitX();
 	if(_mesh.dimension() == 2)
 		vel_inf(2) = 0.;
 

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CLawProblem.h"
+#include "Attitude.h"
 #include "Eigen/Geometry"
 using Eigen::Quaterniond;
 
@@ -52,6 +53,7 @@ public:
 	Real _ref_length;
 	Real _ref_area;
 
+	Attitude _attitude;
 //	MooseEnum _bc_types;
 };
 

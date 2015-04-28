@@ -19,6 +19,7 @@ protected:
 	virtual void sourceTerm(RealVectorValue *source_term, Real* uh, RealGradient *duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, Point &normal);
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
+	virtual Real initialCondition(int eq);
 
 public:
 	int _n_equations;
