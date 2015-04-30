@@ -95,6 +95,7 @@
 /// problem
 #include "CLawProblem.h"
 #include "NavierStokesProblem.h"
+#include "EulerProblem.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -227,6 +228,7 @@ void JoojakApp::registerObjects(Factory & factory)
 
 	registerProblem(CLawProblem);
 	registerProblem(NavierStokesProblem);
+	registerProblem(EulerProblem);
 
 	registerSAObjects(factory);
 }

@@ -8,88 +8,18 @@ using namespace Eigen;
 template<>
 InputParameters validParams<NavierStokesProblem>()
 {
-  InputParameters params = validParams<CLawProblem>();
-  params.addParam<Real>("mach",  0.1, "马赫数");
-  params.addParam<Real>("gamma", 1.4, "比热比");
-  params.addParam<Real>("reynolds", 1, "雷诺数");
-  params.addParam<Real>("prandtl", 0.72, "prandtl数");
-  params.addParam<Real>("attack", 0., "攻角");
-  params.addParam<Real>("sideslip", 0., "侧滑角");
-  params.addParam<Real>("pitch", 0., "俯仰角");
-  params.addParam<Real>("yaw", 180., "偏航角");
-  params.addParam<Real>("roll", -90., "滚转角");
-
-  params.addParam<Real>("ref_length", 1, "参考长度");
-  params.addParam<Real>("ref_area", 1, "参考面积");
+  InputParameters params = validParams<CFDProblem>();
 
   return params;
 }
 
 NavierStokesProblem::NavierStokesProblem(const std::string & name, InputParameters params) :
-	CLawProblem(name, params),
-	_mach(getParam<Real>("mach")),
-	_gamma(getParam<Real>("gamma")),
-	_reynolds(getParam<Real>("reynolds")),
-	_prandtl(getParam<Real>("prandtl")),
-
-	_attack(getParam<Real>("attack")*libMesh::pi/180),
-	_sideslip(getParam<Real>("sideslip")*libMesh::pi/180),
-	_pitch(getParam<Real>("pitch")*libMesh::pi/180),
-	_yaw(getParam<Real>("yaw")*libMesh::pi/180),
-	_roll(getParam<Real>("roll")*libMesh::pi/180),
-
-	_ref_length(getParam<Real>("ref_length")),
-	_ref_area(getParam<Real>("ref_area")),
-	_attitude(Attitude(_attack, _sideslip, _pitch, _yaw, _roll))
+	CFDProblem(name, params)
 //	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
 {
 	_n_equations = 5;
 	if(_n_equations == 0)
 		mooseError("没有指定问题方程个数" << name);
-}
-
-Real NavierStokesProblem::pressure(Real *uh)
-{
-	return (_gamma-1) * (uh[4] - 0.5*(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0]);  //
-}
-
-Real NavierStokesProblem::pressureInfity()
-{
-	return 1.0/_gamma/_mach/_mach;
-}
-Real NavierStokesProblem::enthalpy(Real *uh)
-{
-	Real p = pressure(uh);
-	return (uh[4] + p)/uh[0];
-}
-
-Real NavierStokesProblem::temperature(Real* uh)
-{
-	Real p = pressure(uh);
-	return _gamma*_mach*_mach*p/uh[0];
-}
-
-Real NavierStokesProblem::localMach(Real* uh)
-{
-	Real vel = std::sqrt(uh[1]*uh[1] + uh[2]*uh[2] + uh[3]*uh[3])/uh[0];
-	Real c = std::sqrt(temperature(uh))/_mach;
-	return vel/c;
-}
-
-Real NavierStokesProblem::maxEigenValue(Real *uh, const Point &normal)
-{
-	RealVectorValue vel(uh[1]/uh[0], uh[2]/uh[0], uh[3]/uh[0]);
-	Real c = std::sqrt(_gamma*pressure(uh)/uh[0]);
-	return std::fabs(vel*normal)+c;
-}
-
-void NavierStokesProblem::eigenValue(Real *lam, Real *uh, const Point &normal)
-{
-	RealVectorValue vel(uh[1]/uh[0], uh[2]/uh[0], uh[3]/uh[0]);
-	Real c = std::sqrt(_gamma*pressure(uh)/uh[0]);
-	lam[0] = vel*normal-c;
-	lam[1] = vel*normal;
-	lam[2] = vel*normal+c;
 }
 
 void NavierStokesProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
@@ -232,36 +162,6 @@ void NavierStokesProblem::viscousTermAdiabatic(RealVectorValue* viscous_term, Re
 	viscous_term[component](0) = vel_tau(0);
 	viscous_term[component](1) = vel_tau(1);
 	viscous_term[component](2) = vel_tau(2);
-}
-
-void NavierStokesProblem::inviscousTerm(std::vector<RealVectorValue>& inviscous_term, Real* uh)
-{
-	inviscousTerm(&inviscous_term[0], uh);
-}
-
-Eigen::Quaterniond NavierStokesProblem::bodyFromWind()
-{
-	Quaterniond q_attack(AngleAxisd(_attack, Vector3d::UnitY()));
-	Quaterniond q_sideslip (AngleAxisd(pi-_sideslip,  Vector3d::UnitZ()));
-	return q_attack*q_sideslip;
-}
-
-Eigen::Quaterniond NavierStokesProblem::earthFromBody()
-{
-	Quaterniond q_pitch(AngleAxisd(_pitch, Vector3d::UnitY()));
-	Quaterniond q_yaw(AngleAxisd(_yaw, Vector3d::UnitZ()));
-	Quaterniond q_roll(AngleAxisd(_roll, Vector3d::UnitX()));
-	return q_roll*q_pitch*q_yaw;
-}
-
-Eigen::Quaterniond NavierStokesProblem::earthFromWind()
-{
-	return earthFromBody()*bodyFromWind();
-}
-
-Real NavierStokesProblem::physicalViscosity(Real* uh)
-{
-	return 1.0;
 }
 
 void NavierStokesProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &normal)
@@ -440,7 +340,6 @@ void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
 	Real vel, s;
 	Real Rp, Rm;
 
-//	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
 	Vector3d vel_inf = _attitude.earthFromWind()*Vector3d::UnitX();
 	if(_mesh.dimension() == 2)
 		vel_inf(2) = 0.;
