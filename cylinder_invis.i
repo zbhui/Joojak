@@ -24,6 +24,13 @@
   velocity = 1
 []
 
+[CFDAuxVariables]
+  type = NSAuxVariable 
+  aux_variables = 'pressure'
+  order = FIRST
+  family = MONOMIAL
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+[]
 
 [Materials]
   [./cell_material]

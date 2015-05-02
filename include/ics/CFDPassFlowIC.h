@@ -4,7 +4,7 @@
 #include "CFDInitialCondition.h"
 //#include "NavierStokesProblem.h"
 
-class NavierStokesProblem;
+class CFDProblem;
 
 class CFDPassFlowIC : public CFDInitialCondition
 {
@@ -14,7 +14,7 @@ public:
 
 private:
   Real _velocity;
-  NavierStokesProblem &_na_problem;
+  CFDProblem &_cfd_problem;
 
 protected:
   virtual Real density(const Point &p);

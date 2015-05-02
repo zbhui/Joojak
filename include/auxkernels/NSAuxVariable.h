@@ -2,16 +2,13 @@
 #pragma once
 
 #include "AuxKernel.h"
-#include "NSBase.h"
+#include "CLawInterface.h"
 
-class NSAuxVariable;
-
-template<>
-InputParameters validParams<NSAuxVariable>();
+class CFDProblem;
 
 class NSAuxVariable :
 public AuxKernel,
-public NSBase
+public CLawInterface
 {
 public:
   NSAuxVariable(const std::string & name, InputParameters parameters);
@@ -19,5 +16,10 @@ public:
 protected:
   virtual Real computeValue();
   void valueAtCellPoint(Real *uh);
+
+  vector<VariableValue*> _uh;
+  CFDProblem &_cfd_problem;
 };
 
+template<>
+InputParameters validParams<NSAuxVariable>();

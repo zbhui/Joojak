@@ -244,6 +244,8 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 
 	registerAction(CFDInitialConditionAction, "add_ic");
 	registerAction(CFDPostprocessorAction, "add_postprocessor");
+	registerAction(CFDAuxVariablesAction, "add_aux_variable");
+	registerAction(CFDAuxVariablesAction, "add_aux_kernel");
 
 	registerAction(CommonPostProcessorAction, "add_postprocessor");
 	registerAction(AddCLawAction, "add_variable");
