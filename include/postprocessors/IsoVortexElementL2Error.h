@@ -17,7 +17,13 @@ protected:
 	virtual Real computeQpIntegral();
 
 private:
+	NonlinearSystem &_nl;
+	THREAD_ID _tid;
+	vector<VariableName> _variables;
+    int _n_equations;
+
 	std::vector<VariableValue*> _uh;
+
 };
 
 template<>

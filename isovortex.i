@@ -47,6 +47,17 @@
 []
 
 [Postprocessors]
+  [./error]
+    type = IsoVortexElementL2Error
+  [../]
+[]
+
+[UserObjects]
+  [./layered_integral]
+    type = CFDForceUserObject
+    boundary = 0
+    #execute_on = timestep_end
+  [../]
 []
 
 

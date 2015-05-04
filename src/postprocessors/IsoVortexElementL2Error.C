@@ -11,11 +11,15 @@ InputParameters validParams<IsoVortexElementL2Error>()
 
 IsoVortexElementL2Error::IsoVortexElementL2Error(const std::string & name, InputParameters parameters) :
 	ElementIntegralPostprocessor(name, parameters),
-    IsoVortexBase(name, parameters)
+    IsoVortexBase(name, parameters),
+	_nl(_euler_problem.getNonlinearSystem()),
+	_tid(parameters.get<THREAD_ID>("_tid")),
+	_variables(_nl.getVariableNames()),
+	_n_equations(_variables.size())
 {
 	for (int eq = 0; eq < _euler_problem._n_equations; ++eq)
 	{
-		MooseVariable &val = _euler_problem.getVariable(_tid, "rho");
+		MooseVariable &val = _euler_problem.getVariable(_tid, _variables[eq]);
 		_uh.push_back(_is_implicit ? &val.sln() : &val.slnOld());
 	}
 }

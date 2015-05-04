@@ -81,6 +81,10 @@
 #include "BumpElementL2Error.h"
 #include "NumTimeStep.h"
 #include "VariableResidual.h"
+#include "IsoVortexElementL2Error.h"
+
+/// UserObject
+#include "CFDForceUserObject.h"
 
 /// VectorPostProcessor
 #include "PressureAndSkinFrictionCoeff.h"
@@ -220,6 +224,12 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(BumpElementL2Error);
 	registerPostprocessor(NumTimeStep);
 	registerPostprocessor(VariableResidual);
+	registerPostprocessor(IsoVortexElementL2Error);
+
+
+	/// 注册UserObject
+	registerPostprocessor(CFDForceUserObject);
+
 
 	registerVectorPostprocessor(PressureAndSkinFrictionCoeff);
 
