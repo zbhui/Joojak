@@ -6,18 +6,21 @@ template<>
 InputParameters validParams<NSAuxVariable>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params.addRequiredCoupledVar("variables", "守恒变量");
   return params;
 }
 
-NSAuxVariable::NSAuxVariable(const std::string & name, InputParameters parameters) :
-    AuxKernel(name, parameters),
-	CLawInterface(parameters),
-	_cfd_problem(static_cast<CFDProblem&>(_claw_problem))
+NSAuxVariable::NSAuxVariable(const std::string & name, InputParameters parameter) :
+    AuxKernel(name, parameter),
+	_cfd_problem(static_cast<CFDProblem&>(*parameter.get<FEProblem *>("_fe_problem"))),
+	_nl(_cfd_problem.getNonlinearSystem()),
+	_tid(parameter.get<THREAD_ID>("_tid")),
+	_variables(_nl.getVariableNames()),
+	_n_equations(_variables.size()),
+	_var_order(_cfd_problem.getVariable(_tid, _variables[0]).order())
 {
 	for (int eq = 0; eq < _n_equations; ++eq)
 	{
-		MooseVariable &val = getVariable(eq);
+		MooseVariable &val = _cfd_problem.getVariable(_tid, _variables[eq]);
 		_uh.push_back(&val.sln());
 	}
 }
@@ -46,10 +49,8 @@ Real NSAuxVariable::computeValue()
 
 void NSAuxVariable::valueAtCellPoint(Real *uh)
 {
-	size_t n_equation = coupledComponents("variables");
-	for (size_t eq = 0; eq < n_equation; ++eq)
+	for (size_t eq = 0; eq < _n_equations; ++eq)
 	{
-//		uh[eq] = coupledValue("variables", eq)[_qp];
 		uh[eq] = (*_uh[eq])[_qp];
 	}
 }

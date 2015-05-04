@@ -11,7 +11,6 @@ InputParameters validParams<CLawCellKernel>()
 
 CLawCellKernel::CLawCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
-		CLawInterface(parameters),
 		_eq(getParam<int>("component")),
 		_cell_material_data(getMaterialProperty<CLawCellMaterialData>("cell_material_data"))
 {

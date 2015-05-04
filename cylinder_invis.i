@@ -24,12 +24,11 @@
   velocity = 1
 []
 
-[CFDAuxVariables]
+[AuxVariables]
   type = NSAuxVariable 
-  aux_variables = 'pressure'
+  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
   order = FIRST
   family = MONOMIAL
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
 []
 
 [Materials]

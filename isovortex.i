@@ -1,11 +1,3 @@
-[GlobalParams]
-  order = SECOND
-  family = MONOMIAL
-  	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
-  use_displaced_mesh = true
-[]
-
 [Mesh]
   type = GeneratedMesh
   dim = 2
@@ -17,142 +9,89 @@
   ymax = 0
   block_id = '0'
   block_name = 'fluid'
-  #second_order = true
-  uniform_refine = 0
-  displacements = 'disp_x disp_y'
-[]
-
-
-[AuxVariables]
-  [./disp_x]
-    order = FIRST
-    family = LAGRANGE
-  [../]
-  [./disp_y]
-    order = FIRST
-    family = LAGRANGE
-  [../]
-[]
-
-[AuxKernels]
-  [./disp_x]
-    type = FunctionAux
-    function = func_disp_x
-    variable = disp_x
-  [../]
-  [./disp_y]
-    type = FunctionAux
-    function = func_disp_y
-    variable = disp_y
-  [../]
-[]
-[Functions]
-  [./func_disp_x]
-    type = ParsedFunction
-    value = t
-  [../]
-  [./func_disp_y]
-    type = ParsedFunction
-    value = t
-  [../]
 []
 
 [Problem]
-  kernel_coverage_check = false
+  type = EulerProblem
+  order = FIRST
+  family = MONOMIAL
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  mach = 0.38
 []
 
-[CFDVariables]
+[ICs]
+  type = IsoVortexIC 
 []
 
-[./CFDAuxVariables]
-  type = NSAuxVariable
-  aux_variables = 'pressure mach velocity_x velocity_y velocity_z'    
-[../]
-
-[CFDICs]
-  type = IsoVortexIC
+[AuxVariables]
+  type = NSAuxVariable 
+  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
+  order = FIRST
+  family = MONOMIAL
 []
 
-[CFDKernels]
-  type = EulerCellKernel
+[Materials]
+  [./cell_material]
+    block = 0
+    type = CLawCellMaterial
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  [../]
+  [./face_material]
+    block = 0
+    type = CLawFaceMaterial
+  [../]
+  [./bc_material]
+    type = IsoVortexBndMaterial
+    boundary = '0 1 2 3'
+  [../]
 []
 
-[CFDDGKernels]
-  type = EulerFaceKernel
+[Postprocessors]
 []
-
-[CFDBCs]
-  type = EulerBC
-    boundary = 'left right bottom top'
-[]
-
 
 
 [Preconditioning]
   [./SMP]
     type = SMP
     full = true
-    #petsc_options = '-help'
-    petsc_options_iname = '-ksp_type -pc_type -pc_hypre_type'
-    petsc_options_value = 'gmres  hypre parasails'
+    #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+    petsc_options_iname = '-ksp_type  -pc_type'
+    petsc_options_value = 'gmres       bjacobi'
   [../]
 []
 
 [Executioner]
   type = Transient
-  solve_type = NEWTON
-  scheme = 'crank-nicolson'
-  dt = 0.02
-  end_time = 1
-  num_steps = 5
-  l_tol = 1e-04
-  l_max_its = 10
-  nl_max_its = 10
-  nl_rel_tol = 1e-08
-[]
+  solve_type = newton
+  num_steps = 1000
+  l_tol = 1e-02
+  #l_abs_step_tol = -1e-04
+  l_max_its = 100
+ 	
+  nl_max_its = 100
+  nl_rel_tol = 1e-04
+  #nl_abs_tol = 1e-05
 
-[Functions]
-  [./exact_rho]
-    type = IsoVortexExact
+  [./TimeStepper]
+    type = RatioTimeStepper
+    dt = 0.01
+    ratio = 2
+    step = 2
+    max_dt = 100	
   [../]
-[]
-
-
-[Postprocessors]
-  [./l2_err]
-    type = ElementL2Error
-    variable = rho
-    function = exact_rho
-  [../] 
 []
 
 [Outputs]
   [./exodus]
     type = Exodus
-    output_on = 'timestep_begin'
-    interval = 1 				
-    refinements = 0
+    interval = 1 					
   [../]
+	
   [./console]
     type = Console	
     perf_log = true
-    output_on = linear
+    output_on = 'linear nonlinear'
   [../]
 []
 
-[Materials]
-  [./cell_materical]
-    block = 0
-    type = EulerCellMaterial
-  [../]
-
-  [./face_materical]
-    block = 0
-    type = EulerFaceMaterial
-  [../]
-
-  [./bnd_materical]
-    boundary = 'left right bottom top'
-    type = IsoVortexBndMaterial
-  [../]
-[]

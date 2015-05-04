@@ -23,7 +23,6 @@ InputParameters validParams<NSFaceMaterial>()
 
 NSFaceMaterial::NSFaceMaterial(const std::string & name, InputParameters parameters):
 		Material(name, parameters),
-		CLawInterface(parameters),
 		_current_elem_volume(_assembly.elemVolume()),
 		_neighbor_elem_volume(_assembly.neighborVolume()),
 		_current_side_volume(_assembly.sideElemVolume()),

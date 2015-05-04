@@ -18,10 +18,10 @@ private:
 
 protected:
   virtual Real density(const Point &p);
-  virtual Real x_momentum(const Point &p);
-  virtual Real y_momentum(const Point &p);
-  virtual Real z_momentum(const Point &p);
-  virtual Real total_energy(const Point &p);
+  virtual Real momentumX(const Point &p);
+  virtual Real momentumY(const Point &p);
+  virtual Real momentumZ(const Point &p);
+  virtual Real energyTotal(const Point &p);
 };
 
 template<>

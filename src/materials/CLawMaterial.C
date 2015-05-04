@@ -19,7 +19,6 @@ InputParameters validParams<CLawMaterial>()
 }
 
 CLawMaterial::CLawMaterial(const std::string & name, InputParameters parameters):
-		Material(name, parameters),
-		CLawInterface(parameters)
+		Material(name, parameters)
 {
 }

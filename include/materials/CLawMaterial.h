@@ -12,11 +12,9 @@
 #pragma once
 
 #include "Material.h"
-#include "CLawInterface.h"
 
 class CLawMaterial :
-public Material,
-public CLawInterface
+public Material
 {
 public:
 	CLawMaterial(const std::string & name, InputParameters parameters);

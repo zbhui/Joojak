@@ -11,21 +11,21 @@
 
 #pragma once
 
-#include "EulerBndMaterial.h"
+#include "CLawBoundaryMaterial.h"
 #include "IsoVortexBase.h"
 
-class IsoVortexBndMaterial;
-
-template<>
-InputParameters validParams<IsoVortexBndMaterial>();
-
 class IsoVortexBndMaterial :
-public EulerBndMaterial,
+public CLawBoundaryMaterial,
 public IsoVortexBase
 {
 public:
 	IsoVortexBndMaterial(const std::string & name, InputParameters parameters);
 
 protected:
-	virtual void computeQpRightValue(Real *ur);
+	void computeQpRightValue(Real *ur);
+	virtual void computeQpFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul);
+
 };
+
+template<>
+InputParameters validParams<IsoVortexBndMaterial>();

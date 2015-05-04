@@ -19,17 +19,23 @@
   reynolds = 40
 []
 
-[CFDICs]
+[ICs]
   type = CFDPassFlowIC 
   velocity = 1
 []
 
+[AuxVariables]
+  type = NSAuxVariable 
+  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
+  order = FIRST
+  family = MONOMIAL
+[]
 
 [Materials]
   [./cell_material]
     block = 10
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe' 
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
   [./face_material]
     block = 10

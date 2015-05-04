@@ -1,52 +1,29 @@
 
-#include "IsoVortexBase.h"
-#include "EulerProblem.h"
+#include "IsoVortexProblem.h"
 
 template<>
-InputParameters validParams<IsoVortexBase>()
+InputParameters validParams<IsoVortexProblem>()
 {
-  InputParameters params = emptyInputParameters();
+  InputParameters params = validParams<EulerProblem>();
+
   return params;
 }
 
-IsoVortexBase::IsoVortexBase(const std::string & name, InputParameters parameters) :
-	_euler_problem(static_cast<EulerProblem&>(*parameters.get<FEProblem *>("_fe_problem"))),
-	_gamma(_euler_problem._gamma),
-	_gamm1(_gamma-1),
-	_mach(_euler_problem._mach)
+IsoVortexProblem::IsoVortexProblem(const std::string & name, InputParameters params) :
+	EulerProblem(name, params)
 {
 }
 
-Real IsoVortexBase::value(Real t, const Point& p, int eq)
+void IsoVortexProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type)
 {
-	switch (eq) {
-	case 0:
-		return density(t, p);
-		break;
-	case 1:
-		return x_momentum(t, p);
-		break;
-	case 2:
-		return y_momentum(t, p);
-		break;
-	case 3:
-		return z_momentum(t, p);
-	case 4:
-		return total_energy(t, p);
-		break;
-	default:
-		return 0.0;
-		mooseError("不可用的分量" << eq);
-		break;
-	}
 }
 
-Real IsoVortexBase::density(Real t, const Point &p)
+Real IsoVortexProblem::density(Real t, const Point &p)
 {
 	Real x = p(0)-t;
 	Real y = p(1)-t;
 	Real z = p(2)-t;
-
+//
 	Real gam = 1.4, gamm1 = gam - 1, epi = 5.0;
 	Real xb, yb, r2;
 	Real rho,T;
@@ -61,7 +38,7 @@ Real IsoVortexBase::density(Real t, const Point &p)
 	return rho;
 }
 
-Real IsoVortexBase::x_momentum(Real t, const Point &p)
+Real IsoVortexProblem::momentumX(Real t, const Point &p)
 {
 	Real x = p(0)-t;
 	Real y = p(1)-t;
@@ -82,7 +59,7 @@ Real IsoVortexBase::x_momentum(Real t, const Point &p)
 	return rho*u;
 }
 
-Real IsoVortexBase::y_momentum(Real t, const Point &p)
+Real IsoVortexProblem::momentumY(Real t, const Point &p)
 {
 	Real x = p(0)-t;
 	Real y = p(1)-t;
@@ -103,13 +80,13 @@ Real IsoVortexBase::y_momentum(Real t, const Point &p)
 	return rho*v;
 }
 
-Real IsoVortexBase::z_momentum(Real t, const Point &p)
+Real IsoVortexProblem::momentumZ(Real t, const Point &p)
 {
 	return 0.0;
 }
 
 
-Real IsoVortexBase::total_energy(Real t, const Point &p)
+Real IsoVortexProblem::energyTotal(Real t, const Point &p)
 {
 	Real x = p(0)-t;
 	Real y = p(1)-t;

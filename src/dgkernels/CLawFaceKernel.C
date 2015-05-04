@@ -11,7 +11,6 @@ InputParameters validParams<CLawFaceKernel>()
 }
 CLawFaceKernel::CLawFaceKernel(const std::string & name, InputParameters parameters):
 		DGKernel(name, parameters),
-		CLawInterface(parameters),
 		_flux(getNeighborMaterialProperty<std::vector<Real> >("flux")),
 		_flux_jacobi_variable_ee(getNeighborMaterialProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable_ee")),
 		_flux_jacobi_variable_en(getNeighborMaterialProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable_en")),

@@ -12,16 +12,24 @@
 #pragma once
 
 #include "Material.h"
-#include "CLawInterface.h"
+
+class CLawProblem;
+using std::vector;
 
 class CLawBoundaryMaterial :
-public Material,
-public CLawInterface
+public Material
 {
 public:
 	CLawBoundaryMaterial(const std::string & name, InputParameters parameters);
 
 protected:
+	CLawProblem &_claw_problem;
+	NonlinearSystem &_nl;
+	THREAD_ID _tid;
+	vector<VariableName> _variables;
+	int _n_equations;
+	int _var_order;
+
 	std::string _bc_type;
 	const Real & _current_elem_volume;
 	const Real & _neighbor_elem_volume;
@@ -41,7 +49,10 @@ protected:
 	virtual void computeQpProperties();
 	virtual void resizeQpProperty();
 	virtual void computeQpLeftValue(Real *ul, RealGradient *dul);
-	void computeQpFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul);
+	virtual void computeQpFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul);
+	MooseVariable & getVariable(int eq);
+
+
 };
 
 template<>

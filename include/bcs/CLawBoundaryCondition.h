@@ -2,11 +2,11 @@
 #pragma once
 
 #include "IntegratedBC.h"
-#include "CLawInterface.h"
+//#include "CLawInterface.h"
 
 class CLawBoundaryCondition :
-public IntegratedBC,
-public CLawInterface
+public IntegratedBC
+//public CLawInterface
 {
 public:
 	CLawBoundaryCondition(const std::string & name, InputParameters params);

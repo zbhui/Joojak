@@ -1,30 +1,22 @@
 
 #pragma once
 
-#include "InitialCondition.h"
+#include "MultiInitialCondition.h"
 
-class CFDInitialCondition;
-
-template<>
-InputParameters validParams<CFDInitialCondition>();
-
-/**
- * 为CFD提供初始条件接口
- */
-class CFDInitialCondition :
-	public InitialCondition
+class CFDInitialCondition : public MultiInitialCondition
 {
 public:
 	CFDInitialCondition(const std::string & name, InputParameters parameters);
 
-	virtual Real value(const Point & p);
+	virtual Real value(int component, const Point & p);
 
 protected:
 	virtual Real density(const Point &p) = 0;
-	virtual Real x_momentum(const Point &p) = 0;
-	virtual Real y_momentum(const Point &p) = 0;
-	virtual Real z_momentum(const Point &p) = 0;
-	virtual Real total_energy(const Point &p) = 0;
-
-	unsigned int _eq;
+	virtual Real momentumX(const Point &p) = 0;
+	virtual Real momentumY(const Point &p) = 0;
+	virtual Real momentumZ(const Point &p) = 0;
+	virtual Real energyTotal(const Point &p) = 0;
 };
+
+template<>
+InputParameters validParams<CFDInitialCondition>();

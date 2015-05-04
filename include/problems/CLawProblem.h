@@ -2,6 +2,7 @@
 #pragma once
 
 #include "FEProblem.h"
+using std::vector;
 
 class CLawProblem : public FEProblem
 {
@@ -23,6 +24,7 @@ protected:
 
 public:
 	int _n_equations;
+	vector<VariableName> _variables;
 };
 
 template<>

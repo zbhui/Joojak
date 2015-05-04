@@ -2,23 +2,30 @@
 #pragma once
 
 #include "AuxKernel.h"
-#include "CLawInterface.h"
+//#include "CLawInterface.h"
 
 class CFDProblem;
+using std::vector;
 
 class NSAuxVariable :
-public AuxKernel,
-public CLawInterface
+public AuxKernel
 {
 public:
   NSAuxVariable(const std::string & name, InputParameters parameters);
 
 protected:
-  virtual Real computeValue();
-  void valueAtCellPoint(Real *uh);
+
+  CFDProblem &_cfd_problem;
+  NonlinearSystem &_nl;
+  THREAD_ID _tid;
+  vector<VariableName> _variables;
+  int _n_equations;
+  int _var_order;
 
   vector<VariableValue*> _uh;
-  CFDProblem &_cfd_problem;
+
+  virtual Real computeValue();
+  void valueAtCellPoint(Real *uh);
 };
 
 template<>

@@ -32,22 +32,22 @@ Real IsoVortexIC::density(const Point &p)
 	return IsoVortexBase::density(0, p);
 }
 
-Real IsoVortexIC::x_momentum(const Point &p)
+Real IsoVortexIC::momentumX(const Point &p)
 {
 	return IsoVortexBase::x_momentum(0, p);
 }
 
-Real IsoVortexIC::y_momentum(const Point &p)
+Real IsoVortexIC::momentumY(const Point &p)
 {
 	return IsoVortexBase::y_momentum(0, p);
 }
 
-Real IsoVortexIC::z_momentum(const Point &p)
+Real IsoVortexIC::momentumZ(const Point &p)
 {
 	return IsoVortexBase::z_momentum(0, p);
 }
 
-Real IsoVortexIC::total_energy(const Point &p)
+Real IsoVortexIC::energyTotal(const Point &p)
 {
 	return IsoVortexBase::total_energy(0, p);
 }

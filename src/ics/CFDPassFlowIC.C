@@ -24,19 +24,19 @@ Real CFDPassFlowIC::density(const Point &p)
 	return 1.0;
 }
 
-Real CFDPassFlowIC::x_momentum(const Point &p)
+Real CFDPassFlowIC::momentumX(const Point &p)
 {
 	Vector3d vel = _velocity*(_cfd_problem._attitude.earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(0);
 }
 
-Real CFDPassFlowIC::y_momentum(const Point &p)
+Real CFDPassFlowIC::momentumY(const Point &p)
 {
 	Vector3d vel = _velocity*(_cfd_problem._attitude.earthFromWind()*Vector3d::UnitX());
 	return density(p)*vel(1);
 }
 
-Real CFDPassFlowIC::z_momentum(const Point &p)
+Real CFDPassFlowIC::momentumZ(const Point &p)
 {
 	Vector3d vel = _velocity*(_cfd_problem._attitude.earthFromWind()*Vector3d::UnitX());
 	if(_current_elem->dim() == 2)
@@ -50,7 +50,7 @@ Real CFDPassFlowIC::z_momentum(const Point &p)
 	}
 }
 
-Real CFDPassFlowIC::total_energy(const Point &p)
+Real CFDPassFlowIC::energyTotal(const Point &p)
 {
 	Real pre = 1./_cfd_problem._gamma/_cfd_problem._mach/_cfd_problem._mach;
 	return pre/(_cfd_problem._gamma-1) + 0.5*density(p)*(_velocity*_velocity);

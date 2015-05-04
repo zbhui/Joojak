@@ -2,11 +2,9 @@
 #pragma once
 
 #include "DGKernel.h"
-#include "CLawInterface.h"
 
 class CLawFaceKernel :
-public DGKernel,
-public CLawInterface
+public DGKernel
 {
 public:
 	CLawFaceKernel(const std::string &name, InputParameters parameters);

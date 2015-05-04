@@ -11,7 +11,7 @@ InputParameters validParams<CLawBoundaryCondition>()
 
 CLawBoundaryCondition::CLawBoundaryCondition(const std::string & name, InputParameters parameters):
 		IntegratedBC(name, parameters),
-		CLawInterface(parameters),
+//		CLawInterface(parameters),
 		_flux(getMaterialProperty<std::vector<Real> >("flux")),
 		_flux_jacobi_variable(getMaterialProperty<std::vector<std::vector<Real> > >("flux_jacobi_variable")),
 		_flux_jacobi_grad_variable(getMaterialProperty<std::vector<std::vector<RealGradient> > >("flux_jacobi_grad_variable")),

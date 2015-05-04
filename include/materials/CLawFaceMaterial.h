@@ -2,10 +2,8 @@
 #pragma once
 
 #include "Material.h"
-#include "CLawInterface.h"
 
 using std::vector;
-
 class CLawProblem;
 
 class CLawFaceMaterialData
@@ -34,8 +32,7 @@ public:
 };
 
 class CLawFaceMaterial :
-public Material,
-public CLawInterface
+public Material
 {
 //	struct QpValue
 //	{
@@ -68,8 +65,12 @@ public:
 	CLawFaceMaterial(const std::string & name, InputParameters parameters);
 
 protected:
-	virtual void resizeQpProperty();
-	virtual void computeQpProperties();
+	CLawProblem &_claw_problem;
+	NonlinearSystem &_nl;
+	THREAD_ID _tid;
+	vector<VariableName> _variables;
+	int _n_equations;
+	int _var_order;
 
 	const Real & _current_elem_volume;
 	const Real & _neighbor_elem_volume;
@@ -94,6 +95,8 @@ protected:
 	MaterialProperty<vector<vector<RealVectorValue> > > & _lift_jacobi_variable_neighbor;
 	MaterialProperty<CLawFaceMaterialData> &_face_material_data;
 
+	virtual void resizeQpProperty();
+	virtual void computeQpProperties();
 	void computeQpValue(Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
 	void computeQpFlux(Real *flux, RealVectorValue *lift, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
 };

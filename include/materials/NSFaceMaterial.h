@@ -12,7 +12,6 @@
 #pragma once
 
 #include "Material.h"
-#include "CLawInterface.h"
 
 class NSFaceMaterial;
 
@@ -20,8 +19,7 @@ template<>
 InputParameters validParams<NSFaceMaterial>();
 
 class NSFaceMaterial :
-public Material,
-public CLawInterface
+public Material
 {
 public:
 	NSFaceMaterial(const std::string & name, InputParameters parameters);

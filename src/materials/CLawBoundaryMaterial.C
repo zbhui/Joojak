@@ -15,9 +15,15 @@ InputParameters validParams<CLawBoundaryMaterial>()
   return params;
 }
 
-CLawBoundaryMaterial::CLawBoundaryMaterial(const std::string & name, InputParameters parameters):
-		Material(name, parameters),
-		CLawInterface(parameters),
+CLawBoundaryMaterial::CLawBoundaryMaterial(const std::string & name, InputParameters parameter):
+		Material(name, parameter),
+		_claw_problem(static_cast<CLawProblem&>(_fe_problem)),
+		_nl(_claw_problem.getNonlinearSystem()),
+		_tid(parameter.get<THREAD_ID>("_tid")),
+		_variables(_nl.getVariableNames()),
+		_n_equations(_variables.size()),
+		_var_order(_claw_problem.getVariable(_tid, _variables[0]).order()),
+
 		_bc_type(getParam<std::string>("bc_type")),
 		_current_elem_volume(_assembly.elemVolume()),
 		_neighbor_elem_volume(_assembly.neighborVolume()),
@@ -34,7 +40,7 @@ CLawBoundaryMaterial::CLawBoundaryMaterial(const std::string & name, InputParame
 {
 	for (size_t eq = 0; eq < _n_equations; ++eq)
 	{
-		MooseVariable &val = getVariable(eq);
+		MooseVariable &val = _claw_problem.getVariable(_tid, _variables[eq]);
 		_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
 		_grad_ul.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
 	}

@@ -1,6 +1,9 @@
 
 #include "Moose.h"
 #include "JoojakApp.h"
+
+#include "CLawICAction.h"
+#include "CLawAuxVariablesAction.h"
 #include "JoojakRevision.h"
 #include "AppFactory.h"
 #include "ActionFactory.h"
@@ -8,8 +11,6 @@
 
 /// Action
 #include "CFDAddVariablesAction.h"
-#include "CFDAuxVariablesAction.h"
-#include "CFDInitialConditionAction.h"
 #include "CFDBoundaryConditionAction.h"
 #include "CFDKernelsAction.h"
 #include "CFDDGKernelsAction.h"
@@ -236,16 +237,15 @@ void JoojakApp::registerObjects(Factory & factory)
 void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 	/// 注册Action
-	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_variable");
-	syntax.registerActionSyntax("CFDAuxVariablesAction", "CFDAuxVariables", "add_aux_kernel");
-	syntax.registerActionSyntax("CFDInitialConditionAction", "CFDICs", "add_ic");
+	syntax.registerActionSyntax("CLawAuxVariablesAction", "AuxVariables");
+	syntax.registerActionSyntax("CLawICAction", "ICs", "add_ic");
 	syntax.registerActionSyntax("CommonPostProcessorAction", "Postprocessors", "add_postprocessor");
 	syntax.registerActionSyntax("AddCLawAction", "Problem");
 
-	registerAction(CFDInitialConditionAction, "add_ic");
+	registerAction(CLawICAction, "add_ic");
 	registerAction(CFDPostprocessorAction, "add_postprocessor");
-	registerAction(CFDAuxVariablesAction, "add_aux_variable");
-	registerAction(CFDAuxVariablesAction, "add_aux_kernel");
+	registerAction(CLawAuxVariablesAction, "add_aux_variable");
+	registerAction(CLawAuxVariablesAction, "add_aux_kernel");
 
 	registerAction(CommonPostProcessorAction, "add_postprocessor");
 	registerAction(AddCLawAction, "add_variable");

@@ -1,5 +1,6 @@
 
-#include "CFDAuxVariablesAction.h"
+#include "CLawAuxVariablesAction.h"
+
 #include "AddVariableAction.h"
 #include "MooseApp.h"
 #include "FEProblem.h"
@@ -8,7 +9,7 @@
 #include "libmesh/fe.h"
 
 template<>
-InputParameters validParams<CFDAuxVariablesAction>()
+InputParameters validParams<CLawAuxVariablesAction>()
 {
 	MooseEnum families(AddVariableAction::getNonlinearVariableFamilies());
 	MooseEnum orders(AddVariableAction::getNonlinearVariableOrders());
@@ -17,19 +18,17 @@ InputParameters validParams<CFDAuxVariablesAction>()
 	params.addRequiredParam<std::string>("type", "AuxKernel类型");
 	params.addParam<MooseEnum>("family", families, "Specifies the family of FE shape functions to use for this variable");
 	params.addParam<MooseEnum>("order", orders,  "Specifies the order of the FE shape function to use for this variable (additional orders not listed are allowed)");
-	params.addRequiredParam<std::vector<NonlinearVariableName> >("variables", "非线性变量");
 	params.addParam<std::vector<AuxVariableName> >("aux_variables", "辅助变量名");
 	return params;
 }
 
-CFDAuxVariablesAction::CFDAuxVariablesAction(const std::string & name, InputParameters params) :
+CLawAuxVariablesAction::CLawAuxVariablesAction(const std::string & name, InputParameters params) :
     		Action(name, params),
-			_variables(getParam<std::vector<NonlinearVariableName> >("variables")),
 			_aux_variables(getParam<std::vector<AuxVariableName> >("aux_variables"))
 {
 }
 
-void CFDAuxVariablesAction::act()
+void CLawAuxVariablesAction::act()
 {
 	if(_current_task == "add_aux_variable")
 	{
@@ -44,13 +43,8 @@ void CFDAuxVariablesAction::act()
 
 	else if(_current_task == "add_aux_kernel")
 	{
-		std::vector<VariableName> var_name;
-		for (int i = 0; i < _variables.size(); ++i)
-			var_name.push_back(_variables[i]);
-
 		const std::string aux_kernel_name = getParam<std::string>("type");
 		InputParameters params = _factory.getValidParams(aux_kernel_name);
-		params.set<std::vector<VariableName> >("variables") = var_name;
 		_app.parser().extractParams(_name, params);
 
 		for (int i = 0; i < _aux_variables.size(); ++i)
