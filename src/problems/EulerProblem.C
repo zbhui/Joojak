@@ -218,3 +218,7 @@ void EulerProblem::farField(Real *ur,  Real *ul, Point &normal)
 	}
 }
 
+Real EulerProblem::physicalViscosity(Real* uh)
+{
+	return 0;
+}

@@ -57,6 +57,13 @@
 []
 
 
+[UserObjects]
+  [./cfd_force]
+    type = CFDForceUserObject
+    boundary = wall
+  [../]
+[]
+
 [Preconditioning]
   [./SMP]
     type = SMP

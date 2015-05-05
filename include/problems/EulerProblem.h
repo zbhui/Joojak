@@ -9,6 +9,7 @@ class EulerProblem : public CFDProblem
 public:
 	EulerProblem(const std::string & name, InputParameters params);
 
+	virtual Real physicalViscosity(Real *uh);
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
 	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, Point &normal);

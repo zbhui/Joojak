@@ -18,9 +18,6 @@ InputParameters validParams<CFDProblem>()
   params.addParam<Real>("yaw", 180., "偏航角");
   params.addParam<Real>("roll", -90., "滚转角");
 
-  params.addParam<Real>("ref_length", 1, "参考长度");
-  params.addParam<Real>("ref_area", 1, "参考面积");
-
   return params;
 }
 
@@ -37,8 +34,6 @@ CFDProblem::CFDProblem(const std::string & name, InputParameters params) :
 	_yaw(getParam<Real>("yaw")*libMesh::pi/180),
 	_roll(getParam<Real>("roll")*libMesh::pi/180),
 
-	_ref_length(getParam<Real>("ref_length")),
-	_ref_area(getParam<Real>("ref_area")),
 	_attitude(Attitude(_attack, _sideslip, _pitch, _yaw, _roll))
 //	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
 {
@@ -93,4 +88,25 @@ Real CFDProblem::physicalViscosity(Real* uh)
 	return 1.0;
 }
 
+void CFDProblem::stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh)
+{
+	Real rho = uh[0];
+	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
+	RealGradient grad_rho(duh[0]);
+	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
+	RealTensor temp;
+	for (int alpha = 0; alpha < 3; ++alpha) {
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			temp(alpha,beta) = velocity(alpha)*grad_rho(beta);
+		}
+	}
+	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
+	tau = velocity_tensor + velocity_tensor.transpose();
+	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
+	Real lamdiv = 2./3. * div;
+	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
+	Real mu = physicalViscosity(uh);
+	tau *= mu/_reynolds;
+}
 

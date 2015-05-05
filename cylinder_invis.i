@@ -19,7 +19,7 @@
   reynolds = 40
 []
 
-[CFDICs]
+[ICs]
   type = CFDPassFlowIC 
   velocity = 1
 []
@@ -56,6 +56,12 @@
 [Postprocessors]
 []
 
+[UserObjects]
+  [./cfd_force]
+    type = CFDForceUserObject
+    boundary = wall
+  [../]
+[]
 
 [Preconditioning]
   [./SMP]

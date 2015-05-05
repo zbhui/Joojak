@@ -12,6 +12,7 @@ public:
 	CFDProblem(const std::string & name, InputParameters params);
 
 	virtual Real physicalViscosity(Real *uh);
+	virtual void stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh);
 	virtual Real pressure(Real *uh);
 	virtual Real pressureInfity();
 	virtual Real enthalpy(Real *uh);
@@ -31,9 +32,6 @@ public:
 	Real _pitch;			///俯仰角
 	Real _yaw;			///偏航角
 	Real _roll;			///滚转角
-
-	Real _ref_length;
-	Real _ref_area;
 
 	Attitude _attitude;
 //	MooseEnum _bc_types;
