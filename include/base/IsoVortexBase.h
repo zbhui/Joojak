@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "CLawInterface.h"
+#include "InputParameters.h"
 
 class EulerProblem;
 

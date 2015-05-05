@@ -1,16 +1,20 @@
 
 #include "CouetteFlowBase.h"
+#include "NavierStokesProblem.h"
 
 template<>
 InputParameters validParams<CouetteFlowBase>()
 {
-  InputParameters params = validParams<NSBase>();
-
-  return params;
+	InputParameters params = emptyInputParameters();
+	return params;
 }
 
-CouetteFlowBase::CouetteFlowBase(const std::string & name, InputParameters parameters):
-		NSBase(name, parameters)
+CouetteFlowBase::CouetteFlowBase(const std::string & name, InputParameters parameters) :
+	_ns_problem(static_cast<NavierStokesProblem&>(*parameters.get<FEProblem *>("_fe_problem"))),
+	_gamma(_ns_problem._gamma),
+	_mach(_ns_problem._mach),
+	_reynolds(_ns_problem._reynolds),
+	_prandtl(_ns_problem._prandtl)
 {
 }
 
@@ -21,15 +25,15 @@ Real CouetteFlowBase::value(Real t, const Point& p, int eq)
 		return density(t, p);
 		break;
 	case 1:
-		return x_momentum(t, p);
+		return momentumX(t, p);
 		break;
 	case 2:
-		return y_momentum(t, p);
+		return momentumY(t, p);
 		break;
 	case 3:
-		return z_momentum(t, p);
+		return momentumZ(t, p);
 	case 4:
-		return total_energy(t, p);
+		return energyTotal(t, p);
 		break;
 	default:
 		return 0.0;
@@ -44,35 +48,35 @@ Real CouetteFlowBase::density(Real t, const Point &p)
 	Real y = p(1);
 	Real z = p(2);
 
-	Real tem = temperature(p);
+	Real tem = temperature(t, p);
 	Real pre = 1./(_gamma * _mach * _mach);
 	return pre * _gamma * _mach * _mach/tem;
 
 }
 
-Real CouetteFlowBase::x_momentum(Real t, const Point &p)
+Real CouetteFlowBase::momentumX(Real t, const Point &p)
 {
 	Real rho = density(t, p);
 	Real u = p(1)/2.0;
 	return rho * u;
 }
 
-Real CouetteFlowBase::y_momentum(Real t, const Point &p)
+Real CouetteFlowBase::momentumY(Real t, const Point &p)
 {
 	Real rho = density(t, p);
 	Real v = 0.;
 	return rho * v;
 }
 
-Real CouetteFlowBase::z_momentum(Real t, const Point &p)
+Real CouetteFlowBase::momentumZ(Real t, const Point &p)
 {
 	return 0.0;
 }
 
-Real CouetteFlowBase::total_energy(Real t, const Point &p)
+Real CouetteFlowBase::energyTotal(Real t, const Point &p)
 {
 	Real rho = density(t, p);
-	Real tem = temperature(p);
+	Real tem = temperature(t, p);
 	Real pre = 1./(_gamma * _mach * _mach);
 	Real u = p(1)/2.0;
 	Real v = 0;
@@ -80,7 +84,7 @@ Real CouetteFlowBase::total_energy(Real t, const Point &p)
 	return pre/(_gamma-1)+0.5*rho * (u*u + v*v + w*w);
 }
 
-Real CouetteFlowBase::temperature(const Point& p)
+Real CouetteFlowBase::temperature(Real t, const Point& p)
 {
 	Real x = p(0);
 	Real y = p(1);

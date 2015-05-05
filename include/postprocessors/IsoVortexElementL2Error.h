@@ -4,6 +4,8 @@
 #include "ElementIntegralPostprocessor.h"
 #include "IsoVortexBase.h"
 
+using std::vector;
+
 class IsoVortexElementL2Error :
 public ElementIntegralPostprocessor,
 public IsoVortexBase

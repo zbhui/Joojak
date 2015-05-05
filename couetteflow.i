@@ -1,36 +1,50 @@
-[GlobalParams]
-  order = FIRST
-  family = MONOMIAL
-  	
-  mach = 0.1
-  reynolds = 10	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
-[]
-
-# 网格
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  
   nx = 10
   ny = 5
-  
   xmin = 0
   xmax = 4
-
   ymin = 0
   ymax = 2
-  
-  block_id = '0'
-  block_name = 'fluid'
 []
 
-[Functions]
-  [./exact_rho]
-    type = CouetteFlowExact
+[Problem]
+  type = NavierStokesProblem
+  order = FIRST
+  family = MONOMIAL
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  mach = 0.1
+  reynolds = 100
+[]
+
+[ICs]
+  type = CFDPassFlowIC 
+  velocity = 0
+[]
+
+[AuxVariables]
+  type = NSAuxVariable 
+  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
+  order = FIRST
+  family = MONOMIAL
+[]
+
+[Materials]
+  [./cell_material]
+    block = 0
+    type = CLawCellMaterial
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  [../]
+  [./face_material]
+    block = 0
+    type = CLawFaceMaterial
+  [../]
+  [./bc_material]
+    type = CouetteFlowBndMaterial
+    boundary = '0 1 2 3'
   [../]
 []
-
 
 [Preconditioning]
   [./SMP]
@@ -41,7 +55,6 @@
     petsc_options_iname = '-ksp_type  -pc_type'
     petsc_options_value = 'gmres       bjacobi'
   [../]
-
 []
 
 [Executioner]
@@ -58,7 +71,7 @@
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 100
+    dt = 0.01
     ratio = 2
     step = 2
     max_dt = 100	
@@ -66,75 +79,20 @@
 []
 
 [Postprocessors]
-  [./l2_err]
-    type = ElementL2Error
-    variable = rho
-    function = exact_rho
-  [../]
-
-  [./residuals]
-    type = Residual
-  [../]
-
 []
 
 [Outputs]
   [./exodus]
     type = Exodus
-    output_initial = true
-    interval = 1 					
-    oversample = true
-    refinements = 0
+    interval = 1 
+    output_on = 'initial timestep_end'					
   [../]
 	
   [./console]
     type = Console	
     perf_log = true
-    linear_residuals = true
-    nonlinear_residuals =  true	
+    output_on = 'linear nonlinear'
   [../]
 []
 
-[CFDVariables]
-[]
-
-[./CFDAuxVariables]
-  type = NSAuxVariable
-  aux_variables = 'pressure mach velocity_x velocity_y velocity_z'    
-[../]
-
-[CFDICs]
-  type = CFDPassFlowIC
-[]
-
-[CFDKernels]
-  type = NSCellKernel
-[]
-
-[CFDDGKernels]
-  type = NSFaceKernel
-[]
-
-[CFDBCs]
-  type = NSBC
-  boundary = '0 1 2 3' 
-[]
-
-[CFDPostprocessor]
-[]
-
-[Materials]
-  [./cell_materical]
-    block = 0
-    type = NSCellMaterial
-  [../]
-  [./face_materical]
-    block = 0
-    type = NSFaceMaterial
-  [../]
-  [./bnd_materical]
-    boundary = 'left right bottom top'
-    type = CouetteFlowBndMaterial
-  [../]
-[]
 
