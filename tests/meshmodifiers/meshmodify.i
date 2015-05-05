@@ -19,6 +19,7 @@
 []
 
 [AuxVariables]
+  type = NSAuxVariable
   [./distance_to_left_nodes]
   [../]
   [./penetration_to_left]

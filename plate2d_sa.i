@@ -1,13 +1,3 @@
-[GlobalParams]
- order = FIRST
- family = MONOMIAL
-  	
-  mach = 0.2
-  reynolds = 2E+05
-  	
-  variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
-[]
-
 [Mesh]
   type = FileMesh
   file = ../high-order-workshop/C1.4_plate/a2-125-2s.msh
@@ -20,6 +10,71 @@
   block_name = 'fluid'
 []
 
+[Mesh]
+  type = FileMesh
+  file = grids/cylinder_fine.msh
+  dim = 2
+  
+  block_id = 10
+  block_name = 'fluid'
+  
+  boundary_id = '8 9'
+  boundary_name = 'far_field wall'
+[]
+
+[Problem]
+  type = NavierStokesProblem
+  order = FIRST
+  family = MONOMIAL
+  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  mach = 0.2
+  reynolds = 40
+[]
+
+[ICs]
+  type = CFDPassFlowIC 
+  velocity = 1
+[]
+
+[AuxVariables]
+  type = NSAuxVariable 
+  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
+  order = FIRST
+  family = MONOMIAL
+[]
+
+[Materials]
+  [./cell_material]
+    block = 10
+    type = CLawCellMaterial
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  [../]
+  [./face_material]
+    block = 10
+    type = CLawFaceMaterial
+  [../]
+  [./far_field_material]
+    boundary = far_field
+    bc_type = far_field
+    type = CLawBoundaryMaterial
+  [../]
+  [./wall_material]
+    boundary = wall
+    bc_type = adiabatic_wall
+    type = CLawBoundaryMaterial
+  [../]
+[]
+
+[Postprocessors]
+[]
+
+
+[UserObjects]
+  [./cfd_force]
+    type = CFDForceUserObject
+    boundary = wall
+  [../]
+[]
 
 [Preconditioning]
   [./SMP]
@@ -28,7 +83,7 @@
     #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
     #petsc_options_iname = '-pc_type -snes_type'
     petsc_options_iname = '-ksp_type  -pc_type'
-    petsc_options_value = 'gmres       ilu'
+    petsc_options_value = 'gmres       lu'
   [../]
 []
 
@@ -37,10 +92,12 @@
   solve_type = newton
   num_steps = 1000
   l_tol = 1e-02
+  #l_abs_step_tol = -1e-04
   l_max_its = 100
  	
   nl_max_its = 100
   nl_rel_tol = 1e-04
+  #nl_abs_tol = 1e-05
 
   [./TimeStepper]
     type = RatioTimeStepper
@@ -51,75 +108,117 @@
   [../]
 []
 
-[CFDVariables]
+[Outputs]
+  [./exodus]
+    type = Exodus
+    interval = 1 					
+  [../]
+	
+  [./console]
+    type = Console	
+    perf_log = true
+    output_on = 'linear nonlinear'
+  [../]
 []
 
-[./CFDAuxVariables]
-  type = SAAuxVariable
-  aux_variables = 'pressure mach velocity_x velocity_y velocity_z eddy_viscosity'    
-[../]
-
-[CFDICs]
-  type = SAIC
+[Problem]
+  type = SAProblem
+  order = FIRST
+  family = MONOMIAL
+  variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
+  mach = 0.2
+  reynolds = 1E+06
 []
 
-[CFDKernels]
-  type = SACellKernel
+[ICs]
+  type = CFDPassFlowIC 
+  velocity = 1
 []
 
-[CFDDGKernels]
-  type = SAFaceKernel
+[AuxVariables]
+  type = NSAuxVariable 
+  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
+  order = FIRST
+  family = MONOMIAL
 []
 
-[CFDBCs]
-  type = SABC
-  boundary = 'symmetric wall right top left'
+[Materials]
+  [./cell_material]
+    block = 0
+    type = CLawCellMaterial
+    variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
+  [../]
+  [./face_material]
+    block = 0
+    type = CLawFaceMaterial
+  [../]
+  [./far_field_material]
+    boundary = far_field
+    bc_type = far_field
+    type = CLawBoundaryMaterial
+  [../]
+  [./wall_material]
+    boundary = wall
+    bc_type = adiabatic_wall
+    type = CLawBoundaryMaterial
+  [../]
 []
 
-[CFDPostprocessor]
+[Postprocessors]
+[]
+
+
+[UserObjects]
+  [./cfd_force]
+    type = CFDForceUserObject
+    boundary = wall
+  [../]
+[]
+
+[Preconditioning]
+  [./SMP]
+    type = SMP
+    full = true
+    #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
+    #petsc_options_iname = '-pc_type -snes_type'
+    petsc_options_iname = '-ksp_type  -pc_type'
+    petsc_options_value = 'gmres       lu'
+  [../]
+[]
+
+[Executioner]
+  type = Transient
+  solve_type = newton
+  num_steps = 1000
+  l_tol = 1e-02
+  #l_abs_step_tol = -1e-04
+  l_max_its = 100
+ 	
+  nl_max_its = 100
+  nl_rel_tol = 1e-04
+  #nl_abs_tol = 1e-05
+
+  [./TimeStepper]
+    type = RatioTimeStepper
+    dt = 100
+    ratio = 2
+    step = 2
+    max_dt = 100	
+  [../]
 []
 
 [Outputs]
   [./exodus]
     type = Exodus
-    output_initial = true
-    interval = 1 					#间隔
+    interval = 1 					
   [../]
+	
   [./console]
     type = Console	
     perf_log = true
-    linear_residuals = true
-    nonlinear_residuals =  true	
+    output_on = 'linear nonlinear'
   [../]
 []
 
-[Materials]
-  [./cell_material]
-  block = fluid
-    type = SACellMaterial
-    wall_distance = distance
-  [../]
 
-  [./face_material]
-    block = fluid
-    type = SAFaceMaterial
-  [../]
-
-  [./wall_material]
-    boundary = wall
-    bc_type = isothermal_wall
-    type = SABndMaterial
-  [../]
-  [./far_field_material]
-    boundary = 'left right top'
-    bc_type = far_field
-    type = SABndMaterial
-  [../]
-  [./symmetric_material]
-    boundary = 'symmetric'
-    bc_type = symmetric
-    type = SABndMaterial
-  [../]
-
-[]
 

@@ -1,7 +1,6 @@
 
 #include "EulerProblem.h"
-#include "MooseApp.h"
-using namespace Eigen;
+using Eigen::Vector3d;
 
 template<>
 InputParameters validParams<EulerProblem>()
@@ -15,8 +14,6 @@ EulerProblem::EulerProblem(const std::string & name, InputParameters params) :
 	CFDProblem(name, params)
 {
 	_n_equations = 5;
-	if(_n_equations == 0)
-		mooseError("没有指定问题方程个数" << name);
 }
 
 void EulerProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)

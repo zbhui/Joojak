@@ -1,28 +1,35 @@
 
-#include "NavierStokesProblem.h"
+#include "SAProblem.h"
 
 using Eigen::Vector3d;
 
 template<>
-InputParameters validParams<NavierStokesProblem>()
+InputParameters validParams<SAProblem>()
 {
   InputParameters params = validParams<CFDProblem>();
 
   return params;
 }
 
-NavierStokesProblem::NavierStokesProblem(const std::string & name, InputParameters params) :
-	CFDProblem(name, params)
-//	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
+SAProblem::SAProblem(const std::string & name, InputParameters params) :
+	CFDProblem(name, params),
+	_cb1(0.1355), _cb2(0.622), _sigma_sa(2./3), _kappa(0.41),
+	_cw2(0.3), _cw3(2.0), _cv1(7.1), _cv2(0.7), _cv3(0.9),
+	_ct1(1.0), _ct2(2.0), _ct3(1.2), _ct4(0.5),
+	_prandtl_turb(0.9),
+	_nu_infty(3.0)
 {
-	_n_equations = 5;
+	_cw1 = _cb1/_kappa/_kappa + (1+_cb2)/_sigma_sa;
+	_cw3_pow6 = _cw3*_cw3*_cw3*_cw3*_cw3*_cw3;
+
+	_n_equations = 6;
 	if(_n_equations == 0)
 		mooseError("没有指定问题方程个数" << name);
 }
 
-void NavierStokesProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
+void SAProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 {
-	Real rho, p, h;
+	Real rho, p, h, k;
 	Real u, v, w;
 	rho = uh[0];
 	u = uh[1]/rho;
@@ -30,13 +37,14 @@ void NavierStokesProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* u
 	w = uh[3]/rho;
 	p = pressure(uh);
 	h = enthalpy(uh);
+	k = uh[5]/uh[0];
 
 	int component = 0;
 
 	component = 0;
-	inviscous_term[component](0) = uh[1];	// rhou
-	inviscous_term[component](1) = uh[2];	// rhov
-	inviscous_term[component](2) = uh[3];	// rhow
+	inviscous_term[component](0) = uh[1];
+	inviscous_term[component](1) = uh[2];
+	inviscous_term[component](2) = uh[3];
 
 	component = 1;
 	inviscous_term[component](0) = uh[1] * u + p;
@@ -54,34 +62,49 @@ void NavierStokesProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* u
 	inviscous_term[component](2) = uh[3] * w + p;
 
 	component = 4;
-	inviscous_term[component](0) = rho * h * u;
-	inviscous_term[component](1) = rho * h * v;
-	inviscous_term[component](2) = rho * h * w;
+	inviscous_term[component](0) = rho*h * u;
+	inviscous_term[component](1) = rho*h * v;
+	inviscous_term[component](2) = rho*h * w;
+
+	component = 5;
+	inviscous_term[component](0) = uh[5] * u;
+	inviscous_term[component](1) = uh[5] * v;
+	inviscous_term[component](2) = uh[5] * w;
 }
 
-void NavierStokesProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh)
+void SAProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh)
 {
-	Real rho = uh[0];
+	Real rho(uh[0]);
 	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
 	RealGradient grad_rho(duh[0]);
 	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
 	RealTensor temp;
-	for (int alpha = 0; alpha < 3; ++alpha) {
-		for (int beta = 0; beta < 3; ++beta)
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j)
 		{
-			temp(alpha,beta) = velocity(alpha)*grad_rho(beta);
+			temp(i,j) = velocity(i)*grad_rho(j);
 		}
 	}
-	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
-	RealTensor tau = velocity_tensor + velocity_tensor.transpose();
-	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
-	Real lamdiv = 2./3. * div;
+	RealTensor velocity_tensor((momentum_tensor - temp)/rho);
+	RealTensor tau(velocity_tensor + velocity_tensor.transpose());
+	Real lamdiv = 2./3. * velocity_tensor.tr();
 	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
-	Real mu = physicalViscosity(uh);
-	tau *= mu/_reynolds;
 
-	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
-	grad_enthalpy *= (mu/_reynolds)*(_gamma/_prandtl);
+	Real mu = physicalViscosity(uh);
+	Real X = uh[5]/mu;
+	Real psi(X);
+	if (X < 10)
+		psi = 0.05*log(1+exp(20*X));
+	else
+		psi = X;
+
+	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	Real mu_turb = std::max<Real>(0., uh[5]*fv1);
+
+	tau *= (mu+mu_turb)/_reynolds;
+
+	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/uh[0] - velocity_tensor.transpose() * velocity;
+	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
 
 	int component = 0;
 	viscous_term[component](0) = 0.;
@@ -104,36 +127,51 @@ void NavierStokesProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, R
 	viscous_term[component](2) = tau(2, 2);
 
 	component = 4;
-	RealVectorValue vel_tau = tau * velocity + grad_enthalpy ;
+	RealVectorValue vel_tau(tau * velocity + (mu/_prandtl+mu_turb/_prandtl_turb)/_reynolds*(_gamma)*grad_enthalpy);
 	viscous_term[component](0) = vel_tau(0);
 	viscous_term[component](1) = vel_tau(1);
 	viscous_term[component](2) = vel_tau(2);
 
+	component = 5;
+	viscous_term[component](0) = mu*(1+psi)/_sigma_sa*grad_nu(0)/_reynolds;
+	viscous_term[component](1) = mu*(1+psi)/_sigma_sa*grad_nu(1)/_reynolds;
+	viscous_term[component](2) = mu*(1+psi)/_sigma_sa*grad_nu(2)/_reynolds;
+
 }
 
-void NavierStokesProblem::viscousTermAdiabatic(RealVectorValue* viscous_term, Real* uh, RealGradient* duh)
+void SAProblem::viscousTermAdiabatic(RealVectorValue* viscous_term, Real* uh, RealGradient *duh)
 {
-	Real rho = uh[0];
+	Real rho(uh[0]);
 	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
 	RealGradient grad_rho(duh[0]);
 	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
 	RealTensor temp;
-	for (int alpha = 0; alpha < 3; ++alpha) {
-		for (int beta = 0; beta < 3; ++beta)
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j)
 		{
-			temp(alpha,beta) = velocity(alpha)*grad_rho(beta);
+			temp(i,j) = velocity(i)*grad_rho(j);
 		}
 	}
-	RealTensor velocity_tensor = (momentum_tensor - temp)/rho;
-	RealTensor tau = velocity_tensor + velocity_tensor.transpose();
-	Real div = velocity_tensor(0,0) + velocity_tensor(1,1) + velocity_tensor(2,2);
-	Real lamdiv = 2./3. * div;
+	RealTensor velocity_tensor((momentum_tensor - temp)/rho);
+	RealTensor tau(velocity_tensor + velocity_tensor.transpose());
+	Real lamdiv = 2./3. * velocity_tensor.tr();
 	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
-	Real mu = physicalViscosity(uh);
-	tau *= mu/_reynolds;
 
-	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/rho - velocity_tensor.transpose() * velocity;
-	grad_enthalpy *= (mu/_reynolds)*(_gamma/_prandtl);
+	Real mu = physicalViscosity(uh);
+	Real X = uh[5]/mu;
+	Real psi(X);
+	if (X < 10)
+		psi = 0.05*log(1+exp(20*X));
+	else
+		psi = X;
+
+	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	Real mu_turb = std::max<Real>(0., uh[5]*fv1);
+
+	tau *= (mu+mu_turb)/_reynolds;
+
+	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/uh[0] - velocity_tensor.transpose() * velocity;
+	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
 
 	int component = 0;
 	viscous_term[component](0) = 0.;
@@ -156,13 +194,95 @@ void NavierStokesProblem::viscousTermAdiabatic(RealVectorValue* viscous_term, Re
 	viscous_term[component](2) = tau(2, 2);
 
 	component = 4;
-	RealVectorValue vel_tau = tau * velocity  ;
+	RealVectorValue vel_tau(tau * velocity);
 	viscous_term[component](0) = vel_tau(0);
 	viscous_term[component](1) = vel_tau(1);
 	viscous_term[component](2) = vel_tau(2);
+
+	component = 5;
+	viscous_term[component](0) = mu*(1+psi)/_sigma_sa*grad_nu(0)/_reynolds;
+	viscous_term[component](1) = mu*(1+psi)/_sigma_sa*grad_nu(1)/_reynolds;
+	viscous_term[component](2) = mu*(1+psi)/_sigma_sa*grad_nu(2)/_reynolds;
+
 }
 
-void NavierStokesProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &normal)
+void SAProblem::sourceTerm(RealVectorValue* source_term, Real* uh, RealGradient* duh)
+{
+	Real rho(uh[0]);
+	Real d(uh[6]);     //uh[6] 为壁面距离
+	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
+	RealGradient grad_rho(duh[0]);
+	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
+	RealTensor temp;
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j)
+		{
+			temp(i,j) = velocity(i)*grad_rho(j);
+		}
+	}
+	RealTensor velocity_tensor((momentum_tensor - temp)/rho);
+	RealTensor tau(velocity_tensor + velocity_tensor.transpose());
+	Real lamdiv = 2./3. * velocity_tensor.tr();
+	tau(0, 0) -= lamdiv; tau(1, 1) -= lamdiv; tau(2, 2) -= lamdiv;
+
+	Real mu = physicalViscosity(uh);
+	Real X = uh[5]/mu;
+	Real psi(X);
+	if (X < 10)
+		psi = 0.05*log(1+exp(20*X));
+	else
+		psi = X;
+
+	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	Real mu_turb = std::max<Real>(0., uh[5]*fv1);
+
+	tau *= (mu+mu_turb)/_reynolds;
+
+	RealVectorValue grad_enthalpy = (duh[4]-uh[4]/uh[0] * duh[0])/uh[0] - velocity_tensor.transpose() * velocity;
+	RealVectorValue grad_nu = (duh[5] - uh[5]/uh[0]*duh[0])/uh[0];
+
+
+	RealTensor omega((velocity_tensor - velocity_tensor.transpose())/2.);
+	Real vorticity = sqrt(2*omega.size_sq())+1E-04;
+
+	Real fv2, s_title, s_hat;
+	fv2 = 1-psi/(1+psi*fv1);
+	s_hat = mu*psi/(_reynolds*rho*_kappa*_kappa*d*d)*fv2;
+	if(s_hat >= -_cv2*vorticity)
+		s_title = vorticity+s_hat;
+	else
+		s_title = vorticity+(_cv2*_cv2*vorticity+_cv3*s_hat)*vorticity/((_cv3-2*_cv2)*vorticity-s_hat);
+
+	Real r = std::min<Real>((s_hat)/((s_title*fv2)), 10);
+	//	Real r = s_hat/s_title/fv2;
+	//	std::cout << r  <<std::endl;
+	Real r6 = r*r*r*r*r*r;
+	Real g = r+_cw2*(r6-r);
+	Real g6 = g*g*g*g*g*g;
+	Real fw = g*pow((1+_cw3_pow6)/(g6+_cw3_pow6),1./6);
+
+	int component = 0;
+	source_term[component] = 0;
+
+	component = 1;
+	source_term[component] = 0;
+
+	component = 2;
+	source_term[component] = 0;
+
+	component = 3;
+	source_term[component] = 0;
+
+	component = 4;
+	source_term[component] = 0.;
+
+	component = 5;
+	source_term[component] = _cb1*s_title*mu*psi
+						   + _cb2/_sigma_sa/_reynolds*rho*grad_nu.size_sq()
+						   - _cw1/_reynolds/rho*fw*(mu*mu*psi*psi/d/d);
+}
+
+void SAProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &normal)
 {
 	RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
 	Real uh[5];
@@ -177,7 +297,7 @@ void NavierStokesProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &nor
 		flux[eq] = 0.5*(ifl[eq] + ifr[eq])*normal + maxEigenValue(uh, normal)*(ul[eq] - ur[eq]);
 }
 
-void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type)
+void SAProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type)
 {
 	if(bc_type == "isothermal_wall")
 	{
@@ -215,7 +335,7 @@ void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, s
 	mooseError( bc_type << "未定义的边界条件类型");
 }
 
-void NavierStokesProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Real* ul, RealGradient* dul, Point& normal, Real penalty, std::string bc_type)
+void SAProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Real* ul, RealGradient* dul, Point& normal, Real penalty, std::string bc_type)
 {
 	Real ur[10];
 	RealGradient dur[10];
@@ -246,7 +366,7 @@ void NavierStokesProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift,
 	}
 }
 
-void NavierStokesProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
+void SAProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
 {
     Real twall = 1.;
     Real pre = pressure(ul);
@@ -258,8 +378,7 @@ void NavierStokesProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
     ur[4] = ul[0]*twall/_gamma/(_gamma-1)/_mach/_mach;
 }
 
-
-void NavierStokesProblem::adiabaticWall(Real *ur,  Real *ul, Point &normal)
+void SAProblem::adiabaticWall(Real *ur,  Real *ul, Point &normal)
 {
     ur[0] = ul[0];
     ur[1] = 0.;
@@ -267,69 +386,8 @@ void NavierStokesProblem::adiabaticWall(Real *ur,  Real *ul, Point &normal)
     ur[3] = 0.;
     ur[4] = ul[4];
 }
-//
-//void NavierStokesProblem::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
-//{
-//	for (int eq = 0; eq < _n_equations; ++eq)
-//		dur[eq] = dul[eq];
-//
-//	const Point &normal = _normals[_qp];
-//
-//	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
-//	if(_current_elem->dim() == 2)
-//		vel_inf(2) = 0.;
-//
-//	Real rho_inf = 1.;
-//	Real p_inf = 1/_gamma/_mach/_mach;
-//	Real pl = pressure(ul);
-//	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
-////	Real vel = vel_left.norm();
-//	Real vel = vel_inf.norm();
-//	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
-////	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
-//	Real vn = vel_inf(0)*normal(0)+vel_inf(1)*normal(1)+vel_inf(2)*normal(2);
-//
-//	if(vn < 0)  // 入口
-//	{
-//		if (vel > cl) //超音速
-//		{
-//			ur[0] = rho_inf;
-//			ur[1] = rho_inf*vel_inf(0);
-//			ur[2] = rho_inf*vel_inf(1);
-//			ur[3] = rho_inf*vel_inf(2);
-//			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
-//		}
-//		else	//亚音速
-//		{
-//			ur[0] = rho_inf;
-//			ur[1] = rho_inf*vel_inf(0);
-//			ur[2] = rho_inf*vel_inf(1);
-//			ur[3] = rho_inf*vel_inf(2);
-//			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
-//		}
-//	}
-//	else  //出口
-//	{
-//		if (vel > cl) //超音速
-//		{
-//			ur[0] = ul[0];
-//			ur[1] = ul[1];
-//			ur[2] = ul[2];
-//			ur[3] = ul[3];
-//			ur[4] = ul[4];
-//		}
-//		else	//亚音速
-//		{
-//			ur[0] = ul[0];
-//			ur[1] = ul[1];
-//			ur[2] = ul[2];
-//			ur[3] = ul[3];
-//			ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
-//		}
-//	}
-//}
-//
-void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
+
+void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 {
 	Real rhoR, uR, vR, wR, pR;
 	Real rhoL, uL, vL, wL, pL;
@@ -416,37 +474,3 @@ void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
 	}
 }
 
-
-//
-//
-//void NavierStokesProblem::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
-//{
-//	for (int eq = 0; eq < _n_equations; ++eq)
-//		dur[eq] = dul[eq];
-//
-//	const Point &normal = _normals[_qp];
-//	RealVectorValue momentum(ul[1], ul[2], ul[3]);
-//    Real vn = momentum*normal;
-//    Real pre = pressure(ul);
-//
-//    ur[0] = ul[0];
-//    ur[1] = ul[1] - 2.0 * vn * normal(0);
-//    ur[2] = ul[2] - 2.0 * vn * normal(1);
-//    ur[3] = ul[3] - 2.0 * vn * normal(2);
-//    ur[4] = ul[4];
-////    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
-//}
-//
-//void NavierStokesProblem::pressureOut(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
-//{
-//	for (int eq = 0; eq < _n_equations; ++eq)
-//		dur[eq] = dul[eq];
-//
-//	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
-//	Real p_inf = 1/_gamma/_mach/_mach;
-//	ur[0] = ul[0];
-//	ur[1] = ul[1];
-//	ur[2] = ul[2];
-//	ur[3] = ul[3];
-//	ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
-//}

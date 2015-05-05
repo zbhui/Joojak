@@ -1,8 +1,6 @@
 
 #include "CLawProblem.h"
 
-#include "MooseApp.h"
-
 template<>
 InputParameters validParams<CLawProblem>()
 {

@@ -2,7 +2,6 @@
 #pragma once
 
 #include "CFDProblem.h"
-#include "Attitude.h"
 
 class EulerProblem : public CFDProblem
 {
