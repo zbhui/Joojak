@@ -16,15 +16,15 @@ InputParameters validParams<AddCLawAction>()
   InputParameters params = validParams<Action>();
   params.addParam<MooseEnum>("family", families, "Specifies the family of FE shape functions to use for this variable");
   params.addParam<MooseEnum>("order", orders,  "Specifies the order of the FE shape function to use for this variable (additional orders not listed are allowed)");
-  params.addRequiredParam<std::vector<NonlinearVariableName> >("variables", "非线性变量");
+  params.addRequiredParam<std::vector<VariableName> >("variables", "非线性变量");
   return params;
 }
 
 AddCLawAction::AddCLawAction(const std::string & name, InputParameters params) :
     Action(name, params),
-	_variables(getParam<std::vector<NonlinearVariableName> >("variables"))
+	_variables(getParam<std::vector<VariableName> >("variables"))
+//	_variables(_problem->getNonlinearSystem().getVariableNames())
 {
-
 }
 void AddCLawAction::act()
 {
@@ -48,13 +48,13 @@ void AddCLawAction::act()
 
 void AddCLawAction::addVariable()
 {
-	Real scale_factor = isParamValid("scaling") ? getParam<Real>("scaling") : 1;
-	FEType fe_type(Utility::string_to_enum<Order>(getParam<MooseEnum>("order")),
-             Utility::string_to_enum<FEFamily>(getParam<MooseEnum>("family")));
-	for (int i = 0; i < _variables.size(); ++i)
-	{
-		_problem->addVariable(_variables[i], fe_type, scale_factor);
-	}
+//	Real scale_factor = isParamValid("scaling") ? getParam<Real>("scaling") : 1;
+//	FEType fe_type(Utility::string_to_enum<Order>(getParam<MooseEnum>("order")),
+//             Utility::string_to_enum<FEFamily>(getParam<MooseEnum>("family")));
+//	for (int i = 0; i < _variables.size(); ++i)
+//	{
+//		_problem->addVariable(_variables[i], fe_type, scale_factor);
+//	}
 }
 
 void AddCLawAction::addKernel()
@@ -91,16 +91,16 @@ void AddCLawAction::addDGKernel()
 
 void AddCLawAction::addAuxVariable()
 {
-	FEType fe_type(Utility::string_to_enum<Order>("CONSTANT"), Utility::string_to_enum<FEFamily>("MONOMIAL"));
-
-	_problem->addAuxVariable("proc_id", fe_type);
+//	FEType fe_type(Utility::string_to_enum<Order>("CONSTANT"), Utility::string_to_enum<FEFamily>("MONOMIAL"));
+//
+//	_problem->addAuxVariable("proc_id", fe_type);
 }
 
 void AddCLawAction::addAuxKernel()
 {
-	InputParameters params = _factory.getValidParams("ProcessorIDAux");
-	params.set<AuxVariableName>("variable") = "proc_id";
-	_problem->addAuxKernel("ProcessorIDAux", "proc_id", params);
+//	InputParameters params = _factory.getValidParams("ProcessorIDAux");
+//	params.set<AuxVariableName>("variable") = "proc_id";
+//	_problem->addAuxKernel("ProcessorIDAux", "proc_id", params);
 }
 
 void AddCLawAction::addBoundaryCondition()

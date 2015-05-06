@@ -11,24 +11,56 @@
   block_name = 'fluid'
 []
 
+[MeshModifiers]
+  [./extrude]
+    type = BuildSideSetFromBlock
+    new_boundary = boundary_from_block
+  [../]
+[]
+
 [Problem]
   type = EulerProblem
-  order = FIRST
-  family = MONOMIAL
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
   mach = 0.38
+
+  [./Variables]
+    order = FIRST
+    family = MONOMIAL
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  [../]
+
+  [./AuxVariables]
+    [./Output]
+      type = NSAuxVariable 
+      variables = 'pressure velocity_x velocity_y velocity_z mach'
+      order = FIRST
+      family = MONOMIAL
+    [../]
+
+    [./partition]
+      type = ProcessorIDAux 
+      variables = proc_id
+      order = CONSTANT
+      family = MONOMIAL
+    [../]
+
+   [./distance]
+      type = NearestNodeDistanceAux
+      variables = distance_to_left_nodes
+      order = FIRST
+      family = LAGRANGE
+      boundary = boundary_from_block
+      paired_boundary = 0
+    [../]
+
+  [../]
+
+
 []
 
 [ICs]
   type = IsoVortexIC 
 []
 
-[AuxVariables]
-  type = NSAuxVariable 
-  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
-  order = FIRST
-  family = MONOMIAL
-[]
 
 [Materials]
   [./cell_material]

@@ -10,26 +10,55 @@
   boundary_name = 'far_field wall'
 []
 
+[MeshModifiers]
+  [./extrude]
+    type = BuildSideSetFromBlock
+    new_boundary = boundary_from_block
+  [../]
+[]
+
 [Problem]
   type = NavierStokesProblem
-  order = FIRST
-  family = MONOMIAL
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
-  mach = 0.2
+  mach = 0.1
   reynolds = 40
-[]
+
+  [./Variables]
+    order = FIRST
+    family = MONOMIAL
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  [../]
+
+  [./AuxVariables]
+    [./Output]
+      type = NSAuxVariable 
+      variables = 'pressure velocity_x velocity_y velocity_z mach'
+      order = FIRST
+      family = MONOMIAL
+    [../]
+
+    [./partition]
+      type = ProcessorIDAux 
+      variables = proc_id
+      order = CONSTANT
+      family = MONOMIAL
+    [../]
+
+   [./distance]
+      type = NearestNodeDistanceAux
+      variables = wall_distance
+      order = FIRST
+      family = LAGRANGE
+      boundary = boundary_from_block
+      paired_boundary = wall
+    [../]
+
+  [../]
 
 [ICs]
   type = CFDPassFlowIC 
   velocity = 1
 []
 
-[AuxVariables]
-  type = NSAuxVariable 
-  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
-  order = FIRST
-  family = MONOMIAL
-[]
 
 [Materials]
   [./cell_material]

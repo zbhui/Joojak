@@ -17,6 +17,8 @@
 #include "CFDPostprocessorAction.h"
 #include "CommonPostProcessorAction.h"
 #include "AddCLawAction.h"
+#include "AddMultiVariableAction.h"
+#include "AddMultiAuxVariableAction.h"
 
 /// 单元积分
 #include "CLawCellKernel.h"
@@ -250,7 +252,7 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	syntax.registerActionSyntax("CLawAuxVariablesAction", "AuxVariables");
 	syntax.registerActionSyntax("CLawICAction", "ICs", "add_ic");
 	syntax.registerActionSyntax("CommonPostProcessorAction", "Postprocessors", "add_postprocessor");
-	syntax.registerActionSyntax("AddCLawAction", "Problem");
+//	syntax.registerActionSyntax("AddCLawAction", "Problem");
 
 	registerAction(CLawICAction, "add_ic");
 	registerAction(CFDPostprocessorAction, "add_postprocessor");
@@ -258,12 +260,22 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	registerAction(CLawAuxVariablesAction, "add_aux_kernel");
 
 	registerAction(CommonPostProcessorAction, "add_postprocessor");
-	registerAction(AddCLawAction, "add_variable");
-	registerAction(AddCLawAction, "add_kernel");
-	registerAction(AddCLawAction, "add_dg_kernel");
-	registerAction(AddCLawAction, "add_aux_variable");
-	registerAction(AddCLawAction, "add_aux_kernel");
-	registerAction(AddCLawAction, "add_bc");
+//	registerAction(AddCLawAction, "add_variable");
+//	registerAction(AddCLawAction, "add_kernel");
+//	registerAction(AddCLawAction, "add_dg_kernel");
+//	registerAction(AddCLawAction, "add_aux_variable");
+//	registerAction(AddCLawAction, "add_aux_kernel");
+//	registerAction(AddCLawAction, "add_bc");
+
+	syntax.registerActionSyntax("AddMultiVariableAction", "Problem/Variables");
+	registerAction(AddMultiVariableAction, "add_variable");
+	registerAction(AddMultiVariableAction, "add_kernel");
+	registerAction(AddMultiVariableAction, "add_dg_kernel");
+	registerAction(AddMultiVariableAction, "add_bc");
+
+	syntax.registerActionSyntax("AddMultiAuxVariableAction", "Problem/AuxVariables/*");
+	registerAction(AddMultiAuxVariableAction, "add_aux_variable");
+	registerAction(AddMultiAuxVariableAction, "add_aux_kernel");
 
 
 

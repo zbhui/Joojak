@@ -17,7 +17,7 @@ private:
   void addAuxKernel();
   void addBoundaryCondition();
 protected:
-  std::vector<NonlinearVariableName> _variables;
+  std::vector<VariableName> _variables;
 };
 
 template<>

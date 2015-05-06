@@ -17,6 +17,7 @@ CLawCellMaterial::CLawCellMaterial(const std::string & name, InputParameters par
 		_nl(_claw_problem.getNonlinearSystem()),
 		_tid(parameter.get<THREAD_ID>("_tid")),
 		_variables(_nl.getVariableNames()),
+		_aux_variables(_claw_problem.getAuxiliarySystem().getVariableNames()),
 		_n_equations(_variables.size()),
 		_var_order(_claw_problem.getVariable(_tid, _variables[0]).order()),
 
