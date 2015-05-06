@@ -18,7 +18,9 @@ CLawCellMaterial::CLawCellMaterial(const std::string & name, InputParameters par
 		_tid(parameter.get<THREAD_ID>("_tid")),
 		_variables(_nl.getVariableNames()),
 		_aux_variables(_claw_problem.getAuxiliarySystem().getVariableNames()),
-		_n_equations(_variables.size()),
+		_num_nonliner_variables(_variables.size()),
+		_num_aux_variables(_aux_variables.size()),
+		_num_variables(_num_nonliner_variables + _num_aux_variables),
 		_var_order(_claw_problem.getVariable(_tid, _variables[0]).order()),
 
 		_ds(getParam<Real>("ds")),
@@ -26,11 +28,17 @@ CLawCellMaterial::CLawCellMaterial(const std::string & name, InputParameters par
 {
 	if(_bnd || _neighbor) return ;
 
-	for (int eq = 0; eq < _n_equations; ++eq)
+	for (int eq = 0; eq < _num_nonliner_variables; ++eq)
 	{
-		mooseAssert(val.order() == _var_order, "变量的阶不同");
-
 		MooseVariable &val = _fe_problem.getVariable(_tid, _variables[eq]);
+		_uh.push_back(_is_implicit ? &val.sln() : &val.slnOld());
+		_grad_uh.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
+	}
+
+	for (int eq = 0; eq < _num_aux_variables; ++eq)
+	{
+		std::cout << _aux_variables[eq] << std::endl;
+		MooseVariable &val = _fe_problem.getVariable(_tid, _aux_variables[eq]);
 		_uh.push_back(_is_implicit ? &val.sln() : &val.slnOld());
 		_grad_uh.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
 	}
@@ -40,7 +48,7 @@ void CLawCellMaterial::computeQpProperties()
 {
 	if(_bnd || _neighbor) return ;
 
-	for (int eq = 0; eq < _n_equations; ++eq)
+	for (int eq = 0; eq < _num_nonliner_variables; ++eq)
 	{
 		_cell_material_data[_qp].uh[eq] =  (*_uh[eq])[_qp];
 		_cell_material_data[_qp].duh[eq] = (*_grad_uh[eq])[_qp];
@@ -52,7 +60,7 @@ void CLawCellMaterial::computeQpProperties()
 
 void CLawCellMaterial::fillQpValue()
 {
-	for (int eq = 0; eq < _n_equations; ++eq)
+	for (int eq = 0; eq < _num_nonliner_variables; ++eq)
 	{
 		_cell_material_data[_qp].uh[eq] =  (*_uh[eq])[_qp];
 		_cell_material_data[_qp].duh[eq] = (*_grad_uh[eq])[_qp];

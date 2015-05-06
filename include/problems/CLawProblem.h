@@ -23,8 +23,10 @@ protected:
 	virtual Real initialCondition(int eq);
 
 public:
-	int _n_equations;
 	vector<VariableName> _variables;
+	vector<VariableName> _aux_variables;
+	int _n_equations;
+
 };
 
 template<>

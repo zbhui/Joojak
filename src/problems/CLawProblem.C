@@ -5,17 +5,18 @@ template<>
 InputParameters validParams<CLawProblem>()
 {
   InputParameters params = validParams<FEProblem>();
+  params.addCoupledVar("aux_variables", "耦合变量");
   return params;
 }
 
 CLawProblem::CLawProblem(const std::string & name, InputParameters params) :
     FEProblem(name, params),
-	_n_equations(0),
-	_variables(_nl.getVariableNames())
+	_variables(_nl.getVariableNames()),
+	_n_equations(_variables.size())
 {
 	std::cout << "配置文件：" << _app.getInputFileName() << std::endl;
 	std::cout << params <<std::endl;
-
+	std::cout << _n_equations <<std::endl;
 //    _mesh.printInfo();
 }
 
