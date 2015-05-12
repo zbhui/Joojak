@@ -194,6 +194,11 @@ void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, s
 		farField(ur, ul, normal);
 		return;
 	}
+	if(bc_type == "symmetric")
+	{
+		symmetric(ur, ul, normal);
+		return;
+	}
 //	if(_bc_type == "symmetric")
 //	{
 //		symmetric(ur, dur, ul, dul);
@@ -266,6 +271,19 @@ void NavierStokesProblem::adiabaticWall(Real *ur,  Real *ul, Point &normal)
     ur[2] = 0.;
     ur[3] = 0.;
     ur[4] = ul[4];
+}
+
+void NavierStokesProblem::symmetric(Real *ur,  Real *ul, Point &normal)
+{
+	RealVectorValue momentum(ul[1], ul[2], ul[3]);
+    Real vn = momentum*normal;
+    Real pre = pressure(ul);
+
+    ur[0] = ul[0];
+    ur[1] = ul[1] - 2.0 * vn * normal(0);
+    ur[2] = ul[2] - 2.0 * vn * normal(1);
+    ur[3] = ul[3] - 2.0 * vn * normal(2);
+    ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 //
 //void NavierStokesProblem::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)

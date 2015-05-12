@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "CFDProblem.h"
+#include "NavierStokesProblem.h"
 
-class SAProblem : public CFDProblem
+class SAProblem : public NavierStokesProblem
 {
 public:
 	SAProblem(const std::string & name, InputParameters params);
@@ -20,6 +20,7 @@ private:
 	void isothermalWall(Real *ur,  Real *ul, Point &normal);
 	void adiabaticWall(Real *ur,  Real *ul, Point &normal);
 	void farField(Real *ur,  Real *ul, Point &normal);
+	void symmetric(Real *ur,  Real *ul, Point &normal);
 
 	void viscousTermAdiabatic(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
 

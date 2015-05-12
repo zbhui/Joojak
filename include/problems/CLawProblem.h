@@ -4,7 +4,8 @@
 #include "FEProblem.h"
 using std::vector;
 
-class CLawProblem : public FEProblem
+class CLawProblem :
+public FEProblem
 {
 public:
 	CLawProblem(const std::string & name, InputParameters params);
@@ -22,11 +23,17 @@ protected:
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
 	virtual Real initialCondition(int eq);
 
+	virtual void init();
+
 public:
 	vector<VariableName> _variables;
 	vector<VariableName> _aux_variables;
 	int _n_equations;
 
+	vector<Real> _uh;
+	vector<RealGradient> _duh;
+	vector<RealVectorValue> _inviscous_term;
+	vector<RealVectorValue> _viscous_term;
 };
 
 template<>

@@ -110,3 +110,6 @@ void CFDProblem::stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh)
 	tau *= mu/_reynolds;
 }
 
+void CFDProblem::heatFluxTerm(RealVectorValue& heat_flux, Real* uh, RealGradient* duh)
+{
+}

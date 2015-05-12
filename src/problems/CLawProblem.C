@@ -22,6 +22,13 @@ CLawProblem::CLawProblem(const std::string & name, InputParameters params) :
 
 
 
+void CLawProblem::init()
+{
+	FEProblem::init();
+	_variables = _nl.getVariableNames();
+	_n_equations = (_variables.size());
+	std::cout << _n_equations <<std::endl;
+}
 void CLawProblem::computeFaceFlux(Real* flux, RealVectorValue* lift, Real* ul, Real* ur, RealGradient* dul, RealGradient* dur, Point& normal, Real penalty)
 {
 	RealVectorValue ifl[10], ifr[10], vfl[10], vfr[10];
@@ -70,9 +77,9 @@ void CLawProblem::computeCellFlux(RealGradient* flux, Real* uh, RealGradient* du
 	RealVectorValue inv_term[10], vis_term[10], source_term[10];
 	inviscousTerm(inv_term, uh);
 	viscousTerm(vis_term, uh, duh);
-	sourceTerm(source_term, uh, duh);
+//	sourceTerm(source_term, uh, duh);
 	for (int eq = 0; eq < _n_equations; ++eq)
-		flux[eq] = inv_term[eq] - vis_term[eq] + source_term[eq];
+		flux[eq] = inv_term[eq] - vis_term[eq];
 }
 
 void CLawProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)

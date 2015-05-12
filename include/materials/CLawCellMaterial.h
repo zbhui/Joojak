@@ -18,10 +18,8 @@ protected:
 	NonlinearSystem &_nl;
 	THREAD_ID _tid;
 	vector<VariableName> _variables;
-	vector<VariableName> _aux_variables;
-	int _num_nonliner_variables;
-	int _num_aux_variables;
-	int _num_variables;
+	int _n_equations;
+	int _n_variables;
 	int _var_order;
 
 	Real _ds;

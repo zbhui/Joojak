@@ -13,6 +13,7 @@ public:
 
 	virtual Real physicalViscosity(Real *uh);
 	virtual void stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh);
+	virtual void heatFluxTerm(RealVectorValue &heat_flux, Real* uh, RealGradient* duh);
 	virtual Real pressure(Real *uh);
 	virtual Real pressureInfity();
 	virtual Real enthalpy(Real *uh);

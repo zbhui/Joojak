@@ -1,6 +1,6 @@
 [Mesh]
   type = FileMesh
-  file = grids/cylinder_tri.msh
+  file = grids/cylinder_fine.msh
   dim = 2
   
   block_id = 10
@@ -11,59 +11,60 @@
 []
 
 [MeshModifiers]
-  [./fake_boudary]
+  [./extrude]
     type = BuildSideSetFromBlock
+    new_boundary = boundary_from_block
   [../]
 []
 
-
 [Problem]
-  type = NavierStokesProblem
-  order = FIRST
-  family = MONOMIAL
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
-  mach = 0.2
+  type = SAProblem
+  mach = 0.1
   reynolds = 40
-[]
+
+  [./Variables]
+    order = FIRST
+    family = MONOMIAL
+    variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
+  [../]
+
+  [./AuxVariables]
+    [./Output]
+      type = NSAuxVariable 
+      variables = 'pressure velocity_x velocity_y velocity_z mach'
+      order = FIRST
+      family = MONOMIAL
+    [../]
+
+    [./partition]
+      type = ProcessorIDAux 
+      variables = proc_id
+      order = CONSTANT
+      family = MONOMIAL
+    [../]
+
+   [./distance]
+      type = NearestNodeDistanceAux
+      variables = wall_distance
+      order = FIRST
+      family = LAGRANGE
+      boundary = boundary_from_block
+      paired_boundary = wall
+    [../]
+
+  [../]
 
 [ICs]
   type = CFDPassFlowIC 
   velocity = 1
 []
 
-[AuxVariables]
-  type = NSAuxVariable 
-  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
-  order = FIRST
-  family = MONOMIAL
-
-  [./distance_to_left_nodes]
-  [../]
-  [./distance]
-  [../]
-[]
-
-
-[AuxKernels]
-  [./nodal_distance_aux]
-    type = NearestNodeDistanceAux
-    variable = distance_to_left_nodes
-    boundary = boundary_from_block
-    paired_boundary = 9
-  [../]
-  [./penetration_aux]
-    type = PenetrationAux
-    variable = distance
-    boundary = boundary_from_block
-    paired_boundary = 9
-  [../]
-[]
 
 [Materials]
   [./cell_material]
     block = 10
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+    variables = 'rho momentum_x momentum_y momentum_z rhoe rhon wall_distance'
   [../]
   [./face_material]
     block = 10

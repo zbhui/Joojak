@@ -17,10 +17,8 @@ CLawCellMaterial::CLawCellMaterial(const std::string & name, InputParameters par
 		_nl(_claw_problem.getNonlinearSystem()),
 		_tid(parameter.get<THREAD_ID>("_tid")),
 		_variables(_nl.getVariableNames()),
-		_aux_variables(_claw_problem.getAuxiliarySystem().getVariableNames()),
-		_num_nonliner_variables(_variables.size()),
-		_num_aux_variables(_aux_variables.size()),
-		_num_variables(_num_nonliner_variables + _num_aux_variables),
+		_n_equations(_variables.size()),
+		_n_variables(coupledComponents("variables")),
 		_var_order(_claw_problem.getVariable(_tid, _variables[0]).order()),
 
 		_ds(getParam<Real>("ds")),
@@ -28,19 +26,10 @@ CLawCellMaterial::CLawCellMaterial(const std::string & name, InputParameters par
 {
 	if(_bnd || _neighbor) return ;
 
-	for (int eq = 0; eq < _num_nonliner_variables; ++eq)
+	for (int eq = 0; eq < _n_variables; ++eq)
 	{
-		MooseVariable &val = _fe_problem.getVariable(_tid, _variables[eq]);
-		_uh.push_back(_is_implicit ? &val.sln() : &val.slnOld());
-		_grad_uh.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
-	}
-
-	for (int eq = 0; eq < _num_aux_variables; ++eq)
-	{
-		std::cout << _aux_variables[eq] << std::endl;
-		MooseVariable &val = _fe_problem.getVariable(_tid, _aux_variables[eq]);
-		_uh.push_back(_is_implicit ? &val.sln() : &val.slnOld());
-		_grad_uh.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
+		_uh.push_back(&coupledValue("variables", eq));
+		_grad_uh.push_back(&coupledGradient("variables", eq));
 	}
 }
 
@@ -48,7 +37,7 @@ void CLawCellMaterial::computeQpProperties()
 {
 	if(_bnd || _neighbor) return ;
 
-	for (int eq = 0; eq < _num_nonliner_variables; ++eq)
+	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		_cell_material_data[_qp].uh[eq] =  (*_uh[eq])[_qp];
 		_cell_material_data[_qp].duh[eq] = (*_grad_uh[eq])[_qp];
@@ -60,7 +49,7 @@ void CLawCellMaterial::computeQpProperties()
 
 void CLawCellMaterial::fillQpValue()
 {
-	for (int eq = 0; eq < _num_nonliner_variables; ++eq)
+	for (int eq = 0; eq < _n_equations; ++eq)
 	{
 		_cell_material_data[_qp].uh[eq] =  (*_uh[eq])[_qp];
 		_cell_material_data[_qp].duh[eq] = (*_grad_uh[eq])[_qp];

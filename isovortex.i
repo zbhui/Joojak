@@ -45,7 +45,7 @@
 
    [./distance]
       type = NearestNodeDistanceAux
-      variables = distance_to_left_nodes
+      variables = distance
       order = FIRST
       family = LAGRANGE
       boundary = boundary_from_block
@@ -66,7 +66,7 @@
   [./cell_material]
     block = 0
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+    variables = 'rho momentum_x momentum_y momentum_z rhoe distance'
   [../]
   [./face_material]
     block = 0

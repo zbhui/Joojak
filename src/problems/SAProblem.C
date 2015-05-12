@@ -6,13 +6,13 @@ using Eigen::Vector3d;
 template<>
 InputParameters validParams<SAProblem>()
 {
-  InputParameters params = validParams<CFDProblem>();
+  InputParameters params = validParams<NavierStokesProblem>();
 
   return params;
 }
 
 SAProblem::SAProblem(const std::string & name, InputParameters params) :
-	CFDProblem(name, params),
+	NavierStokesProblem(name, params),
 	_cb1(0.1355), _cb2(0.622), _sigma_sa(2./3), _kappa(0.41),
 	_cw2(0.3), _cw3(2.0), _cv1(7.1), _cv2(0.7), _cv3(0.9),
 	_ct1(1.0), _ct2(2.0), _ct3(1.2), _ct4(0.5),
@@ -23,50 +23,18 @@ SAProblem::SAProblem(const std::string & name, InputParameters params) :
 	_cw3_pow6 = _cw3*_cw3*_cw3*_cw3*_cw3*_cw3;
 
 	_n_equations = 6;
-	if(_n_equations == 0)
-		mooseError("没有指定问题方程个数" << name);
 }
 
 void SAProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 {
-	Real rho, p, h, k;
-	Real u, v, w;
+	NavierStokesProblem::inviscousTerm(inviscous_term, uh);
+	Real rho, u, v, w;
 	rho = uh[0];
 	u = uh[1]/rho;
 	v = uh[2]/rho;
 	w = uh[3]/rho;
-	p = pressure(uh);
-	h = enthalpy(uh);
-	k = uh[5]/uh[0];
 
-	int component = 0;
-
-	component = 0;
-	inviscous_term[component](0) = uh[1];
-	inviscous_term[component](1) = uh[2];
-	inviscous_term[component](2) = uh[3];
-
-	component = 1;
-	inviscous_term[component](0) = uh[1] * u + p;
-	inviscous_term[component](1) = uh[1] * v;
-	inviscous_term[component](2) = uh[1] * w;
-
-	component = 2;
-	inviscous_term[component](0) = uh[2] * u;
-	inviscous_term[component](1) = uh[2] * v + p;
-	inviscous_term[component](2) = uh[2] * w;
-
-	component = 3;
-	inviscous_term[component](0) = uh[3] * u;
-	inviscous_term[component](1) = uh[3] * v;
-	inviscous_term[component](2) = uh[3] * w + p;
-
-	component = 4;
-	inviscous_term[component](0) = rho*h * u;
-	inviscous_term[component](1) = rho*h * v;
-	inviscous_term[component](2) = rho*h * w;
-
-	component = 5;
+	int component = 5;
 	inviscous_term[component](0) = uh[5] * u;
 	inviscous_term[component](1) = uh[5] * v;
 	inviscous_term[component](2) = uh[5] * w;
@@ -314,6 +282,11 @@ void SAProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, std::string
 		farField(ur, ul, normal);
 		return;
 	}
+	if(bc_type == "symmetric")
+	{
+		symmetric(ur, ul, normal);
+		return;
+	}
 //	if(_bc_type == "symmetric")
 //	{
 //		symmetric(ur, dur, ul, dul);
@@ -368,109 +341,24 @@ void SAProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Real* ul,
 
 void SAProblem::isothermalWall(Real *ur,  Real *ul, Point &normal)
 {
-    Real twall = 1.;
-    Real pre = pressure(ul);
-
-    ur[0] = ul[0];
-    ur[1] = 0.;
-    ur[2] = 0.;
-    ur[3] = 0.;
-    ur[4] = ul[0]*twall/_gamma/(_gamma-1)/_mach/_mach;
+    NavierStokesProblem::isothermalWall(ur, ul, normal);
+    ur[5] = 0;
 }
 
 void SAProblem::adiabaticWall(Real *ur,  Real *ul, Point &normal)
 {
-    ur[0] = ul[0];
-    ur[1] = 0.;
-    ur[2] = 0.;
-    ur[3] = 0.;
-    ur[4] = ul[4];
+    NavierStokesProblem::adiabaticWall(ur, ul, normal);
+    ur[5] = 0;
 }
 
+void SAProblem::symmetric(Real *ur,  Real *ul, Point &normal)
+{
+    NavierStokesProblem::symmetric(ur, ul, normal);
+    ur[5] = ul[5];
+}
 void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 {
-	Real rhoR, uR, vR, wR, pR;
-	Real rhoL, uL, vL, wL, pL;
-	Real cR, cL, cb;
-	Real vnR, vnL, vnb;
-	Real vel, s;
-	Real Rp, Rm;
-
-	Vector3d vel_inf = _attitude.earthFromWind()*Vector3d::UnitX();
-	if(_mesh.dimension() == 2)
-		vel_inf(2) = 0.;
-
-	uR = vel_inf(0);
-	vR = vel_inf(1);
-	wR = vel_inf(2);
-
-	Real lam[3];
-	eigenValue(lam, ul, normal);
-
-	rhoR = 1.0;
-
-	pR = 1 / _gamma /_mach / _mach;
-	cR = sqrt(fabs(_gamma * pR / rhoR));
-	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
-
-	rhoL = ul[0];
-	uL = ul[1] / rhoL;
-	vL = ul[2] / rhoL;
-	wL = ul[3] / rhoL;
-	vel = sqrt(uL * uL + vL * vL + wL * wL);
-	pL = pressure(ul);
-	cL = sqrt(fabs(_gamma * pL / rhoL));
-	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
-
-	if(lam[1] < 0)  // 入口
-	{
-		if (vel > cL) //超音速
-		{
-			ur[0] = rhoR;
-			ur[1] = rhoR * uR;
-			ur[2] = rhoR * vR;
-			ur[3] = rhoR * wR;
-			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
-		}
-		else	//亚音速
-		{
-			s = pR / pow(rhoR, _gamma);
-			Rp = -vnR + 2.0 * cR / (_gamma - 1);
-			Rm = -vnL - 2.0 * cL / (_gamma - 1);
-			vnb = -(Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
-			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
-			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-		}
-	}
-	else  //出口
-	{
-		if (vel > cL) //超音速
-		{
-			ur[0] = ul[0];
-			ur[1] = ul[1];
-			ur[2] = ul[2];
-			ur[3] = ul[3];
-			ur[4] = ul[4];
-		}
-		else	//亚音速
-		{
-			s = pL / pow(rhoL, _gamma);
-			Rp = vnL + 2 * cL / (_gamma - 1);
-			Rm = vnR - 2 * cR / (_gamma - 1);
-			vnb = (Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
-			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
-			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-		}
-	}
+    NavierStokesProblem::adiabaticWall(ur, ul, normal);
+    ur[5] = ul[5];
 }
 

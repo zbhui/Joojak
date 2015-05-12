@@ -11,11 +11,24 @@
 
 [Problem]
   type = NavierStokesProblem
-  order = FIRST
-  family = MONOMIAL
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
   mach = 0.1
   reynolds = 100
+
+  [./Variables]
+    order = FIRST
+    family = MONOMIAL
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  [../]
+
+  [./AuxVariables]
+    [./Output]
+      type = NSAuxVariable 
+      variables = 'pressure velocity_x velocity_y velocity_z mach'
+      order = FIRST
+      family = MONOMIAL
+    [../]
+
+  [../]
 []
 
 [ICs]
@@ -23,26 +36,20 @@
   velocity = 0
 []
 
-[AuxVariables]
-  type = NSAuxVariable 
-  aux_variables = 'pressure velocity_x velocity_y velocity_z mach'
-  order = FIRST
-  family = MONOMIAL
-[]
 
 [Materials]
   [./cell_material]
-    block = 0
+    block = ANY_BLOCK_ID
     type = CLawCellMaterial
     variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
   [./face_material]
-    block = 0
+    block = ANY_BLOCK_ID
     type = CLawFaceMaterial
   [../]
   [./bc_material]
     type = CouetteFlowBndMaterial
-    boundary = '0 1 2 3'
+    boundary = ANY_BOUNDARY_ID
   [../]
 []
 
@@ -53,7 +60,7 @@
     #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
     #petsc_options_iname = '-pc_type -snes_type'
     petsc_options_iname = '-ksp_type  -pc_type'
-    petsc_options_value = 'gmres       bjacobi'
+    petsc_options_value = 'gmres       ilu'
   [../]
 []
 
