@@ -1,5 +1,6 @@
 
 #include "EulerProblem.h"
+#include "CLawCellMaterial.h"
 using Eigen::Vector3d;
 
 template<>
@@ -13,7 +14,6 @@ InputParameters validParams<EulerProblem>()
 EulerProblem::EulerProblem(const std::string & name, InputParameters params) :
 	CFDProblem(name, params)
 {
-	_n_equations = 5;
 }
 
 void EulerProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
@@ -131,6 +131,33 @@ void EulerProblem::wall(Real *ur,  Real *ul, Point &normal)
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 
+void EulerProblem::computeCellMaterial(CLawCellMaterial& claw_cell_material)
+{
+	vector<VariableValue*> var = claw_cell_material._uh;
+	int n_qpoints = claw_cell_material.numPoints();
+
+	Real uh[10];
+	RealVectorValue flux_term[10], flux_term_new[10];
+	Real _ds = 1e-08;
+	for(int qp = 0 ; qp < n_qpoints; ++qp)
+	{
+		for (int eq = 0; eq < _n_equations; ++eq)
+			uh[eq] =  (*var[eq])[qp];
+
+		inviscousTerm(claw_cell_material._cell_material_data[qp]._flux_term, uh);
+		inviscousTerm(flux_term, uh);
+		for (int q = 0; q < _n_equations; ++q)
+		{
+			uh[q] += _ds;
+			inviscousTerm(flux_term_new, uh);
+			for (int p = 0; p < _n_equations; ++p)
+				claw_cell_material._cell_material_data[qp]._flux_jacobi_variable[p][q] = (flux_term_new[p] - flux_term[p])/_ds;
+
+			uh[q] -= _ds;
+		}
+	}
+}
+
 void EulerProblem::symmetric(Real *ur,  Real *ul, Point &normal)
 {
 	wall(ur, ul, normal);
@@ -218,4 +245,9 @@ void EulerProblem::farField(Real *ur,  Real *ul, Point &normal)
 Real EulerProblem::physicalViscosity(Real* uh)
 {
 	return 0;
+}
+
+void EulerProblem::updateDependValue(DependValue& denpend_value, Real *uh)
+{
+	denpend_value.pressure = pressure(uh);
 }

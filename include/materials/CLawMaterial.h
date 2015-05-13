@@ -12,13 +12,26 @@
 #pragma once
 
 #include "Material.h"
+using std::vector;
+class CLawProblem;
 
-class CLawMaterial :
-public Material
+class CLawMaterial : public Material
 {
 public:
 	CLawMaterial(const std::string & name, InputParameters parameters);
 
+protected:
+	CLawProblem &_claw_problem;
+	NonlinearSystem &_nl;
+	THREAD_ID _tid;
+	vector<VariableName> _variables;
+	int _n_equations;
+	int _n_variables;
+	int _var_order;
+public:
+	const MooseArray<Point> & qpoints() {return _q_point;}
+	const MooseArray<Point> & normals() {return _normals;}
+	int numPoints() {return _qrule->n_points();}
 protected:
 };
 

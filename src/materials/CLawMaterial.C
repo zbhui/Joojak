@@ -1,15 +1,6 @@
-/** ***********************************************************
-*  @file
-*  @brief
-*  @author	刘  伟
-*
-*  Program:   Joojak
-*  Copyright (c) 刘伟，张来平，2014，空气动力学国家重点实验室(SKLA)
-*  All rights reserved.
-*  ************************************************************
-**/
 
 #include "CLawMaterial.h"
+#include "CLawProblem.h"
 
 template<>
 InputParameters validParams<CLawMaterial>()
@@ -18,7 +9,14 @@ InputParameters validParams<CLawMaterial>()
   return params;
 }
 
-CLawMaterial::CLawMaterial(const std::string & name, InputParameters parameters):
-		Material(name, parameters)
+CLawMaterial::CLawMaterial(const std::string & name, InputParameters parameter):
+		Material(name, parameter),
+		_claw_problem(static_cast<CLawProblem&>(_fe_problem)),
+		_nl(_claw_problem.getNonlinearSystem()),
+		_tid(parameter.get<THREAD_ID>("_tid")),
+		_variables(_nl.getVariableNames()),
+		_n_equations(_variables.size()),
+		_n_variables(coupledComponents("variables")),
+		_var_order(_claw_problem.getVariable(_tid, _variables[0]).order())
 {
 }

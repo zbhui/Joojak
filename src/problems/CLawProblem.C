@@ -1,5 +1,8 @@
 
 #include "CLawProblem.h"
+#include "CLawCellMaterial.h"
+#include "CLawFaceMaterial.h"
+#include "CLawBoundaryMaterial.h"
 
 template<>
 InputParameters validParams<CLawProblem>()
@@ -118,3 +121,74 @@ Real CLawProblem::initialCondition(int eq)
 	mooseError("CLawProblem::initialCondition，需要子类填充.");
 }
 
+void CLawProblem::computeCellMaterial(CLawCellMaterial& claw_cell_material)
+{
+	vector<VariableValue*> var = claw_cell_material._uh;
+	int n_qpoints = claw_cell_material.numPoints();
+
+	Real uh[10];
+	RealVectorValue flux_term[10];
+	for(int qp = 0 ; qp < n_qpoints; ++qp)
+	{
+		for (int eq = 0; eq < _n_equations; ++eq)
+			uh[eq] =  (*var[eq])[qp];
+
+		computeCellFlux(claw_cell_material._cell_material_data[qp]._flux_term, uh, NULL);
+
+	}
+
+
+}
+
+void CLawProblem::computeFaceMaterial(CLawFaceMaterial& claw_face_material)
+{
+	vector<VariableValue*> &varl = claw_face_material._ul;
+	vector<VariableValue*> &varr = claw_face_material._ur;
+	int n_qpoints = claw_face_material.numPoints();
+
+	Real _ds = 1e-08;
+
+//	Real h_face = (_current_elem_volume+_neighbor_elem_volume)/_current_side_volume /2.;
+//	Real penalty = _sigma*_var_order*_var_order/h_face;
+
+	for(int qp = 0 ; qp < n_qpoints; ++qp)
+	{
+		Real ul[10], ur[10], ur_new[10];
+		RealGradient dul[10], dur[10];
+		Real flux_new[10];
+		RealVectorValue lift_new[10];
+		RealVectorValue vis_term_left[10], vis_term_right[10], vis_term_new[10];
+
+		for (int eq = 0; eq < _n_equations; ++eq)
+		{
+			ul[eq] =  (*varl[eq])[qp];
+			ur[eq] =  (*varr[eq])[qp];
+		}
+
+		Point normal = claw_face_material.normals()[qp];
+		computeFaceFlux(claw_face_material._face_material_data[qp]._flux, claw_face_material._face_material_data[qp]._lift, ul, ur, dul, dur, normal, 0);
+//		fluxRiemann(claw_face_material._face_material_data[qp]._flux, ul, ur, normal);
+//		for (int q = 0; q < _n_equations; ++q)
+//		{
+//			ul[q] += _ds;
+//			computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
+//			for (int p = 0; p < _n_equations; ++p)
+//			{
+//				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
+//				_flux_jacobi_variable_ee[_qp][p][q] = tmp;
+//				_lift_jacobi_variable[_qp][p][q] = (lift_new[p] - _lift[_qp][p])/_ds;
+//			}
+//			ul[q] -= _ds;
+//
+//			ur[q] += _ds;
+//			computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
+//			for (int p = 0; p < _n_equations; ++p)
+//			{
+//				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
+//				_flux_jacobi_variable_en[_qp][p][q] = tmp;
+//				_lift_jacobi_variable_neighbor[_qp][p][q] = (lift_new[p] - _lift[_qp][p])/_ds;
+//			}
+//			ur[q] -= _ds;
+//		computeCellFlux(claw_cell_material._cell_material_data[qp]._flux_term, uh, NULL);
+	}
+}

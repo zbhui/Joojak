@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Material.h"
+#include "CLawMaterial.h"
 
 using std::vector;
 class CLawProblem;
@@ -9,69 +9,25 @@ class CLawProblem;
 class CLawFaceMaterialData
 {
 public:
-	void update(CLawProblem & claw_problem);
-	void setProblem(CLawProblem & claw_problem, Real ds);
-
-private:
-	void computeQpValue(RealVectorValue *flux_term);
-	CLawProblem * _claw_problem;
-	int _n_equations;
-	Real _ds;
-
-public:
-	Point normal;
-	Real ul[10], ur[10], u_bar[10], u_diff[10];
-	RealGradient dul[10], dur[10], duh[10];
-	Real inv_flux[10], vis_flux[10], flux[10];
 	Real _flux[10];
 	Real _flux_jacobi_variable_ee[10][10];
 	Real _flux_jacobi_variable_en[10][10];
-	RealVectorValue lift[10];
+	RealGradient _flux_jacobi_grad_variable_ee;
+	RealGradient _flux_jacobi_grad_variable_en;
+	RealVectorValue _lift[10];
 	RealVectorValue _lift_jacobi_variable[10][10];
 	RealVectorValue _lift_jacobi_variable_neighbor[10][10];
 };
 
-class CLawFaceMaterial :
-public Material
+class CLawFaceMaterial : public CLawMaterial
 {
-//	struct QpValue
-//	{
-//		Real ul[10], ur[10], u_bar[10], u_diff[10];
-//		RealGradient dul[10], dur[10], duh[10];
-//		Real inv_flux[10], vis_flux[10], flux[10];
-//		RealVectorValue lift[10];
-//		Point normal;
-//		inline void disturbLeftValue(int component, Real ds)
-//		{
-//			ul[component] += ds;
-//		}
-//		inline void disturbRightValue(int component, Real ds)
-//		{
-//			ul[component] += ds;
-//		}
-//
-//		inline void disturbLeftGradValue(int component, int beta, Real ds)
-//		{
-//			dul[component](beta) += ds;
-//		}
-//
-//		inline void disturbRightGradValue(int component, int beta, Real ds)
-//		{
-//			dur[component](beta) += ds;
-//		}
-//	};
-
 public:
 	CLawFaceMaterial(const std::string & name, InputParameters parameters);
 
-protected:
-	CLawProblem &_claw_problem;
-	NonlinearSystem &_nl;
-	THREAD_ID _tid;
-	vector<VariableName> _variables;
-	int _n_equations;
-	int _var_order;
+public:
+	const MooseArray<Point> & normals() {return _normals;}
 
+public:
 	const Real & _current_elem_volume;
 	const Real & _neighbor_elem_volume;
 	const Real & _current_side_volume;
@@ -84,19 +40,10 @@ protected:
 	vector<VariableGradient*> _grad_ul;
 	vector<VariableGradient*> _grad_ur;
 
-	MaterialProperty<vector<Real> > & _flux;
-	MaterialProperty<vector<vector<Real> > > & _flux_jacobi_variable_ee;
-	MaterialProperty<vector<vector<Real> > > & _flux_jacobi_variable_en;
-	MaterialProperty<vector<vector<RealGradient> > > & _flux_jacobi_grad_variable_ee;
-	MaterialProperty<vector<vector<RealGradient> > > & _flux_jacobi_grad_variable_en;
-
-	MaterialProperty<vector<RealVectorValue> > & _lift;
-	MaterialProperty<vector<vector<RealVectorValue> > > & _lift_jacobi_variable;
-	MaterialProperty<vector<vector<RealVectorValue> > > & _lift_jacobi_variable_neighbor;
 	MaterialProperty<CLawFaceMaterialData> &_face_material_data;
 
-	virtual void resizeQpProperty();
-	virtual void computeQpProperties();
+//	virtual void computeQpProperties();
+	virtual void computeProperties();
 	void computeQpValue(Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
 	void computeQpFlux(Real *flux, RealVectorValue *lift, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur);
 };

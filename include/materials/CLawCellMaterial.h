@@ -1,36 +1,24 @@
 
 #pragma once
 
-#include "Material.h"
+#include "CLawMaterial.h"
 #include "CLawCellMaterialData.h"
+#include "CLawMaterialData.h"
 
 using std::vector;
 class CLawProblem;
 
-class CLawCellMaterial :
-public Material
+class CLawCellMaterial : public CLawMaterial
 {
 public:
 	CLawCellMaterial(const std::string & name, InputParameters parameters);
 
-protected:
-	CLawProblem &_claw_problem;
-	NonlinearSystem &_nl;
-	THREAD_ID _tid;
-	vector<VariableName> _variables;
-	int _n_equations;
-	int _n_variables;
-	int _var_order;
-
-	Real _ds;
-
+public:
 	std::vector<VariableValue*> _uh;
 	std::vector<VariableGradient*> _grad_uh;
 	MaterialProperty<CLawCellMaterialData >& _cell_material_data;
 
-	virtual void computeQpProperties();
-	void fillQpValue();
-	void computeMaterialData();
+	virtual void computeProperties();
 };
 
 template<>

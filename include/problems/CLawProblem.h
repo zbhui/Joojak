@@ -4,6 +4,10 @@
 #include "FEProblem.h"
 using std::vector;
 
+class CLawCellMaterial;
+class CLawFaceMaterial;
+class CLawBoundaryMaterial;
+
 class CLawProblem :
 public FEProblem
 {
@@ -13,6 +17,8 @@ public:
 	virtual void computeCellFlux(RealGradient *flux, Real *uh, RealGradient *duh);
 	virtual void computeFaceFlux(Real *flux, RealVectorValue *lift, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur, Point &normal, Real penalty);
 	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, Point &normal, Real penalty, std::string bc_type);
+	virtual void computeCellMaterial(CLawCellMaterial& claw_cell_material);
+	virtual void computeFaceMaterial(CLawFaceMaterial& claw_face_material);
 
 protected:
 	virtual void computeLift(RealVectorValue *lift, Real *ul, Real *ur, Point &normal);
@@ -24,6 +30,7 @@ protected:
 	virtual Real initialCondition(int eq);
 
 	virtual void init();
+
 
 public:
 	vector<VariableName> _variables;

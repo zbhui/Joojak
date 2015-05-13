@@ -20,7 +20,8 @@ CLawFaceKernel::CLawFaceKernel(const std::string & name, InputParameters paramet
 		_lift(getNeighborMaterialProperty<std::vector<RealVectorValue> >("lift")),
 		_lift_jacobi_variable_ee(getNeighborMaterialProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_ee")),
 		_lift_jacobi_variable_en(getNeighborMaterialProperty<std::vector<std::vector<RealVectorValue> > >("lift_jacobi_variable_en")),
-		_eq(getParam<int>("component"))
+		_eq(getParam<int>("component")),
+		_face_material_data(getNeighborMaterialProperty<CLawFaceMaterialData>("face_material_data"))
 {
 }
 
@@ -29,10 +30,12 @@ Real CLawFaceKernel::computeQpResidual(Moose::DGResidualType type)
 	switch (type)
 	{
 	case Moose::Element:
-		return  _flux[_qp][_eq] * _test[_i][_qp] + _lift[_qp][_eq]*_grad_test[_i][_qp];
+		return  _face_material_data[_qp]._flux[_eq] * _test[_i][_qp] ;//+ _lift[_qp][_eq]*_grad_test[_i][_qp];
+//		return  _flux[_qp][_eq] * _test[_i][_qp] + _lift[_qp][_eq]*_grad_test[_i][_qp];
 		break;
 	case Moose::Neighbor:
-		return -_flux[_qp][_eq] * _test_neighbor[_i][_qp] + _lift[_qp][_eq]*_grad_test_neighbor[_i][_qp];
+		return -_face_material_data[_qp]._flux[_eq] * _test_neighbor[_i][_qp] ;//+ _lift[_qp][_eq]*_grad_test_neighbor[_i][_qp];
+//		return -_flux[_qp][_eq] * _test_neighbor[_i][_qp] + _lift[_qp][_eq]*_grad_test_neighbor[_i][_qp];
 		break;
 	}
 
@@ -42,11 +45,13 @@ Real CLawFaceKernel::computeQpResidual(Moose::DGResidualType type)
 
 Real CLawFaceKernel::computeQpJacobian(Moose::DGJacobianType type)
 {
+	return 0;
 	return computeQpJacobian(_eq, _eq, type);
 }
 
 Real CLawFaceKernel::computeQpOffDiagJacobian(Moose::DGJacobianType type, unsigned int jvar)
 {
+	return 0;
 	return computeQpJacobian(_eq, jvar, type);
 
 }
