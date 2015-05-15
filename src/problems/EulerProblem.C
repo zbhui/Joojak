@@ -1,6 +1,9 @@
 
 #include "EulerProblem.h"
 #include "CLawCellMaterial.h"
+#include "CLawFaceMaterial.h"
+#include "CLawBoundaryMaterial.h"
+
 using Eigen::Vector3d;
 
 template<>
@@ -129,33 +132,6 @@ void EulerProblem::wall(Real *ur,  Real *ul, Point &normal)
     ur[2] = ul[2] - 2.0 * vn * normal(1);
     ur[3] = ul[3] - 2.0 * vn * normal(2);
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
-}
-
-void EulerProblem::computeCellMaterial(CLawCellMaterial& claw_cell_material)
-{
-	vector<VariableValue*> var = claw_cell_material._uh;
-	int n_qpoints = claw_cell_material.numPoints();
-
-	Real uh[10];
-	RealVectorValue flux_term[10], flux_term_new[10];
-	Real _ds = 1e-08;
-	for(int qp = 0 ; qp < n_qpoints; ++qp)
-	{
-		for (int eq = 0; eq < _n_equations; ++eq)
-			uh[eq] =  (*var[eq])[qp];
-
-		inviscousTerm(claw_cell_material._cell_material_data[qp]._flux_term, uh);
-		inviscousTerm(flux_term, uh);
-		for (int q = 0; q < _n_equations; ++q)
-		{
-			uh[q] += _ds;
-			inviscousTerm(flux_term_new, uh);
-			for (int p = 0; p < _n_equations; ++p)
-				claw_cell_material._cell_material_data[qp]._flux_jacobi_variable[p][q] = (flux_term_new[p] - flux_term[p])/_ds;
-
-			uh[q] -= _ds;
-		}
-	}
 }
 
 void EulerProblem::symmetric(Real *ur,  Real *ul, Point &normal)

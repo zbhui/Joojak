@@ -14,13 +14,10 @@ InputParameters validParams<CLawFaceMaterial>()
 
 CLawFaceMaterial::CLawFaceMaterial(const std::string & name, InputParameters parameter):
 		CLawMaterial(name, parameter),
-		_current_elem_volume(_assembly.elemVolume()),
-		_neighbor_elem_volume(_assembly.neighborVolume()),
-		_current_side_volume(_assembly.sideElemVolume()),
 		_ds(getParam<Real>("ds")),
 		_sigma(getParam<Real>("sigma")),
 		_epsilon(getParam<Real>("epsilon")),
-		_face_material_data(declareProperty<CLawFaceMaterialData>("face_material_data"))
+		_material_data(declareProperty<CLawFaceMaterialData>("face_material_data"))
 {
 	if(_bnd && _neighbor)
 	{
@@ -42,85 +39,9 @@ void CLawFaceMaterial::computeProperties()
 	if(_bnd && _neighbor)
 		_claw_problem.computeFaceMaterial(*this);
 }
-//void CLawFaceMaterial::computeQpProperties()
-//{
-//	if(_bnd && _neighbor)
-//	{
-//		resizeQpProperty();
-//
-//		Real ul[10], ur[10], ur_new[10];
-//		RealGradient dul[10], dur[10];
-//		Real flux_new[10];
-//		RealVectorValue lift_new[10];
-//		RealVectorValue vis_term_left[10], vis_term_right[10], vis_term_new[10];
-//
-//		computeQpValue(ul, ur, dul, dur);
-//
-//		computeQpFlux(&_flux[_qp][0], &_lift[_qp][0], ul, ur, dul, dur);
-//		for (int q = 0; q < _n_equations; ++q)
-//		{
-//			ul[q] += _ds;
-//			computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
-//			for (int p = 0; p < _n_equations; ++p)
-//			{
-//				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
-//				_flux_jacobi_variable_ee[_qp][p][q] = tmp;
-//				_lift_jacobi_variable[_qp][p][q] = (lift_new[p] - _lift[_qp][p])/_ds;
-//			}
-//			ul[q] -= _ds;
-//
-//			ur[q] += _ds;
-//			computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
-//			for (int p = 0; p < _n_equations; ++p)
-//			{
-//				Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
-//				_flux_jacobi_variable_en[_qp][p][q] = tmp;
-//				_lift_jacobi_variable_neighbor[_qp][p][q] = (lift_new[p] - _lift[_qp][p])/_ds;
-//			}
-//			ur[q] -= _ds;
-//
-//			for (int beta = 0; beta < 3; ++beta)
-//			for (int q = 0; q < _n_equations; ++q)
-//			{
-//				dul[q](beta) += _ds;
-//				computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
-//				for (int p = 0; p < _n_equations; ++p)
-//				{
-//					Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
-//					_flux_jacobi_grad_variable_ee[_qp][p][q](beta) = tmp;
-//				}
-//				dul[q](beta) -= _ds;
-//
-//				dur[q](beta) += _ds;
-//				computeQpFlux(flux_new, lift_new, ul, ur, dul, dur);
-//				for (int p = 0; p < _n_equations; ++p)
-//				{
-//					Real tmp = (flux_new[p] - _flux[_qp][p])/_ds;
-//					_flux_jacobi_grad_variable_en[_qp][p][q](beta) = tmp;
-//				}
-//				dur[q](beta) -= _ds;
-//			}
-//		}
-//	}
-//
-//}
 
-void CLawFaceMaterial::computeQpValue(Real *ul, Real *ur, RealGradient *dul, RealGradient *dur)
-{
-	for (int eq = 0; eq < _n_equations; ++eq)
-	{
-		ul[eq] = (*_ul[eq])[_qp];
-		ur[eq] = (*_ur[eq])[_qp];
-		dul[eq] = (*_grad_ul[eq])[_qp];
-		dur[eq] = (*_grad_ur[eq])[_qp];
-	}
-}
-
-void CLawFaceMaterial::computeQpFlux(Real* flux, RealVectorValue* lift, Real* ul, Real* ur, RealGradient* dul, RealGradient* dur)
+Real CLawFaceMaterial::penalty()
 {
 	Real h_face = (_current_elem_volume+_neighbor_elem_volume)/_current_side_volume /2.;
-	Real penalty = _sigma*_var_order*_var_order/h_face;
-	Point normal = _normals[_qp];
-	_claw_problem.computeFaceFlux(flux, lift, ul, ur, dul, dur, normal, penalty);
+	return _sigma*_var_order*_var_order/h_face;
 }
-

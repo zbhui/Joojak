@@ -28,6 +28,10 @@ protected:
 	int _n_equations;
 	int _n_variables;
 	int _var_order;
+
+	const Real & _current_elem_volume;
+	const Real & _neighbor_elem_volume;
+	const Real & _current_side_volume;
 public:
 	const MooseArray<Point> & qpoints() {return _q_point;}
 	const MooseArray<Point> & normals() {return _normals;}

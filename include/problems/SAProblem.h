@@ -10,7 +10,7 @@ public:
 
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
 	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
-	virtual void sourceTerm(RealVectorValue* source_term, Real* uh, RealGradient* duh);
+	virtual void sourceTerm(Real* source_term, Real* uh, RealGradient* duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, Point &normal);
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
 	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, Point &normal, Real penalty, std::string bc_type);

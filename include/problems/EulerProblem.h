@@ -25,7 +25,7 @@ public:
 	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, Point &normal);
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
-	virtual void computeCellMaterial(CLawCellMaterial& claw_cell_material);
+
 
 private:
 	void wall(Real *ur,  Real *ul, Point &normal);
@@ -33,7 +33,6 @@ private:
 	void symmetric(Real *ur,  Real *ul, Point &normal);
 
 	void updateDependValue(DependValue &denpend_value,  Real *uh);
-
 };
 
 template<>

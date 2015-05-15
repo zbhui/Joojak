@@ -17,6 +17,9 @@ CLawMaterial::CLawMaterial(const std::string & name, InputParameters parameter):
 		_variables(_nl.getVariableNames()),
 		_n_equations(_variables.size()),
 		_n_variables(coupledComponents("variables")),
-		_var_order(_claw_problem.getVariable(_tid, _variables[0]).order())
+		_var_order(_claw_problem.getVariable(_tid, _variables[0]).order()),
+		_current_elem_volume(_assembly.elemVolume()),
+		_neighbor_elem_volume(_assembly.neighborVolume()),
+		_current_side_volume(_assembly.sideElemVolume())
 {
 }

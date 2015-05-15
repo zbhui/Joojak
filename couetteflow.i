@@ -60,7 +60,7 @@
     #petsc_options = '-ksp_monitor -ksp_view -snes_test_display'
     #petsc_options_iname = '-pc_type -snes_type'
     petsc_options_iname = '-ksp_type  -pc_type'
-    petsc_options_value = 'gmres       ilu'
+    petsc_options_value = 'gmres       lu'
   [../]
 []
 
@@ -78,7 +78,7 @@
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 0.01
+    dt = 0.1
     ratio = 2
     step = 2
     max_dt = 100	

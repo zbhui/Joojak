@@ -174,7 +174,7 @@ void SAProblem::viscousTermAdiabatic(RealVectorValue* viscous_term, Real* uh, Re
 
 }
 
-void SAProblem::sourceTerm(RealVectorValue* source_term, Real* uh, RealGradient* duh)
+void SAProblem::sourceTerm(Real* source_term, Real* uh, RealGradient* duh)
 {
 	Real rho(uh[0]);
 	Real d(uh[6]);     //uh[6] 为壁面距离

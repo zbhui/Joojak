@@ -12,7 +12,7 @@ InputParameters validParams<CLawCellMaterial>()
 
 CLawCellMaterial::CLawCellMaterial(const std::string & name, InputParameters parameter):
 		CLawMaterial(name, parameter),
-		_cell_material_data(declareProperty<CLawCellMaterialData>("cell_material_data"))
+		_material_data(declareProperty<CLawCellMaterialData>("cell_material_data"))
 {
 	if(_bnd || _neighbor) return ;
 
