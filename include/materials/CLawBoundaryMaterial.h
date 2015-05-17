@@ -37,10 +37,7 @@ public:
 	Real _sigma;
 	Real _epsilon;
 
-	std::vector<VariableValue*> _ul;
-	std::vector<VariableGradient*> _grad_ul;
 	MaterialProperty<CLawBoundaryMaterialData> &_material_data;
-
 	virtual void computeProperties();
 public:
 	const std::string &getBCType(){return _bc_type;}

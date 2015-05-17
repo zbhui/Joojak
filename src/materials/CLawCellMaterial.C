@@ -14,13 +14,6 @@ CLawCellMaterial::CLawCellMaterial(const std::string & name, InputParameters par
 		CLawMaterial(name, parameter),
 		_material_data(declareProperty<CLawCellMaterialData>("cell_material_data"))
 {
-	if(_bnd || _neighbor) return ;
-
-	for (int eq = 0; eq < _n_variables; ++eq)
-	{
-		_uh.push_back(&coupledValue("variables", eq));
-		_grad_uh.push_back(&coupledGradient("variables", eq));
-	}
 }
 
 void CLawCellMaterial::computeProperties()

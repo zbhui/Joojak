@@ -23,12 +23,6 @@ CLawBoundaryMaterial::CLawBoundaryMaterial(const std::string & name, InputParame
 		_epsilon(getParam<Real>("epsilon")),
 		_material_data(declareProperty<CLawBoundaryMaterialData>("bnd_material_data"))
 {
-	for (size_t eq = 0; eq < _n_equations; ++eq)
-	{
-		MooseVariable &val = _claw_problem.getVariable(_tid, _variables[eq]);
-		_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
-		_grad_ul.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
-	}
 }
 
 void CLawBoundaryMaterial::computeProperties()

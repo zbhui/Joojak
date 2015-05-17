@@ -1,5 +1,8 @@
 
 #include "NavierStokesProblem.h"
+#include "CLawCellMaterial.h"
+#include "CLawFaceMaterial.h"
+#include "CLawBoundaryMaterial.h"
 
 using Eigen::Vector3d;
 
@@ -13,12 +16,10 @@ InputParameters validParams<NavierStokesProblem>()
 
 NavierStokesProblem::NavierStokesProblem(const std::string & name, InputParameters params) :
 	CFDProblem(name, params)
-//	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
 {
-	_n_equations = 5;
-	if(_n_equations == 0)
-		mooseError("没有指定问题方程个数" << name);
 }
+
+
 
 void NavierStokesProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 {
@@ -58,6 +59,7 @@ void NavierStokesProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* u
 	inviscous_term[component](1) = rho * h * v;
 	inviscous_term[component](2) = rho * h * w;
 }
+
 
 void NavierStokesProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh)
 {

@@ -21,7 +21,7 @@
   type = NavierStokesProblem
   mach = 0.1
   reynolds = 40
-
+  aux_variables = distance
   [./Variables]
     order = FIRST
     family = MONOMIAL
@@ -45,7 +45,7 @@
 
    [./distance]
       type = NearestNodeDistanceAux
-      variables = wall_distance
+      variables = distance
       order = FIRST
       family = LAGRANGE
       boundary = boundary_from_block

@@ -33,11 +33,6 @@ public:
 	Real _sigma;
 	Real _epsilon;
 
-	vector<VariableValue*> _ul;
-	vector<VariableValue*> _ur;
-	vector<VariableGradient*> _grad_ul;
-	vector<VariableGradient*> _grad_ur;
-
 	MaterialProperty<CLawFaceMaterialData> &_material_data;
 
 	virtual void computeProperties();

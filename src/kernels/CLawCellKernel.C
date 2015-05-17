@@ -12,13 +12,13 @@ InputParameters validParams<CLawCellKernel>()
 CLawCellKernel::CLawCellKernel(const std::string & name, InputParameters parameters):
 		Kernel(name, parameters),
 		_eq(getParam<int>("component")),
-		_cell_material_data(getMaterialProperty<CLawCellMaterialData>("cell_material_data"))
+		_cell(getMaterialProperty<CLawCellMaterialData>("cell_material_data"))
 {
 }
 
 Real CLawCellKernel::computeQpResidual()
 {
-	return -(_cell_material_data[_qp]._flux_term[_eq]*_grad_test[_i][_qp]);
+	return -(_cell[_qp]._flux_term[_eq]*_grad_test[_i][_qp]) -_cell[_qp]._source_term[_eq]*_test[_i][_qp];
 }
 
 Real CLawCellKernel::computeQpJacobian()
@@ -32,5 +32,5 @@ Real CLawCellKernel::computeQpOffDiagJacobian(unsigned int jvar)
 
 Real CLawCellKernel::computeQpJacobian(int p, int q)
 {
-	return (_cell_material_data[_qp]._flux_jacobi_variable[p][q]*_phi[_j][_qp]+_cell_material_data[_qp]._flux_jacobi_grad_variable[p][q]*_grad_phi[_j][_qp])*_grad_test[_i][_qp];
+	return (_cell[_qp]._flux_jacobi_variable[p][q]*_phi[_j][_qp]+_cell[_qp]._flux_jacobi_grad_variable[p][q]*_grad_phi[_j][_qp])*_grad_test[_i][_qp];
 }

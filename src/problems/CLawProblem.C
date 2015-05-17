@@ -8,12 +8,13 @@ template<>
 InputParameters validParams<CLawProblem>()
 {
   InputParameters params = validParams<FEProblem>();
-  params.addCoupledVar("aux_variables", "耦合变量");
+  params.addParam<std::vector<VariableName> >("aux_variables", "耦合变量");
   return params;
 }
 
 CLawProblem::CLawProblem(const std::string & name, InputParameters params) :
-    FEProblem(name, params)
+    FEProblem(name, params),
+	_aux_variables(getParam<std::vector<VariableName> >("aux_variables"))
 {
 	std::cout << "配置文件：" << _app.getInputFileName() << std::endl;
 	std::cout << params <<std::endl;
@@ -24,9 +25,7 @@ CLawProblem::CLawProblem(const std::string & name, InputParameters params) :
 void CLawProblem::init()
 {
 	FEProblem::init();
-	_variables = _nl.getVariableNames();
-	_n_equations = (_variables.size());
-	_n_variables = _n_equations;
+	_n_equations =_nl.getVariableNames().size();
 }
 void CLawProblem::computeFaceFlux(Real* flux, RealVectorValue* lift, Real* ul, Real* ur, RealGradient* dul, RealGradient* dur, Point& normal, Real penalty)
 {
@@ -138,6 +137,7 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 	Real uh[10];
 	RealGradient duh[10];
 	RealVectorValue flux_new[10];
+	Real source_new[10];
 	Real _ds = 1e-08;
 	for(int qp = 0 ; qp < n_qpoints; ++qp)
 	{
@@ -148,15 +148,18 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 		}
 
 		RealVectorValue *flux = material[qp]._flux_term;
-		computeCellFlux(flux, uh, duh);
+		Real *source = material[qp]._source_term;
+		computeCellFlux(flux, source, uh, duh);
 
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			uh[q] += _ds;
-			computeCellFlux(flux_new, uh, duh);
+			computeCellFlux(flux_new, source_new, uh, duh);
 			for (int p = 0; p < _n_equations; ++p)
+			{
 				material[qp]._flux_jacobi_variable[p][q] = (flux_new[p] - flux[p])/_ds;
-
+				material[qp]._source_jacobi_variable[p][q] = (source_new[p] - source[p])/_ds;
+			}
 			uh[q] -= _ds;
 		}
 
@@ -164,11 +167,14 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			duh[q](beta) += _ds;
-			computeCellFlux(flux_new, uh, duh);
-			for (int alpha = 0; alpha< 3; ++alpha)
+			computeCellFlux(flux_new, source_new, uh, duh);
 			for (int p = 0; p < _n_equations; ++p)
 			{
-				material[qp]._flux_jacobi_grad_variable[p][q](alpha, beta) = (flux_new[p](alpha) - flux[p](alpha))/_ds;
+				material[qp]._source_jacobi_grad_variable[p][q](beta) = (source_new[p] - source[p])/_ds;
+				for (int alpha = 0; alpha< 3; ++alpha)
+				{
+					material[qp]._flux_jacobi_grad_variable[p][q](alpha, beta) = (flux_new[p](alpha) - flux[p](alpha))/_ds;
+				}
 			}
 			duh[q](beta) -= _ds;
 		}
@@ -177,10 +183,10 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 
 void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 {
-	vector<VariableValue*> &varl = face._ul;
-	vector<VariableValue*> &varr = face._ur;
-	vector<VariableGradient*> &grad_varl = face._grad_ul;
-	vector<VariableGradient*> &grad_varr = face._grad_ur;
+	vector<VariableValue*> &varl = face._uh;
+	vector<VariableValue*> &varr = face._uh_neighbor;
+	vector<VariableGradient*> &grad_varl = face._grad_uh;
+	vector<VariableGradient*> &grad_varr = face._grad_uh_neighbor;
 	int n_qpoints = face.numPoints();
 
 	MaterialProperty<CLawFaceMaterialData >& material = face._material_data; ;
@@ -255,8 +261,8 @@ void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 {
 	MaterialProperty<CLawBoundaryMaterialData>& material = bnd._material_data; ;
-	vector<VariableValue*> &varl = bnd._ul;
-	vector<VariableGradient*> &grad_varl = bnd._grad_ul;
+	vector<VariableValue*> &varl = bnd._uh;
+	vector<VariableGradient*> &grad_varl = bnd._grad_uh;
 	int n_qpoints = bnd.numPoints();
 
 	Real _ds = 1e-08;

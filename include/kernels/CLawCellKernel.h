@@ -14,7 +14,7 @@ public:
 
 protected:
 	int _eq;
-	MaterialProperty<CLawCellMaterialData > &_cell_material_data;
+	MaterialProperty<CLawCellMaterialData > &_cell;
 
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();

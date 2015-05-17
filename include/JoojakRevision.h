@@ -3,6 +3,6 @@
 #ifndef JOOJAK_REVISION_H
 #define JOOJAK_REVISION_H
 
-#define JOOJAK_REVISION "git commit ed9630a on 2015-04-02"
+#define JOOJAK_REVISION "git commit 6d4bfc0 on 2015-05-15"
 
 #endif // JOOJAK_REVISION_H

@@ -25,7 +25,7 @@ protected:
 	NonlinearSystem &_nl;
 	THREAD_ID _tid;
 	vector<VariableName> _variables;
-	int _n_equations;
+	vector<VariableName> _aux_variables;
 	int _n_variables;
 	int _var_order;
 
@@ -36,6 +36,12 @@ public:
 	const MooseArray<Point> & qpoints() {return _q_point;}
 	const MooseArray<Point> & normals() {return _normals;}
 	int numPoints() {return _qrule->n_points();}
+	int numVariables() {return _n_variables;}
+
+	vector<VariableValue*> _uh;
+	vector<VariableValue*> _uh_neighbor;
+	vector<VariableGradient*> _grad_uh;
+	vector<VariableGradient*> _grad_uh_neighbor;
 protected:
 };
 

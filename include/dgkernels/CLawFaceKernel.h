@@ -16,7 +16,7 @@ protected:
 	virtual Real computeQpOffDiagJacobian(Moose::DGJacobianType type, unsigned int jvar);
 
 	int _eq;
-	MaterialProperty<CLawFaceMaterialData> &_face_material_data;
+	MaterialProperty<CLawFaceMaterialData> &_face;
 
 private:
 	Real computeQpJacobian(int p, int q, Moose::DGJacobianType type);

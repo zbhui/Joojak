@@ -30,7 +30,7 @@ IsoVortexBndMaterial::IsoVortexBndMaterial(const std::string & name, InputParame
 void IsoVortexBndMaterial::computeQpRightValue(Real* ur)
 {
 	Point p = _q_point[_qp];
-	for (int eq = 0; eq < _n_equations; ++eq)
+	for (int eq = 0; eq < _n_variables; ++eq)
 		ur[eq] = IsoVortexBase::value(_t, p, eq);
 }
 
@@ -43,7 +43,7 @@ void IsoVortexBndMaterial::computeQpFlux(Real *flux, RealVectorValue *lift, Real
 	Real ur[10];
 	RealGradient dur[10];
 
-	for (int eq = 0; eq < _n_equations; ++eq)
+	for (int eq = 0; eq < _n_variables; ++eq)
 		dur[eq] = dul[eq];
 
 	computeQpRightValue(ur);

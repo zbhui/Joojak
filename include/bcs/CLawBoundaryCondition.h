@@ -13,7 +13,7 @@ protected:
 	virtual Real computeQpResidual();
 	virtual Real computeQpJacobian();
 	virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-	MaterialProperty<CLawBoundaryMaterialData> &_material_data;
+	MaterialProperty<CLawBoundaryMaterialData> &_boundary;
 
 private:
 	Real computeQpJacobian(int p, int q);

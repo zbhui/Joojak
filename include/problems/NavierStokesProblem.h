@@ -14,7 +14,6 @@ public:
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
 	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, Point &normal, Real penalty, std::string bc_type);
 
-
 protected:
 	void isothermalWall(Real *ur,  Real *ul, Point &normal);
 	void adiabaticWall(Real *ur,  Real *ul, Point &normal);
@@ -23,7 +22,19 @@ protected:
 
 	void viscousTermAdiabatic(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
 
-//	MooseEnum _bc_types;
+	struct DependValue
+	{
+		Real pressure;
+		RealVectorValue vel;
+		Real viscosity;
+
+		Real uh[10];
+
+		void update();
+	};
+
+	DependValue _value;
+	DependValue _value_neighbor;
 };
 
 template<>

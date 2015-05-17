@@ -19,19 +19,6 @@ CLawFaceMaterial::CLawFaceMaterial(const std::string & name, InputParameters par
 		_epsilon(getParam<Real>("epsilon")),
 		_material_data(declareProperty<CLawFaceMaterialData>("face_material_data"))
 {
-	if(_bnd && _neighbor)
-	{
-		for (int eq = 0; eq < _n_equations; ++eq)
-		{
-			MooseVariable &val = _claw_problem.getVariable(_tid, _variables[eq]);
-			mooseAssert(val.order() == _var_order, "变量的阶不同");
-
-			_ul.push_back(_is_implicit ? &val.sln() : &val.slnOld());
-			_ur.push_back(_is_implicit ? &val.slnNeighbor() : &val.slnOldNeighbor());
-			_grad_ul.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
-			_grad_ur.push_back(_is_implicit ? &val.gradSlnNeighbor(): &val.gradSlnOldNeighbor());
-		}
-	}
 }
 
 void CLawFaceMaterial::computeProperties()

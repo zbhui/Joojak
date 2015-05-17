@@ -22,6 +22,7 @@ public:
 	virtual void computeFaceMaterial(CLawFaceMaterial& claw_face_material);
 	virtual void computeBoundaryMaterial(CLawBoundaryMaterial& bnd_material);
 
+	const vector<VariableName> & getAuxVariables() {return _aux_variables;}
 protected:
 	virtual void computeLift(RealVectorValue *lift, Real *ul, Real *ur, Point &normal);
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
@@ -35,10 +36,8 @@ protected:
 
 
 public:
-	vector<VariableName> _variables;
 	vector<VariableName> _aux_variables;
 	int _n_equations;
-	int _n_variables;
 
 	vector<Real> _uh;
 	vector<RealGradient> _duh;
