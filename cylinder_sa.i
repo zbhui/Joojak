@@ -21,6 +21,7 @@
   type = SAProblem
   mach = 0.1
   reynolds = 40
+  aux_variables = distance
 
   [./Variables]
     order = FIRST
@@ -45,7 +46,7 @@
 
    [./distance]
       type = NearestNodeDistanceAux
-      variables = wall_distance
+      variables = distance
       order = FIRST
       family = LAGRANGE
       boundary = boundary_from_block
@@ -55,7 +56,7 @@
   [../]
 
 [ICs]
-  type = CFDPassFlowIC 
+  type = SAIC 
   velocity = 1
 []
 
@@ -64,7 +65,7 @@
   [./cell_material]
     block = 10
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe rhon wall_distance'
+    variables = 'rho momentum_x momentum_y momentum_z rhoe rhon distance'
   [../]
   [./face_material]
     block = 10
@@ -77,7 +78,7 @@
   [../]
   [./wall_material]
     boundary = wall
-    bc_type = adiabatic_wall
+    bc_type = isothermal_wall
     type = CLawBoundaryMaterial
   [../]
 []
@@ -118,7 +119,7 @@
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 100
+    dt = 0.000100
     ratio = 2
     step = 2
     max_dt = 100	

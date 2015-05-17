@@ -26,7 +26,7 @@
   type = NavierStokesProblem
   order = FIRST
   family = MONOMIAL
-  variables = 'rho momentum_x momentum_y momentum_z rhoe'
+  variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
   mach = 0.2
   reynolds = 40
 []
@@ -47,7 +47,7 @@
   [./cell_material]
     block = 10
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+    variables = 'rho momentum_x momentum_y momentum_z rhoe rhon'
   [../]
   [./face_material]
     block = 10

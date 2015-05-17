@@ -14,7 +14,6 @@ public FEProblem
 public:
 	CLawProblem(const std::string & name, InputParameters params);
 
-	virtual void computeCellFlux(RealGradient *flux, Real *uh, RealGradient *duh);
 	virtual void computeCellFlux(RealGradient *flux, Real *source, Real *uh, RealGradient *duh);
 	virtual void computeFaceFlux(Real *flux, RealVectorValue *lift, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur, Point &normal, Real penalty);
 	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, Point &normal, Real penalty, std::string bc_type);

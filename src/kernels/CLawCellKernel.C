@@ -32,5 +32,7 @@ Real CLawCellKernel::computeQpOffDiagJacobian(unsigned int jvar)
 
 Real CLawCellKernel::computeQpJacobian(int p, int q)
 {
-	return (_cell[_qp]._flux_jacobi_variable[p][q]*_phi[_j][_qp]+_cell[_qp]._flux_jacobi_grad_variable[p][q]*_grad_phi[_j][_qp])*_grad_test[_i][_qp];
+	Real r = (_cell[_qp]._flux_jacobi_variable[p][q]*_phi[_j][_qp]+_cell[_qp]._flux_jacobi_grad_variable[p][q]*_grad_phi[_j][_qp])*_grad_test[_i][_qp];
+	r += (_cell[_qp]._source_jacobi_variable[p][q]*_phi[_j][_qp] + _cell[_qp]._source_jacobi_grad_variable[p][q]*_grad_phi[_j][_qp])*_test[_i][_qp];
+	return r ;
 }

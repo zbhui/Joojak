@@ -70,16 +70,6 @@ void CLawProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Real* u
 	computeFaceFlux(flux, lift, ul, ur, dul, dur, normal, penalty);
 }
 
-void CLawProblem::computeCellFlux(RealGradient* flux, Real* uh, RealGradient* duh)
-{
-	RealVectorValue inv_term[10], vis_term[10], source_term[10];
-	inviscousTerm(inv_term, uh);
-	viscousTerm(vis_term, uh, duh);
-//	sourceTerm(source_term, uh, duh);
-	for (int eq = 0; eq < _n_equations; ++eq)
-		flux[eq] = inv_term[eq] - vis_term[eq];
-}
-
 
 void CLawProblem::computeCellFlux(RealGradient* flux, Real* source, Real* uh, RealGradient* duh)
 {
@@ -132,6 +122,7 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 	vector<VariableValue*> &var = cell._uh;
 	vector<VariableGradient*> &grad_var = cell._grad_uh;
 	int n_qpoints = cell.numPoints();
+	int n_variables = cell.numVariables();
 
 	MaterialProperty<CLawCellMaterialData >& material = cell._material_data; ;
 	Real uh[10];
@@ -141,12 +132,11 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 	Real _ds = 1e-08;
 	for(int qp = 0 ; qp < n_qpoints; ++qp)
 	{
-		for (int eq = 0; eq < _n_equations; ++eq)
+		for (int eq = 0; eq < n_variables; ++eq)
 		{
 			uh[eq] =  (*var[eq])[qp];
 			duh[eq] =  (*grad_var[eq])[qp];
 		}
-
 		RealVectorValue *flux = material[qp]._flux_term;
 		Real *source = material[qp]._source_term;
 		computeCellFlux(flux, source, uh, duh);
@@ -188,6 +178,7 @@ void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 	vector<VariableGradient*> &grad_varl = face._grad_uh;
 	vector<VariableGradient*> &grad_varr = face._grad_uh_neighbor;
 	int n_qpoints = face.numPoints();
+	int n_variables = face.numVariables();
 
 	MaterialProperty<CLawFaceMaterialData >& material = face._material_data; ;
 
@@ -201,7 +192,7 @@ void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 		RealVectorValue lift_new[10];
 		RealVectorValue vis_term_left[10], vis_term_right[10], vis_term_new[10];
 
-		for (int eq = 0; eq < _n_equations; ++eq)
+		for (int eq = 0; eq < n_variables; ++eq)
 		{
 			ul[eq] =  (*varl[eq])[qp];
 			ur[eq] =  (*varr[eq])[qp];
@@ -264,6 +255,7 @@ void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 	vector<VariableValue*> &varl = bnd._uh;
 	vector<VariableGradient*> &grad_varl = bnd._grad_uh;
 	int n_qpoints = bnd.numPoints();
+	int n_variables = bnd.numVariables();
 
 	Real _ds = 1e-08;
 	std::string bc_type = bnd.getBCType();
@@ -276,7 +268,7 @@ void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 		RealVectorValue lift_new[10];
 		RealVectorValue vis_term_left[10], vis_term_right[10], vis_term_new[10];
 
-		for (int eq = 0; eq < _n_equations; ++eq)
+		for (int eq = 0; eq < n_variables; ++eq)
 		{
 			ul[eq] =  (*varl[eq])[qp];
 			dul[eq] = (*grad_varl[eq])[qp];
