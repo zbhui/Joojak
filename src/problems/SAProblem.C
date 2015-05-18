@@ -358,7 +358,91 @@ void SAProblem::symmetric(Real *ur,  Real *ul, Point &normal)
 }
 void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 {
-    NavierStokesProblem::adiabaticWall(ur, ul, normal);
-    ur[5] = ul[5];
+	Real rhoR, uR, vR, wR, pR;
+	Real rhoL, uL, vL, wL, pL;
+	Real cR, cL, cb;
+	Real vnR, vnL, vnb;
+	Real vel, s;
+	Real Rp, Rm;
+
+	Vector3d vel_inf = _attitude.earthFromWind()*Vector3d::UnitX();
+	if(_mesh.dimension() == 2)
+		vel_inf(2) = 0.;
+
+	uR = vel_inf(0);
+	vR = vel_inf(1);
+	wR = vel_inf(2);
+
+	Real lam[3];
+	eigenValue(lam, ul, normal);
+
+	rhoR = 1.0;
+
+	pR = 1 / _gamma /_mach / _mach;
+	cR = sqrt(fabs(_gamma * pR / rhoR));
+	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
+
+	rhoL = ul[0];
+	Real rho = ul[0];
+	uL = ul[1] / rhoL;
+	vL = ul[2] / rhoL;
+	wL = ul[3] / rhoL;
+	vel = sqrt(uL * uL + vL * vL + wL * wL);
+	pL = pressure(ul);
+	cL = sqrt(fabs(_gamma * pL / rhoL));
+	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
+
+	if(lam[1] < 0)  // 入口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = rhoR;
+			ur[1] = rhoR * uR;
+			ur[2] = rhoR * vR;
+			ur[3] = rhoR * wR;
+			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
+		}
+		else	//亚音速
+		{
+			s = pR / pow(rhoR, _gamma);
+			Rp = -vnR + 2.0 * cR / (_gamma - 1);
+			Rm = -vnL - 2.0 * cL / (_gamma - 1);
+			vnb = -(Rp + Rm) / 2.0;
+			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+
+			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
+			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
+			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
+			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+		}
+		ur[5] = rho*_nu_infty;
+	}
+	else  //出口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = ul[4];
+		}
+		else	//亚音速
+		{
+			s = pL / pow(rhoL, _gamma);
+			Rp = vnL + 2 * cL / (_gamma - 1);
+			Rm = vnR - 2 * cR / (_gamma - 1);
+			vnb = (Rp + Rm) / 2.0;
+			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+
+			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
+			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
+			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
+			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+		}
+		ur[5] = ul[5];
+	}
 }
 

@@ -31,6 +31,9 @@ switch (component) {
 	case 4:
 		return energyTotal(p);
 		break;
+	case 5:
+		return eddyViscoisty(p);
+		break;
 	default:
 		return 0.0;
 

@@ -55,3 +55,8 @@ Real CFDPassFlowIC::energyTotal(const Point &p)
 	Real pre = 1./_cfd_problem._gamma/_cfd_problem._mach/_cfd_problem._mach;
 	return pre/(_cfd_problem._gamma-1) + 0.5*density(p)*(_velocity*_velocity);
 }
+
+Real CFDPassFlowIC::eddyViscoisty(const Point& p)
+{
+	return density(p)*3;
+}

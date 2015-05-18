@@ -22,6 +22,7 @@ protected:
   virtual Real momentumY(const Point &p);
   virtual Real momentumZ(const Point &p);
   virtual Real energyTotal(const Point &p);
+  virtual Real eddyViscoisty(const Point &p);
 };
 
 template<>
