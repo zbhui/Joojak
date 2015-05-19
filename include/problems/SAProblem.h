@@ -16,6 +16,9 @@ public:
 	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, Point &normal, Real penalty, std::string bc_type);
 
 
+	Real nuInfinity() {return _nu_infty;}
+	Real eddyViscosity(Real* uh);
+	Real computeAuxValue(std::string var_name, Real* uh);
 private:
 	void isothermalWall(Real *ur,  Real *ul, Point &normal);
 	void adiabaticWall(Real *ur,  Real *ul, Point &normal);

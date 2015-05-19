@@ -2,16 +2,15 @@
 #pragma once
 
 #include "AuxKernel.h"
-//#include "CLawInterface.h"
 
 class CFDProblem;
 using std::vector;
 
-class NSAuxVariable :
+class CFDAuxVariable :
 public AuxKernel
 {
 public:
-  NSAuxVariable(const std::string & name, InputParameters parameters);
+  CFDAuxVariable(const std::string & name, InputParameters parameters);
 
 protected:
 
@@ -29,4 +28,4 @@ protected:
 };
 
 template<>
-InputParameters validParams<NSAuxVariable>();
+InputParameters validParams<CFDAuxVariable>();

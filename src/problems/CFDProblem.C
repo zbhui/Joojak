@@ -113,3 +113,20 @@ void CFDProblem::stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh)
 void CFDProblem::heatFluxTerm(RealVectorValue& heat_flux, Real* uh, RealGradient* duh)
 {
 }
+
+Real CFDProblem::computeAuxValue(std::string var_name, Real* uh)
+{
+	if(var_name == "pressure")
+		return pressure(uh);
+	if(var_name == "mach")
+		return localMach(uh);
+	if(var_name == "velocity_x")
+		return uh[1]/uh[0];
+	if(var_name == "velocity_y")
+		return uh[2]/uh[0];
+	if(var_name == "velocity_z")
+		return uh[3]/uh[0];
+
+	mooseError("未知的辅助变量");
+	return 0;
+}

@@ -22,6 +22,7 @@ public:
 	virtual Real maxEigenValue(Real *uh, const Point &normal);
 	virtual void eigenValue(Real *lam, Real *uh, const Point &normal);
 
+	virtual Real computeAuxValue(std::string name, Real *uh);
 public:
 	Real _mach;
 	Real _gamma;

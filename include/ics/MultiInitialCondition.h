@@ -3,6 +3,8 @@
 
 #include "InitialCondition.h"
 
+typedef Real (*buildICs)(const Point & p);
+
 class MultiInitialCondition :
 	public InitialCondition
 {
@@ -14,6 +16,7 @@ public:
 
 protected:
 	unsigned int _component;
+	std::map<std::string, buildICs> _name_to_ics;
 };
 
 template<>

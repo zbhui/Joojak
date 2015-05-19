@@ -446,3 +446,38 @@ void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 	}
 }
 
+Real SAProblem::eddyViscosity(Real* uh)
+{
+	if(uh[5] < 0)
+		return 0.;
+
+	Real mu = physicalViscosity(uh);
+	Real X = uh[5]/mu;
+	Real psi;
+	if (X <= 10)
+		psi = 0.05*log(1+exp(20*X));
+	else
+		psi = X;
+
+	Real fv1 = psi*psi*psi/(psi*psi*psi+_cv1*_cv1*_cv1);
+	return uh[5]*fv1;
+}
+
+Real SAProblem::computeAuxValue(std::string var_name, Real* uh)
+{
+	if(var_name == "pressure")
+		return pressure(uh);
+	if(var_name == "mach")
+		return localMach(uh);
+	if(var_name == "velocity_x")
+		return uh[1]/uh[0];
+	if(var_name == "velocity_y")
+		return uh[2]/uh[0];
+	if(var_name == "velocity_z")
+		return uh[3]/uh[0];
+	if(var_name == "eddy_viscosity")
+		return eddyViscosity(uh);
+
+	mooseError("未知的辅助变量");
+	return 0;
+}

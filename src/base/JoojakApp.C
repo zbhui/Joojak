@@ -2,6 +2,7 @@
 #include "Moose.h"
 #include "JoojakApp.h"
 
+#include "CFDAuxVariable.h"
 #include "CLawICAction.h"
 #include "CLawAuxVariablesAction.h"
 #include "JoojakRevision.h"
@@ -51,7 +52,6 @@
 #include "CouetteFlowExact.h"
 
 /// 辅助kernel
-#include "NSAuxVariable.h"
 #include "EmptyTimeDerivative.h"
 
 /// 材料属性
@@ -215,7 +215,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerFunction(CouetteFlowExact);
 
 	///注册辅助kernel
-	registerAux(NSAuxVariable);
+	registerAux(CFDAuxVariable);
 
 	/// 注册时间步长
 	registerTimeStepper(RatioTimeStepper);

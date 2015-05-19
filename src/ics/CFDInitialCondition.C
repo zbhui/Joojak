@@ -15,6 +15,7 @@ CFDInitialCondition::CFDInitialCondition(const std::string & name, InputParamete
 
 Real CFDInitialCondition::value(int component, const Point & p)
 {
+	std::string var_name = _var.name();
 switch (component) {
 	case 0:
 		return density(p);

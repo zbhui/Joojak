@@ -1,6 +1,7 @@
 
 #include "CFDPassFlowIC.h"
 #include "CFDProblem.h"
+#include "SAProblem.h"
 #include "Eigen/Geometry"
 using namespace Eigen;
 
@@ -11,7 +12,6 @@ InputParameters validParams<CFDPassFlowIC>()
     params.addParam<Real>("velocity", 1.0, "均匀流速度");
     return params;
 }
-
 CFDPassFlowIC::CFDPassFlowIC(const std::string & name, InputParameters parameters) :
     CFDInitialCondition(name, parameters),
     _velocity(getParam<Real>("velocity")),
@@ -58,5 +58,6 @@ Real CFDPassFlowIC::energyTotal(const Point &p)
 
 Real CFDPassFlowIC::eddyViscoisty(const Point& p)
 {
-	return density(p)*3;
+	SAProblem &sa_problem  = static_cast<SAProblem&>(_cfd_problem);
+	return density(p)*sa_problem.nuInfinity();
 }

@@ -30,7 +30,7 @@
 
   [./AuxVariables]
     [./Output]
-      type = NSAuxVariable 
+      type = CFDAuxVariable 
       variables = 'pressure velocity_x velocity_y velocity_z mach'
       order = FIRST
       family = MONOMIAL
