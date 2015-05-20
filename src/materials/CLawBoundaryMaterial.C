@@ -7,7 +7,7 @@ InputParameters validParams<CLawBoundaryMaterial>()
 {
   InputParameters params = validParams<CLawMaterial>();
 
-  params.addRequiredParam<std::string>("bc_type", "边界条件");
+  params.addParam<std::string>("bc_type", "empty", "边界条件");
   params.addParam<Real>("ds", 1.490116119384766e-08, "微扰量");
   params.addParam<Real>("sigma", 6, "通量罚值，默认值为6");
   params.addParam<Real>("epsilon", 1, "对称项罚值，可以取1, 0 , -1，分别对应SIP, IIP, NIP");

@@ -11,15 +11,8 @@
   block_name = 'fluid'
 []
 
-[MeshModifiers]
-  [./extrude]
-    type = BuildSideSetFromBlock
-    new_boundary = boundary_from_block
-  [../]
-[]
-
 [Problem]
-  type = EulerProblem
+  type = IsoVortexProblem
   mach = 0.38
 
   [./Variables]
@@ -30,35 +23,18 @@
 
   [./AuxVariables]
     [./Output]
-      type = NSAuxVariable 
+      type = CFDAuxVariable 
       variables = 'pressure velocity_x velocity_y velocity_z mach'
       order = FIRST
       family = MONOMIAL
     [../]
-
-    [./partition]
-      type = ProcessorIDAux 
-      variables = proc_id
-      order = CONSTANT
-      family = MONOMIAL
-    [../]
-
-   [./distance]
-      type = NearestNodeDistanceAux
-      variables = distance
-      order = FIRST
-      family = LAGRANGE
-      boundary = boundary_from_block
-      paired_boundary = 0
-    [../]
-
   [../]
 
 
 []
 
 [ICs]
-  type = IsoVortexIC 
+  type = CLawIC 
 []
 
 
@@ -66,14 +42,14 @@
   [./cell_material]
     block = 0
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe distance'
+    variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
   [./face_material]
     block = 0
     type = CLawFaceMaterial
   [../]
   [./bc_material]
-    type = IsoVortexBndMaterial
+    type = CLawBoundaryMaterial
     boundary = '0 1 2 3'
   [../]
 []

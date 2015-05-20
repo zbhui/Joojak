@@ -112,7 +112,7 @@ void CLawProblem::boundaryCondition(Real* ur, Real* ul, Point& normal, std::stri
 	mooseError("CLawProblem::boundaryCondition，需要子类填充.");
 }
 
-Real CLawProblem::initialCondition(int eq)
+Real CLawProblem::initialCondition(const Point & point, int eq)
 {
 	mooseError("CLawProblem::initialCondition，需要子类填充.");
 }
@@ -260,7 +260,7 @@ void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 	Real _ds = 1e-08;
 	std::string bc_type = bnd.getBCType();
 
-	for(int qp = 0 ; qp < n_qpoints; ++qp)
+	for(_qp = 0 ; _qp < n_qpoints; ++_qp)
 	{
 		Real ul[10], ur[10], ur_new[10];
 		RealGradient dul[10], dur[10];
@@ -270,24 +270,26 @@ void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 
 		for (int eq = 0; eq < n_variables; ++eq)
 		{
-			ul[eq] =  (*varl[eq])[qp];
-			dul[eq] = (*grad_varl[eq])[qp];
+			ul[eq] =  (*varl[eq])[_qp];
+			dul[eq] = (*grad_varl[eq])[_qp];
 		}
 
-		Point normal = bnd.normals()[qp];
+		Point normal = bnd.normals()[_qp];
 		Real penalty = bnd.penalty();
-		Real *flux = bnd._material_data[qp]._flux;
-		RealVectorValue *lift = bnd._material_data[qp]._lift;
+		Real *flux = bnd._material_data[_qp]._flux;
+		RealVectorValue *lift = bnd._material_data[_qp]._lift;
 
-		computeBoundaryFlux(flux, lift, ul, dul, normal, penalty, bc_type);
+//		computeBoundaryFlux(flux, lift, ul, dul, normal, penalty, bc_type);
+		computeBoundaryFlux(flux, lift, ul, dul, bnd);
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			ul[q] += _ds;
-			computeBoundaryFlux(flux_new, lift_new, ul, dul, normal, penalty, bc_type);
+//			computeBoundaryFlux(flux_new, lift_new, ul, dul, normal, penalty, bc_type);
+			computeBoundaryFlux(flux_new, lift_new, ul, dul, bnd);
 			for (int p = 0; p < _n_equations; ++p)
 			{
-				material[qp]._flux_jacobi_variable[p][q] = (flux_new[p] - flux[p])/_ds;
-				material[qp]._lift_jacobi_variable[p][q] = (lift_new[p] - lift[p])/_ds;
+				material[_qp]._flux_jacobi_variable[p][q] = (flux_new[p] - flux[p])/_ds;
+				material[_qp]._lift_jacobi_variable[p][q] = (lift_new[p] - lift[p])/_ds;
 			}
 			ul[q] -= _ds;
 
@@ -295,13 +297,30 @@ void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 			for (int q = 0; q < _n_equations; ++q)
 			{
 				dul[q](beta) += _ds;
-				computeBoundaryFlux(flux_new, lift_new, ul, dul, normal, penalty, bc_type);
+//				computeBoundaryFlux(flux_new, lift_new, ul, dul, normal, penalty, bc_type);
+				computeBoundaryFlux(flux_new, lift_new, ul, dul, bnd);
 				for (int p = 0; p < _n_equations; ++p)
 				{
-					material[qp]._flux_jacobi_grad_variable[p][q](beta) = (flux_new[p] - flux[p])/_ds;
+					material[_qp]._flux_jacobi_grad_variable[p][q](beta) = (flux_new[p] - flux[p])/_ds;
 				}
 				dul[q](beta) -= _ds;
 			}
 		}
 	}
 }
+
+void CLawProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Real* ul, RealGradient* dul, CLawBoundaryMaterial& bnd)
+{
+	Point normal = bnd.normals()[_qp];
+	Real penalty = bnd.penalty();
+	RealGradient dur[10];
+	Real ur[10];
+	for (int eq = 0; eq < _n_equations; ++eq)
+		dur[eq] = dul[eq];
+
+	std::string bc_type = bnd.getBCType();
+	boundaryCondition(ur, ul, normal, bc_type);
+
+	computeFaceFlux(flux, lift, ul, ur, dul, dur, normal, penalty);
+}
+

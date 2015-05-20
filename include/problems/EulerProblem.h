@@ -20,9 +20,13 @@ public:
 public:
 	EulerProblem(const std::string & name, InputParameters params);
 
+	virtual void computeCellFlux(RealGradient *flux, Real *source, Real *uh, RealGradient *duh);
+
+
 	virtual Real physicalViscosity(Real *uh);
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
 	virtual void viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);
+	virtual void artificialViscous(RealVectorValue* artificial_viscous, Real* uh, RealGradient *duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, Point &normal);
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
 

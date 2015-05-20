@@ -38,6 +38,7 @@
 
 /// 初始条件
 #include "IsoVortexIC.h"
+#include "CLawIC.h"
 #include "CFDPassFlowIC.h"
 #include "KOIC.h"
 
@@ -104,6 +105,7 @@
 #include "NavierStokesProblem.h"
 #include "EulerProblem.h"
 #include "SAProblem.h"
+#include "IsoVortexProblem.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -168,6 +170,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerInitialCondition(IsoVortexIC);
 	registerInitialCondition(CFDPassFlowIC);
 	registerInitialCondition(KOIC);
+	registerInitialCondition(CLawIC);
 
 	/// 注册边界条件
 	registerBoundaryCondition(EulerBC);
@@ -244,6 +247,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerProblem(NavierStokesProblem);
 	registerProblem(EulerProblem);
 	registerProblem(SAProblem);
+	registerProblem(IsoVortexProblem);
 
 	registerSAObjects(factory);
 }

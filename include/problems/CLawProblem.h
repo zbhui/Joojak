@@ -14,9 +14,11 @@ public FEProblem
 public:
 	CLawProblem(const std::string & name, InputParameters params);
 
+	virtual Real initialCondition(const Point & point, int eq);
 	virtual void computeCellFlux(RealGradient *flux, Real *source, Real *uh, RealGradient *duh);
 	virtual void computeFaceFlux(Real *flux, RealVectorValue *lift, Real *ul, Real *ur, RealGradient *dul, RealGradient *dur, Point &normal, Real penalty);
 	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, Point &normal, Real penalty, std::string bc_type);
+	virtual void computeBoundaryFlux(Real *flux, RealVectorValue *lift, Real *ul, RealGradient *dul, CLawBoundaryMaterial &bnd);
 	virtual void computeCellMaterial(CLawCellMaterial& claw_cell_material);
 	virtual void computeFaceMaterial(CLawFaceMaterial& claw_face_material);
 	virtual void computeBoundaryMaterial(CLawBoundaryMaterial& bnd_material);
@@ -29,9 +31,10 @@ protected:
 	virtual void sourceTerm(Real *source_term, Real* uh, RealGradient *duh);
 	virtual void fluxRiemann(Real *flux, Real *ul, Real *ur, Point &normal);
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
-	virtual Real initialCondition(int eq);
 
 	virtual void init();
+
+	int _qp;
 
 
 public:
