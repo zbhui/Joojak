@@ -2,8 +2,6 @@
 #pragma once
 
 #include "CLawMaterial.h"
-//#include "CLawCellMaterialData.h"
-#include "CLawMaterialData.h"
 
 using std::vector;
 class CLawProblem;
