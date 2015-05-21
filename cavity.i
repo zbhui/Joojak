@@ -1,27 +1,15 @@
 [Mesh]
-  type = FileMesh
-  file = grids/cylinder_fine.msh
+  type = GeneratedMesh
   dim = 2
-  
-  block_id = 10
-  block_name = 'fluid'
-  
-  boundary_id = '8 9'
-  boundary_name = 'far_field wall'
-[]
-
-[MeshModifiers]
-  [./extrude]
-    type = BuildSideSetFromBlock
-    new_boundary = boundary_from_block
-  [../]
+  nx = 40
+  ny = 40
 []
 
 [Problem]
   type = NavierStokesProblem
   mach = 0.1
-  reynolds = 40
-  aux_variables = distance
+  reynolds = 100
+
   [./Variables]
     order = FIRST
     family = MONOMIAL
@@ -36,23 +24,8 @@
       family = MONOMIAL
     [../]
 
-    [./partition]
-      type = ProcessorIDAux 
-      variables = proc_id
-      order = CONSTANT
-      family = MONOMIAL
-    [../]
-
-   [./distance]
-      type = NearestNodeDistanceAux
-      variables = distance
-      order = FIRST
-      family = LAGRANGE
-      boundary = boundary_from_block
-      paired_boundary = wall
-    [../]
-
   [../]
+[]
 
 [ICs]
   type = CFDPassFlowIC 
@@ -62,34 +35,23 @@
 
 [Materials]
   [./cell_material]
-    block = 10
+    block = ANY_BLOCK_ID
     type = CLawCellMaterial
     variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
   [./face_material]
-    block = 10
+    block = ANY_BLOCK_ID
     type = CLawFaceMaterial
   [../]
-  [./far_field_material]
-    boundary = far_field
+  [./far]
+    type = CLawBoundaryMaterial
+    boundary = top
     bc_type = far_field
-    type = CLawBoundaryMaterial
   [../]
-  [./wall_material]
-    boundary = wall
+  [./wall]
+    type = CLawBoundaryMaterial
+    boundary = 'left right bottom'
     bc_type = isothermal_wall
-    type = CLawBoundaryMaterial
-  [../]
-[]
-
-[Postprocessors]
-[]
-
-
-[UserObjects]
-  [./cfd_force]
-    type = CFDForceUserObject
-    boundary = wall
   [../]
 []
 
@@ -118,17 +80,21 @@
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 0.001
+    dt = 0.01
     ratio = 2
     step = 2
     max_dt = 100	
   [../]
 []
 
+[Postprocessors]
+[]
+
 [Outputs]
   [./exodus]
     type = Exodus
-    interval = 1 					
+    interval = 1 
+    output_on = 'initial timestep_end'					
   [../]
 	
   [./console]
@@ -137,4 +103,6 @@
     output_on = 'linear nonlinear'
   [../]
 []
+
+
 

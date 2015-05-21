@@ -10,7 +10,7 @@
 []
 
 [Problem]
-  type = NavierStokesProblem
+  type = CouetteFlowProblem
   mach = 0.1
   reynolds = 100
 
@@ -22,7 +22,7 @@
 
   [./AuxVariables]
     [./Output]
-      type = NSAuxVariable 
+      type = CFDAuxVariable 
       variables = 'pressure velocity_x velocity_y velocity_z mach'
       order = FIRST
       family = MONOMIAL
@@ -48,7 +48,7 @@
     type = CLawFaceMaterial
   [../]
   [./bc_material]
-    type = CouetteFlowBndMaterial
+    type = CLawBoundaryMaterial
     boundary = ANY_BOUNDARY_ID
   [../]
 []
@@ -86,6 +86,9 @@
 []
 
 [Postprocessors]
+  [./error]
+    type = CouetteFlowElementL2Error
+  [../]
 []
 
 [Outputs]

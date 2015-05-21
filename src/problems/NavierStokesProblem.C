@@ -384,7 +384,7 @@ void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
 	cL = sqrt(fabs(_gamma * pL / rhoL));
 	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
 
-	if(lam[1] < 0)  // 入口
+	if(vnR <= 0)  // 入口
 	{
 		if (vel > cL) //超音速
 		{
@@ -436,9 +436,6 @@ void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
 	}
 }
 
-
-//
-//
 //void NavierStokesProblem::symmetric(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
 //{
 //	for (int eq = 0; eq < _n_equations; ++eq)

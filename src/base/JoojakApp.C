@@ -52,6 +52,7 @@
 #include "NumTimeStep.h"
 #include "VariableResidual.h"
 #include "IsoVortexElementL2Error.h"
+#include "CouetteFlowElementL2Error.h"
 
 /// UserObject
 #include "CFDForceUserObject.h"
@@ -70,6 +71,7 @@
 #include "EulerProblem.h"
 #include "SAProblem.h"
 #include "IsoVortexProblem.h"
+#include "CouetteFlowProblem.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -167,6 +169,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerPostprocessor(NumTimeStep);
 	registerPostprocessor(VariableResidual);
 	registerPostprocessor(IsoVortexElementL2Error);
+	registerPostprocessor(CouetteFlowElementL2Error);
 
 
 	/// 注册UserObject
@@ -181,6 +184,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerProblem(EulerProblem);
 	registerProblem(SAProblem);
 	registerProblem(IsoVortexProblem);
+	registerProblem(CouetteFlowProblem);
 }
 
 void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
