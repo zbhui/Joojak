@@ -72,6 +72,7 @@
 #include "SAProblem.h"
 #include "IsoVortexProblem.h"
 #include "CouetteFlowProblem.h"
+#include "SodProblem.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -179,12 +180,15 @@ void JoojakApp::registerObjects(Factory & factory)
 
 	registerMeshModifier(BuildSideSetFromBlock);
 
-	registerProblem(CLawProblem);
+
+	/// 注册Problem
+//	registerProblem(CLawProblem);
 	registerProblem(NavierStokesProblem);
 	registerProblem(EulerProblem);
 	registerProblem(SAProblem);
 	registerProblem(IsoVortexProblem);
 	registerProblem(CouetteFlowProblem);
+	registerProblem(SodProblem);
 }
 
 void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)

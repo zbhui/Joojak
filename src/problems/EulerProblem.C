@@ -92,31 +92,31 @@ void EulerProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGrad
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-//	viscous_term[component] = 0.0001*duh[component];
+	viscous_term[component] = 0.0001*duh[component];
 
 	component = 1;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-//	viscous_term[component] = 0.0001*duh[component];
+	viscous_term[component] = 0.002*duh[component];
 
 	component = 2;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-//	viscous_term[component] = 0.0001*duh[component];
+	viscous_term[component] = 0.002*duh[component];
 
 	component = 3;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-//	viscous_term[component] = 0.0001*duh[component];
+	viscous_term[component] = 0.002*duh[component];
 
 	component = 4;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-//	viscous_term[component] = 0.0001*duh[component];
+	viscous_term[component] = 0.002*duh[component];
 }
 
 void EulerProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &normal)
