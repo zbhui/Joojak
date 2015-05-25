@@ -21,30 +21,48 @@ EulerProblem::EulerProblem(const std::string & name, InputParameters params) :
 
 void EulerProblem::computeCellFlux(RealGradient* flux, Real* source, Real* uh, RealGradient* duh)
 {
-	RealVectorValue inv_term[10], vis_term[10], source_term[10];
+	RealVectorValue inv_term[10], vis_term[10], source_term[10], artificial_term[10];
 	inviscousTerm(inv_term, uh);
 	viscousTerm(vis_term, uh, duh);
 	sourceTerm(source, uh, duh);
+	artificialViscous(artificial_term, uh, duh);
 	for (int eq = 0; eq < _n_equations; ++eq)
-		flux[eq] = inv_term[eq] - vis_term[eq];
+		flux[eq] = inv_term[eq] - vis_term[eq] - artificial_term[eq];
 }
 
+void EulerProblem::computeFaceFlux(Real* flux, RealVectorValue* lift, Real* ul, Real* ur, RealGradient* dul, RealGradient* dur, Point& normal, Real penalty)
+{
+	RealVectorValue ifl[10], ifr[10], vfl[10], vfr[10];
+	computeLift(lift, ul, ur, normal);
+
+	viscousTerm(vfl, ul, dul);
+	viscousTerm(vfr, ur, dur);
+
+	fluxRiemann(flux, ul, ur, normal);
+
+	for (int eq = 0; eq < _n_equations; ++eq)
+	{
+		flux[eq] -= 0.5*((vfl[eq]+vfr[eq])-penalty*lift[eq])*normal;
+	}
+
+}
 void EulerProblem::artificialViscous(RealVectorValue* artificial_viscous, Real* uh, RealGradient* duh)
 {
+	Real viscosity = 0.000;
 	int component = 0;
-	artificial_viscous[component] = 0.0001*duh[component];
+	artificial_viscous[component] = viscosity*duh[component];
 
 	component = 1;
-	artificial_viscous[component] = 0.0001*duh[component];
+	artificial_viscous[component] = viscosity*duh[component];
 
 	component = 2;
-	artificial_viscous[component] = 0.0001*duh[component];
+	artificial_viscous[component] = viscosity*duh[component];
 
 	component = 3;
-	artificial_viscous[component] = 0.0001*duh[component];
+	artificial_viscous[component] = viscosity*duh[component];
 
 	component = 4;
-	artificial_viscous[component] = 0.0001*duh[component];
+	artificial_viscous[component] = viscosity*duh[component];
 }
 
 void EulerProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
@@ -88,35 +106,36 @@ void EulerProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 
 void EulerProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* duh)
 {
+	Real viscosity = 0.000;
 	int component = 0;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-	viscous_term[component] = 0.0001*duh[component];
+	viscous_term[component] = viscosity*duh[component];
 
 	component = 1;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-	viscous_term[component] = 0.002*duh[component];
+	viscous_term[component] = viscosity*duh[component];
 
 	component = 2;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-	viscous_term[component] = 0.002*duh[component];
+	viscous_term[component] = viscosity*duh[component];
 
 	component = 3;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-	viscous_term[component] = 0.002*duh[component];
+	viscous_term[component] = viscosity*duh[component];
 
 	component = 4;
 	viscous_term[component](0) = 0.;
 	viscous_term[component](1) = 0.;
 	viscous_term[component](2) = 0.;
-	viscous_term[component] = 0.002*duh[component];
+	viscous_term[component] = viscosity*duh[component];
 }
 
 void EulerProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &normal)
