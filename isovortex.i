@@ -30,7 +30,25 @@
     [../]
   [../]
 
+[]
 
+[Adaptivity]
+  marker = marker
+  max_h_level = 2
+  [./Indicators]
+    [./error]
+      type = FluxJumpIndicator
+      variable = rho
+    [../]
+  [../]
+  [./Markers]
+    [./marker]
+      type = ErrorFractionMarker
+      indicator = error
+      coarsen = 0.1
+      refine = 0.7
+    [../]
+  [../]
 []
 
 [ICs]
@@ -95,7 +113,7 @@
   [./TimeStepper]
     type = RatioTimeStepper
     dt = 0.01
-    ratio = 2
+    ratio = 1
     step = 2
     max_dt = 100	
   [../]
@@ -104,7 +122,8 @@
 [Outputs]
   [./exodus]
     type = Exodus
-    interval = 1 					
+    interval = 1
+    output_on = 'initial timestep_end' 					
   [../]
 	
   [./console]

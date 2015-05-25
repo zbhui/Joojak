@@ -56,9 +56,29 @@
 
 [ICs]
   type = CFDPassFlowIC 
-  velocity = 0
+  velocity = 1
 []
 
+[Adaptivity]
+  marker = marker
+  max_h_level = 2
+  start_time = 10
+  stop_time = 200
+  [./Indicators]
+    [./error]
+      type = FluxJumpIndicator
+      variable = rho
+    [../]
+  [../]
+  [./Markers]
+    [./marker]
+      type = ErrorFractionMarker
+      indicator = error
+      coarsen = 0.1
+      refine = 0.7
+    [../]
+  [../]
+[]
 
 [Materials]
   [./cell_material]
@@ -118,7 +138,7 @@
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 0.001
+    dt = 1
     ratio = 2
     step = 2
     max_dt = 100	

@@ -74,6 +74,9 @@
 #include "CouetteFlowProblem.h"
 #include "SodProblem.h"
 
+/// problem
+#include "FluxJumpIndicator.h"
+
 template<>
 InputParameters validParams<JoojakApp>()
 {
@@ -189,6 +192,9 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerProblem(IsoVortexProblem);
 	registerProblem(CouetteFlowProblem);
 	registerProblem(SodProblem);
+
+
+	registerIndicator(FluxJumpIndicator);
 }
 
 void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
