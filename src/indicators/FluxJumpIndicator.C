@@ -10,7 +10,9 @@ InputParameters validParams<FluxJumpIndicator>()
 
 
 FluxJumpIndicator::FluxJumpIndicator(const std::string & name, InputParameters parameters) :
-	InternalSideIndicator(name, parameters)
+	InternalSideIndicator(name, parameters),
+    TwoMaterialPropertyInterface(parameters),
+	_face(getNeighborMaterialProperty<CLawFaceMaterialData>("face_material_data11"))
 {
 }
 
@@ -26,6 +28,8 @@ void FluxJumpIndicator::computeIndicator()
 
     _solution.add(_field_var.nodalDofIndex(), sum/_current_side_elem->volume());
     _solution.add(_field_var.nodalDofIndexNeighbor(), sum/_current_side_elem->volume());
+
+    std::cout << _face[_qp]._indicator <<std::endl ;
   }
 }
 

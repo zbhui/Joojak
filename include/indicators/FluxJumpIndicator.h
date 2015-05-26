@@ -2,8 +2,12 @@
 #pragma once
 
 #include "InternalSideIndicator.h"
+#include "TwoMaterialPropertyInterface.h"
+#include "CLawFaceMaterial.h"
 
-class FluxJumpIndicator : public InternalSideIndicator
+class FluxJumpIndicator :
+public InternalSideIndicator,
+protected TwoMaterialPropertyInterface
 {
 public:
   FluxJumpIndicator(const std::string & name, InputParameters parameters);
@@ -15,6 +19,7 @@ protected:
   void computeIndicator();
   void finalize();
 
+  MaterialProperty<CLawFaceMaterialData> &_face;
 
 };
 

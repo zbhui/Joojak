@@ -200,6 +200,9 @@ void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 			dur[eq] = (*grad_varr[eq])[qp];
 		}
 
+
+
+
 		Point normal = face.normals()[qp];
 		Real penalty = face.penalty();
 		Real *flux = face._material_data[qp]._flux;
@@ -246,6 +249,14 @@ void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 				dur[q](beta) -= _ds;
 			}
 		}
+
+		RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
+		Real uh[5];
+
+		inviscousTerm(ifl, ul);
+		inviscousTerm(ifr, ur);
+		face._material_data[qp]._indicator = 1;//(ifl[0] - ifr[0]) * normal / (ul[0] + ur[0])*2.;
+
 	}
 }
 

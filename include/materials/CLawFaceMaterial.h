@@ -17,6 +17,7 @@ public:
 	RealVectorValue _lift[10];
 	RealVectorValue _lift_jacobi_variable_ee[10][10];
 	RealVectorValue _lift_jacobi_variable_en[10][10];
+	Real _indicator;
 };
 
 class CLawFaceMaterial : public CLawMaterial
