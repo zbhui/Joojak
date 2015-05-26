@@ -24,7 +24,7 @@ public:
 	virtual void computeBoundaryMaterial(CLawBoundaryMaterial& bnd_material);
 
 	const vector<VariableName> & getAuxVariables() {return _aux_variables;}
-protected:
+
 	virtual void computeLift(RealVectorValue *lift, Real *ul, Real *ur, Point &normal);
 	virtual void inviscousTerm(RealVectorValue *inviscous_term, Real *uh);
 	virtual void viscousTerm(RealVectorValue *viscous_term, Real* uh, RealGradient *duh);

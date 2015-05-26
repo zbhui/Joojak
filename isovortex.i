@@ -27,14 +27,18 @@
       variables = 'pressure velocity_x velocity_y velocity_z mach'
       order = FIRST
       family = MONOMIAL
+      execute_on = 'initial timestep_end'
     [../]
   [../]
 
 []
 
 [Adaptivity]
+  initial_marker = marker
+  initial_steps = 2
   marker = marker
   max_h_level = 2
+  cycles_per_step = 2
   [./Indicators]
     [./error]
       type = FluxJumpIndicator
@@ -120,6 +124,7 @@
 []
 
 [Outputs]
+  tecplot = true
   [./exodus]
     type = Exodus
     interval = 1

@@ -62,8 +62,8 @@
 [Adaptivity]
   marker = marker
   max_h_level = 2
-  start_time = 10
-  stop_time = 200
+  start_time = 200
+  stop_time = 800
   [./Indicators]
     [./error]
       type = FluxJumpIndicator
@@ -138,7 +138,7 @@
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 1
+    dt = 100
     ratio = 2
     step = 2
     max_dt = 100	
