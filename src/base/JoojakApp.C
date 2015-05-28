@@ -8,7 +8,6 @@
 #include "Syntax.h"
 
 /// Action
-#include "CFDAuxVariable.h"
 #include "CLawAuxVariablesAction.h"
 #include "CLawICAction.h"
 #include "CommonPostProcessorAction.h"
@@ -35,6 +34,9 @@
 #include "CouetteFlowExact.h"
 
 /// 辅助kernel
+#include "CFDAuxVariable.h"
+#include "ArtificialViscosityAuxKernel.h"
+
 #include "EmptyTimeDerivative.h"
 
 /// 材料属性
@@ -76,6 +78,7 @@
 
 /// problem
 #include "FluxJumpIndicator.h"
+#include "TestJumpIndicator.h"
 
 template<>
 InputParameters validParams<JoojakApp>()
@@ -163,6 +166,7 @@ void JoojakApp::registerObjects(Factory & factory)
 
 	///注册辅助kernel
 	registerAux(CFDAuxVariable);
+	registerAux(ArtificialViscosityAuxKernel);
 
 	/// 注册时间步长
 	registerTimeStepper(RatioTimeStepper);
@@ -195,6 +199,7 @@ void JoojakApp::registerObjects(Factory & factory)
 
 
 	registerIndicator(FluxJumpIndicator);
+	registerIndicator(TestJumpIndicator);
 }
 
 void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)

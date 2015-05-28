@@ -13,7 +13,7 @@
 
 [Problem]
   type = IsoVortexProblem
-  mach = 0.38
+  aux_variables = error
 
   [./Variables]
     order = FIRST
@@ -49,8 +49,8 @@
     [./marker]
       type = ErrorFractionMarker
       indicator = error
-      coarsen = 0.1
-      refine = 0.7
+      coarsen = 0.7
+      refine = 0.9
     [../]
   [../]
 []
@@ -124,7 +124,6 @@
 []
 
 [Outputs]
-  tecplot = true
   [./exodus]
     type = Exodus
     interval = 1

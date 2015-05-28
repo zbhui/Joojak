@@ -48,7 +48,13 @@ void EulerProblem::computeFaceFlux(Real* flux, RealVectorValue* lift, Real* ul, 
 }
 void EulerProblem::artificialViscous(RealVectorValue* artificial_viscous, Real* uh, RealGradient* duh)
 {
-	Real viscosity = 0.000;
+	RealVectorValue vel(uh[1], uh[2], uh[3]);
+	vel /= uh[0];
+	Real c = std::sqrt(temperature(uh))/_mach;
+    Real indicator = uh[5] ;
+	Real viscosity = 4*indicator;//* duh[0].size()/uh[0]*0.01;
+//	Real viscosity = 1*(vel.size() + c)*0.01*indicator;
+
 	int component = 0;
 	artificial_viscous[component] = viscosity*duh[component];
 
@@ -106,6 +112,7 @@ void EulerProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
 
 void EulerProblem::viscousTerm(RealVectorValue* viscous_term, Real* uh, RealGradient* duh)
 {
+
 	Real viscosity = 0.000;
 	int component = 0;
 	viscous_term[component](0) = 0.;

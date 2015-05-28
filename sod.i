@@ -6,7 +6,7 @@
 
 [Problem]
   type = SodProblem
-
+  aux_variables = artificial_vis
   [./Variables]
     order = THIRD
     family = MONOMIAL
@@ -20,13 +20,36 @@
       order = FIRST
       family = MONOMIAL
     [../]
+    [./artificial_vis]
+      type = ArtificialViscosityAuxKernel 
+      variables = artificial_vis
+      indicator = error
+      order = FIRST
+      family = MONOMIAL
+    [../]
   [../]
-
-
 []
 
 [ICs]
   type = CLawIC 
+[]
+
+
+[Adaptivity]
+  [./Indicators]
+    [./error]
+      type = FluxJumpIndicator
+      variable = rhoe
+    [../]
+  [../]
+  [./Markers]
+    [./marker]
+      type = ErrorFractionMarker
+      indicator = error
+      coarsen = 0.7
+      refine = 0.9
+    [../]
+  [../]
 []
 
 
@@ -73,6 +96,7 @@
   type = Transient
   solve_type = newton
   num_steps = 1000
+  #scheme = crank-nicolson
   scheme = bdf2
   l_tol = 1e-02
   #l_abs_step_tol = -1e-04
