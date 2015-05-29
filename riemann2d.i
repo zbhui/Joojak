@@ -1,14 +1,15 @@
 [Mesh]
   type = GeneratedMesh
-  dim = 1
-  nx = 100
+  dim = 2
+  nx = 20
+  ny = 20
 []
 
 [Problem]
-  type = SodProblem
+  type = Riemann2DProblem
   aux_variables = artificial_vis
   [./Variables]
-    order = THIRD
+    order = FIRST
     family = MONOMIAL
     variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]

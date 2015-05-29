@@ -22,10 +22,10 @@ protected:
   int _var_order;
 
   vector<VariableValue*> _uh;
-
+  vector<VariableGradient*> _grad_uh;
   VariableValue &_indicator;
   virtual Real computeValue();
-  void valueAtCellPoint(Real *uh);
+  void valueAtCellPoint(Real *uh, RealVectorValue *duh);
 };
 
 template<>

@@ -75,6 +75,8 @@
 #include "IsoVortexProblem.h"
 #include "CouetteFlowProblem.h"
 #include "SodProblem.h"
+#include "BlastWaveProblem.h"
+#include "Riemann2DProblem.h"
 
 /// problem
 #include "FluxJumpIndicator.h"
@@ -196,6 +198,8 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerProblem(IsoVortexProblem);
 	registerProblem(CouetteFlowProblem);
 	registerProblem(SodProblem);
+	registerProblem(BlastWaveProblem);
+	registerProblem(Riemann2DProblem);
 
 
 	registerIndicator(FluxJumpIndicator);

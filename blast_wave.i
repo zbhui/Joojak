@@ -1,14 +1,15 @@
 [Mesh]
   type = GeneratedMesh
   dim = 1
-  nx = 100
+  nx = 400
+  xmax = 100
 []
 
 [Problem]
-  type = SodProblem
+  type = BlastWaveProblem
   aux_variables = artificial_vis
   [./Variables]
-    order = THIRD
+    order = FIRST
     family = MONOMIAL
     variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
@@ -17,7 +18,7 @@
     [./Output]
       type = CFDAuxVariable 
       variables = 'pressure velocity_x velocity_y velocity_z mach'
-      order = FIRST
+      order = SECOND
       family = MONOMIAL
     [../]
     [./artificial_vis]
@@ -27,18 +28,25 @@
       marker = marker
       order = FIRST
       family = MONOMIAL
+      execute_on = 'initial timestep_end'
     [../]
   [../]
 []
 
 [ICs]
   type = CLawIC 
+  [./error]
+    variable = error
+    type = ConstantIC
+    value = 10
+  [../]
 []
 
 
 [Adaptivity]
   [./Indicators]
     [./error]
+      execute_on = 'initial timestep_end'
       type = TestJumpIndicator
       variable = rhoe
     [../]
@@ -67,6 +75,7 @@
   [./bc_material]
     type = CLawBoundaryMaterial
     boundary = '0 1'
+    bc_type = wall
   [../]
 []
 
@@ -96,7 +105,8 @@
 [Executioner]
   type = Transient
   solve_type = newton
-  num_steps = 1000
+  num_steps = 100000
+  end_time = 3.8
   #scheme = crank-nicolson
   scheme = bdf2
   l_tol = 1e-02
@@ -109,14 +119,15 @@
 
   [./TimeStepper]
     type = RatioTimeStepper
-    dt = 0.001
-    ratio = 1
+    dt = 0.0001
+    ratio = 2
     step = 2
-    max_dt = 100	
+    max_dt = 0.001	
   [../]
 []
 
 [Outputs]
+  output_on = 'initial timestep_end'
   [./exodus]
     type = Exodus
     interval = 1 					
