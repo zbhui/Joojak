@@ -67,7 +67,7 @@ Real Riemann2DProblem::energyTotal(Real t, const Point &p)
 
 Real Riemann2DProblem::pressure(Real t, const Point &p)
 {
-	return _initial_condition[pointLocator(p)][3];
+	return _initial_condition[pointLocator(p)][4];
 }
 void Riemann2DProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Real* ul, RealGradient* dul, CLawBoundaryMaterial& bnd)
 {
@@ -81,7 +81,8 @@ void Riemann2DProblem::computeBoundaryFlux(Real* flux, RealVectorValue* lift, Re
 	std::string bc_type = bnd.getBCType();
 	Point q_point = bnd.qpoints()[_qp];
 	for (int eq = 0; eq < _n_equations; ++eq)
-		ur[eq] = valueExact(time(), q_point, eq);
+//		ur[eq] = valueExact(time(), q_point, eq);
+		ur[eq] = ul[eq];
 
 	computeFaceFlux(flux, lift, ul, ur, dul, dur, normal, penalty);
 }

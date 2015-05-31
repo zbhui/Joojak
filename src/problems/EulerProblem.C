@@ -52,8 +52,8 @@ void EulerProblem::artificialViscous(RealVectorValue* artificial_viscous, Real* 
 	vel /= uh[0];
 	Real c = std::sqrt(temperature(uh))/_mach;
     Real indicator = uh[5] ;
-//	Real viscosity = 1000;//10000*indicator;//* duh[0].size()/uh[0]*0.01;
-	Real viscosity = 100;4*(vel.size() + c)*indicator;
+	Real viscosity = indicator;//* duh[0].size()/uh[0]*0.01;
+//	Real viscosity = 0.00;//4*(vel.size() + c)*indicator;
 
 	int component = 0;
 	artificial_viscous[component] = viscosity*duh[component];

@@ -1,15 +1,15 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 20
-  ny = 20
+  nx = 50
+  ny = 50
 []
 
 [Problem]
   type = Riemann2DProblem
   aux_variables = artificial_vis
   [./Variables]
-    order = FIRST
+    order = SECOND
     family = MONOMIAL
     variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
@@ -25,7 +25,7 @@
       type = ArtificialViscosityAuxKernel 
       variables = artificial_vis
       indicator = error
-      marker = marker
+      marker = jump_marker
       order = FIRST
       family = MONOMIAL
     [../]
@@ -38,18 +38,40 @@
 
 
 [Adaptivity]
+  initial_marker = marker
+  marker = marker
+  max_h_level = 2
+  initial_steps = 2
   [./Indicators]
     [./error]
-      type = TestJumpIndicator
+      type = FluxJumpIndicator
       variable = rhoe
     [../]
   [../]
   [./Markers]
     [./marker]
+      type = ComboMarker
+      markers = 'jump_marker box1 box2'
+    [../]    
+    [./jump_marker]
       type = ErrorFractionMarker
       indicator = error
-      coarsen = 0.7
-      refine = 0.9
+      coarsen = 0.2
+      refine = 0.8
+    [../]
+    [./box1]
+      type = BoxMarker
+      bottom_left = '0 0.4 0'
+      top_right = '0.53 0.53 0'
+      inside = refine
+      outside = coarsen
+    [../]
+    [./box2]
+      type = BoxMarker
+      bottom_left = '0.47 0.0 0'
+      top_right = '0.53 0.53 0'
+      inside = refine
+      outside = coarsen
     [../]
   [../]
 []
@@ -67,7 +89,7 @@
   [../]
   [./bc_material]
     type = CLawBoundaryMaterial
-    boundary = '0 1'
+    boundary = ANY_BOUNDARY_ID
   [../]
 []
 
@@ -105,8 +127,9 @@
   l_max_its = 100
  	
   nl_max_its = 100
-  nl_rel_tol = 1e-04
-  #nl_abs_tol = 1e-05
+  nl_rel_tol = 1e-02
+  #nl_abs_tol = 1e-03
+  end_time = 0.2
 
   [./TimeStepper]
     type = RatioTimeStepper
@@ -119,8 +142,10 @@
 
 [Outputs]
   [./exodus]
+    output_initial = true
     type = Exodus
-    interval = 1 					
+    interval = 1 
+    refinements = 0					
   [../]
 	
   [./console]
