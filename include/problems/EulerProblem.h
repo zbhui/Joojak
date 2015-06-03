@@ -32,7 +32,7 @@ public:
 	virtual void boundaryCondition(Real *ur, Real *ul, Point &normal, std::string bc_type);
 
 
-private:
+protected:
 	void wall(Real *ur,  Real *ul, Point &normal);
 	void farField(Real *ur,  Real *ul, Point &normal);
 	void symmetric(Real *ur,  Real *ul, Point &normal);

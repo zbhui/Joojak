@@ -37,16 +37,7 @@ Real ArtificialViscosityAuxKernel::computeValue()
 	std::string var_name = _var.name();
 	valueAtCellPoint(uh, duh);
 
-	Real viscosity = _indicator[_qp]*_current_elem->hmax();
-//	if (_indicator[_qp] > 0)
-//	  std :: cout << duh[4].size()/uh[4] << std::endl;
-
-//	viscosity *= (duh[4].size()/uh[4] * _current_elem->hmax());
-
-//	if(_t_step < 100)
-//		return 500*viscosity;
-//	else
-//		return 10*viscosity;
+	Real viscosity = 5*_indicator[_qp]*_current_elem->hmax();
 
 	return viscosity;
 

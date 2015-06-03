@@ -5,7 +5,8 @@
 []
 
 [Problem]
-  type = SodProblem
+  type = Riemann1DProblem
+  sub_type = sod
   aux_variables = artificial_vis
   [./Variables]
     order = THIRD
@@ -40,7 +41,7 @@
   [./Indicators]
     [./error]
       type = TestJumpIndicator
-      variable = rhoe
+      variable = rho
     [../]
   [../]
   [./Markers]

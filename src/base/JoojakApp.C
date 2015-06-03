@@ -76,6 +76,7 @@
 #include "CouetteFlowProblem.h"
 #include "SodProblem.h"
 #include "BlastWaveProblem.h"
+#include "Riemann1DProblem.h"
 #include "Riemann2DProblem.h"
 
 /// problem
@@ -199,6 +200,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	registerProblem(CouetteFlowProblem);
 	registerProblem(SodProblem);
 	registerProblem(BlastWaveProblem);
+	registerProblem(Riemann1DProblem);
 	registerProblem(Riemann2DProblem);
 
 

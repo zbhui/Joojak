@@ -19,8 +19,6 @@ Riemann2DProblem::Riemann2DProblem(const std::string & name, InputParameters par
 //	_initial_condition[1] = {1,0.7276,0,0,1};
 //	_initial_condition[2] = {0.8,0,0,0,1};
 //	_initial_condition[3] = {1,0,0.7276,0,1};
-	std::vector<int> a;
-	a += 1,23;
 	_initial_condition[0] += 0.5313,0,0,0,0.4;
 	_initial_condition[1] += 1,0.7276,0,0,1;
 	_initial_condition[2] += 0.8,0,0,0,1;
