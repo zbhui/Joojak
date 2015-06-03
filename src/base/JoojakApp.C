@@ -62,7 +62,7 @@
 /// VectorPostProcessor
 
 /// Executioner
-#include "SteadyTransientExecutioner.h"
+//#include "SteadyTransientExecutioner.h"
 
 /// mesh modifier
 #include "BuildSideSetFromBlock.h"
@@ -186,7 +186,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	/// 注册UserObject
 	registerPostprocessor(CFDForceUserObject);
 
-	registerExecutioner(SteadyTransientExecutioner);
+//	registerExecutioner(SteadyTransientExecutioner);
 
 	registerMeshModifier(BuildSideSetFromBlock);
 

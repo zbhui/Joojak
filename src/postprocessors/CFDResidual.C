@@ -18,7 +18,7 @@ CFDResidual::CFDResidual(const std::string & name, InputParameters parameters) :
 Real
 CFDResidual::getValue()
 {
-  return _fe_problem.getNonlinearSystem()._initial_residual;
+  return _fe_problem.getNonlinearSystem()._initial_residual_before_preset_bcs;
 
 //  return _fe_problem.getNonlinearSystem().residualVector(Moose::KT_ALL).l2_norm();
 }
