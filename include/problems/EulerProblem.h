@@ -8,11 +8,18 @@ class EulerProblem : public CFDProblem
 public:
 	struct DependValue
 	{
-		Real pressure;
+		Real rho;
+		Real c;
+		Real T;
+		Real p;
 		RealVectorValue vel;
+		Real vel_size;
+		RealVectorValue mom;
+		Real mom_size;
+		Real rhoe;
+		Real s;
+		Real h;
 		Real viscosity;
-
-		Real uh[10];
 
 		void update();
 	};
