@@ -32,6 +32,7 @@ CLawMaterial::CLawMaterial(const std::string & name, InputParameters parameter):
 		_uh_neighbor.push_back(_is_implicit ? &val.slnNeighbor() : &val.slnOldNeighbor());
 		_grad_uh.push_back(_is_implicit ? &val.gradSln(): &val.gradSlnOld());
 		_grad_uh_neighbor.push_back(_is_implicit ? &val.gradSlnNeighbor(): &val.gradSlnOldNeighbor());
-	}
 
+		addMooseVariableDependency(&_fe_problem.getVariable(_tid, _variables[ivar]));
+	}
 }

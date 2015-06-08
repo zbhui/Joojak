@@ -41,7 +41,7 @@
   [./cell_material]
     block = ANY_BLOCK_ID
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe'
+    #variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
   [./face_material]
     block = ANY_BLOCK_ID

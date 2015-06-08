@@ -226,7 +226,7 @@ void EulerProblem::farField(Real *ur,  Real *ul, Point &normal)
 
 	Real vn_left = left.vel*normal;
 	Real vn_right = right.vel*normal;
-	Real vel = left.vel.size();
+	vel = left.vel.size();
 
 	if (vel >= cL) {	//超声速
 		if (vnL >= 0.0) //exit
@@ -280,7 +280,7 @@ void EulerProblem::farField(Real *ur,  Real *ul, Point &normal)
 }
 
 //void EulerProblem::farFieldRiemann(Real *ur,  Real *ul, Point &normal)
-{
+//{
 //	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
 //	if(_current_elem->dim() == 2)
 //		vel_inf(2) = 0.;
@@ -342,5 +342,5 @@ Real EulerProblem::physicalViscosity(Real* uh)
 
 void EulerProblem::updateDependValue(DependValue& denpend_value, Real *uh)
 {
-	denpend_value.pressure = pressure(uh);
+	denpend_value.p = pressure(uh);
 }
