@@ -14,7 +14,7 @@ CLawCellKernel::CLawCellKernel(const std::string & name, InputParameters paramet
 		_eq(getParam<int>("component")),
 		_cell(getMaterialProperty<CLawCellMaterialData>("cell_material_data"))
 {
-	addMooseVariableDependency(mooseVariable());
+//	addMooseVariableDependency(mooseVariable());
 }
 
 Real CLawCellKernel::computeQpResidual()
