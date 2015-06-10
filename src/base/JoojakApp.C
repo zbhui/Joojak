@@ -226,7 +226,7 @@ void JoojakApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 	registerAction(AddMultiVariableAction, "add_variable");
 	registerAction(AddMultiVariableAction, "add_kernel");
 	registerAction(AddMultiVariableAction, "add_dg_kernel");
-	registerAction(AddMultiVariableAction, "add_bc");
+//	registerAction(AddMultiVariableAction, "add_bc");
 
 	syntax.registerActionSyntax("AddMultiAuxVariableAction", "Problem/AuxVariables/*");
 	registerAction(AddMultiAuxVariableAction, "add_aux_variable");

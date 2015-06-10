@@ -13,7 +13,6 @@
 
 [Problem]
   type = IsoVortexProblem
-  aux_variables = error
 
   [./Variables]
     order = FIRST
@@ -33,32 +32,18 @@
 
 []
 
-[Adaptivity]
-  initial_marker = marker
-  initial_steps = 2
-  marker = marker
-  max_h_level = 2
-  cycles_per_step = 2
-  [./Indicators]
-    [./error]
-      type = FluxJumpIndicator
-      variable = rho
-    [../]
-  [../]
-  [./Markers]
-    [./marker]
-      type = ErrorFractionMarker
-      indicator = error
-      coarsen = 0.7
-      refine = 0.9
-    [../]
-  [../]
-[]
-
 [ICs]
   type = CLawIC 
 []
 
+[BCs]
+  [./Periodic]
+    [./all]
+      variable = u
+      auto_direction = 'x y z'
+    [../]
+  [../]
+[]
 
 [Materials]
   [./cell_material]
