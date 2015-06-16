@@ -153,8 +153,8 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 			uh[q] -= _ds;
 		}
 
-		for (int beta = 0; beta < 3; ++beta)
 		for (int q = 0; q < _n_equations; ++q)
+		for (int beta = 0; beta < 3; ++beta)
 		{
 			duh[q](beta) += _ds;
 			computeCellFlux(flux_new, source_new, uh, duh);
@@ -200,14 +200,12 @@ void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 			dur[eq] = (*grad_varr[eq])[qp];
 		}
 
-
-
-
 		Point normal = face.normals()[qp];
 		Real penalty = face.penalty();
 		Real *flux = face._material_data[qp]._flux;
 		RealVectorValue *lift = face._material_data[qp]._lift;
 		computeFaceFlux(flux, lift, ul, ur, dul, dur, normal, penalty);
+
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			ul[q] += _ds;
@@ -228,35 +226,25 @@ void CLawProblem::computeFaceMaterial(CLawFaceMaterial& face)
 				material[qp]._lift_jacobi_variable_en[p][q] = (lift_new[p] - lift[p])/_ds;
 			}
 			ur[q] -= _ds;
-
-			for (int beta = 0; beta < 3; ++beta)
-			for (int q = 0; q < _n_equations; ++q)
-			{
-				dul[q](beta) += _ds;
-				computeFaceFlux(flux_new, lift_new, ul, ur, dul, dur, normal, penalty);
-				for (int p = 0; p < _n_equations; ++p)
-				{
-					material[qp]._flux_jacobi_grad_variable_ee[p][q](beta) = (flux_new[p] - flux[p])/_ds;
-				}
-				dul[q](beta) -= _ds;
-
-				dur[q](beta) += _ds;
-				computeFaceFlux(flux_new, lift_new, ul, ur, dul, dur, normal, penalty);
-				for (int p = 0; p < _n_equations; ++p)
-				{
-					material[qp]._flux_jacobi_grad_variable_en[p][q](beta) = (flux_new[p] - flux[p])/_ds;
-				}
-				dur[q](beta) -= _ds;
-			}
 		}
 
-		RealVectorValue ifl[5], ifr[5], vfl[5], vfr[5];
-		Real uh[5];
+		for (int q = 0; q < _n_equations; ++q)
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			dul[q](beta) += _ds;
+			computeFaceFlux(flux_new, lift_new, ul, ur, dul, dur, normal, penalty);
+			for (int p = 0; p < _n_equations; ++p)
+				material[qp]._flux_jacobi_grad_variable_ee[p][q](beta) = (flux_new[p] - flux[p])/_ds;
 
-		inviscousTerm(ifl, ul);
-		inviscousTerm(ifr, ur);
-		face._material_data[qp]._indicator = 1;//(ifl[0] - ifr[0]) * normal / (ul[0] + ur[0])*2.;
+			dul[q](beta) -= _ds;
 
+			dur[q](beta) += _ds;
+			computeFaceFlux(flux_new, lift_new, ul, ur, dul, dur, normal, penalty);
+			for (int p = 0; p < _n_equations; ++p)
+				material[qp]._flux_jacobi_grad_variable_en[p][q](beta) = (flux_new[p] - flux[p])/_ds;
+
+			dur[q](beta) -= _ds;
+		}
 	}
 }
 
@@ -290,12 +278,10 @@ void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 		Real *flux = bnd._material_data[_qp]._flux;
 		RealVectorValue *lift = bnd._material_data[_qp]._lift;
 
-//		computeBoundaryFlux(flux, lift, ul, dul, normal, penalty, bc_type);
 		computeBoundaryFlux(flux, lift, ul, dul, bnd);
 		for (int q = 0; q < _n_equations; ++q)
 		{
 			ul[q] += _ds;
-//			computeBoundaryFlux(flux_new, lift_new, ul, dul, normal, penalty, bc_type);
 			computeBoundaryFlux(flux_new, lift_new, ul, dul, bnd);
 			for (int p = 0; p < _n_equations; ++p)
 			{
@@ -303,19 +289,18 @@ void CLawProblem::computeBoundaryMaterial(CLawBoundaryMaterial& bnd)
 				material[_qp]._lift_jacobi_variable[p][q] = (lift_new[p] - lift[p])/_ds;
 			}
 			ul[q] -= _ds;
+		}
 
-			for (int beta = 0; beta < 3; ++beta)
-			for (int q = 0; q < _n_equations; ++q)
+		for (int q = 0; q < _n_equations; ++q)
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			dul[q](beta) += _ds;
+			computeBoundaryFlux(flux_new, lift_new, ul, dul, bnd);
+			for (int p = 0; p < _n_equations; ++p)
 			{
-				dul[q](beta) += _ds;
-//				computeBoundaryFlux(flux_new, lift_new, ul, dul, normal, penalty, bc_type);
-				computeBoundaryFlux(flux_new, lift_new, ul, dul, bnd);
-				for (int p = 0; p < _n_equations; ++p)
-				{
-					material[_qp]._flux_jacobi_grad_variable[p][q](beta) = (flux_new[p] - flux[p])/_ds;
-				}
-				dul[q](beta) -= _ds;
+				material[_qp]._flux_jacobi_grad_variable[p][q](beta) = (flux_new[p] - flux[p])/_ds;
 			}
+			dul[q](beta) -= _ds;
 		}
 	}
 }

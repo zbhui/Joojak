@@ -36,20 +36,11 @@
   type = CLawIC 
 []
 
-[BCs]
-  [./Periodic]
-    [./all]
-      variable = u
-      auto_direction = 'x y z'
-    [../]
-  [../]
-[]
 
 [Materials]
   [./cell_material]
     block = 0
     type = CLawCellMaterial
-    variables = 'rho momentum_x momentum_y momentum_z rhoe'
   [../]
   [./face_material]
     block = 0
@@ -90,7 +81,7 @@
 [Executioner]
   type = Transient
   solve_type = newton
-  num_steps = 1000
+  num_steps = 1
   l_tol = 1e-02
   #l_abs_step_tol = -1e-04
   l_max_its = 100

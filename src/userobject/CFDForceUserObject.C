@@ -56,6 +56,8 @@ void CFDForceUserObject::execute()
 
 void CFDForceUserObject::finalize()
 {
+//	gatherSum(_dynam);
+
 	Quaterniond q = _cfd_problem._attitude.earthFromWind().inverse();
     Vector3d form_force = q*_dynam.transToEigenVector(_dynam.form_force);
     Vector3d friction_force = q*_dynam.transToEigenVector(_dynam.friction_force);

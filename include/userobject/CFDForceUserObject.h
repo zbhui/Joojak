@@ -65,7 +65,6 @@ public:
 
 protected:
 	void computeQpValue(Real *uh, RealGradient *duh);
-
 private:
 
 
@@ -79,10 +78,10 @@ private:
 	Real _ref_area;
 	RealVectorValue _ref_point;
 
-	Dynam _dynam;
+
 	vector<VariableValue*> _uh;
 	vector<VariableGradient*> _grad_uh;
-
+	Dynam _dynam;
 	bool _momentum;
 	bool _force;
 

@@ -27,6 +27,7 @@ CLawBoundaryMaterial::CLawBoundaryMaterial(const std::string & name, InputParame
 
 void CLawBoundaryMaterial::computeProperties()
 {
+	if(!_bnd) return ;
 		_claw_problem.computeBoundaryMaterial(*this);
 }
 
