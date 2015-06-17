@@ -200,7 +200,6 @@ void EulerProblem::symmetric(Real *ur,  Real *ul, Point &normal)
 
 void EulerProblem::farField(Real *ur,  Real *ul, Point &normal)
 {
-	DependValue left, right;
 	Real rhoR, uR, vR, wR, pR;
 	Real rhoL, uL, vL, wL, pL;
 	Real cR, cL, cb;
@@ -208,61 +207,43 @@ void EulerProblem::farField(Real *ur,  Real *ul, Point &normal)
 	Real vel, s;
 	Real Rp, Rm;
 
-	Vector3d velocity = _attitude.earthFromWind()*Vector3d::UnitX();
-	uR = velocity(0);
-	vR = velocity(1);
-	wR = velocity(2);
+	Vector3d vel_inf = _attitude.earthFromWind()*Vector3d::UnitX();
+	if(_mesh.dimension() == 2)
+		vel_inf(2) = 0.;
+
+	uR = vel_inf(0);
+	vR = vel_inf(1);
+	wR = vel_inf(2);
+
+	Real lam[3];
+	eigenValue(lam, ul, normal);
+
 	rhoR = 1.0;
 
-	right.rho = 1;
-	right.p = 1 / _gamma /_mach / _mach;
-	left.vel = RealVectorValue(velocity(0), velocity(1), velocity(2));
-	right.c = _mach * 1;
+	pR = 1 / _gamma /_mach / _mach;
+	cR = sqrt(fabs(_gamma * pR / rhoR));
+	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
 
-    left.rho = ul[0];
-    left.vel = RealVectorValue(ul[1], ul[2], ul[3])/ul[0];
-    left.p = pressure(ul);
-    left.c = sqrt(fabs(_gamma * left.p / left.rho));
+	rhoL = ul[0];
+	uL = ul[1] / rhoL;
+	vL = ul[2] / rhoL;
+	wL = ul[3] / rhoL;
+	vel = sqrt(uL * uL + vL * vL + wL * wL);
+	pL = pressure(ul);
+	cL = sqrt(fabs(_gamma * pL / rhoL));
+	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
 
-	Real vn_left = left.vel*normal;
-	Real vn_right = right.vel*normal;
-	vel = left.vel.size();
-
-	if (vel >= cL) {	//超声速
-		if (vnL >= 0.0) //exit
+	if(vnR <= 0)  // 入口
+	{
+		if (vel > cL) //超音速
 		{
-			ur[0] = ul[0];
-			ur[1] = ul[1];
-			ur[2] = ul[2];
-			ur[3] = ul[3];
-			ur[4] = ul[4];
+			ur[0] = rhoR;
+			ur[1] = rhoR * uR;
+			ur[2] = rhoR * vR;
+			ur[3] = rhoR * wR;
+			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
 		}
-		else //inlet
-		{
-			ur[0] = right.rho;
-			ur[1] = right.rho*right.vel(0);
-			ur[2] = right.rho*right.vel(1);
-			ur[3] = right.rho*right.vel(2);
-			ur[4] = right.p/(_gamma - 1) + 0.5*right.rho*right.vel.size();
-		}
-	}
-	else
-	{ 	//  亚声速
-		if (vnL >= 0.0)
-		{			//exit
-			s = pL / pow(rhoL, _gamma);
-			Rp = vnL + 2 * cL / (_gamma - 1);
-			Rm = vnR - 2 * cR / (_gamma - 1);
-			vnb = (Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
-			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
-			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
-		}
-		else
+		else	//亚音速
 		{
 			s = pR / pow(rhoR, _gamma);
 			Rp = -vnR + 2.0 * cR / (_gamma - 1);
@@ -277,6 +258,108 @@ void EulerProblem::farField(Real *ur,  Real *ul, Point &normal)
 			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
 		}
 	}
+	else  //出口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = ul[4];
+		}
+		else	//亚音速
+		{
+			s = pL / pow(rhoL, _gamma);
+			Rp = vnL + 2 * cL / (_gamma - 1);
+			Rm = vnR - 2 * cR / (_gamma - 1);
+			vnb = (Rp + Rm) / 2.0;
+			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+
+			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
+			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
+			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
+			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+		}
+	}
+//	DependValue left, right;
+//	Real rhoR, uR, vR, wR, pR;
+//	Real rhoL, uL, vL, wL, pL;
+//	Real cR, cL, cb;
+//	Real vnR, vnL, vnb;
+//	Real vel, s;
+//	Real Rp, Rm;
+//
+//	Vector3d velocity = _attitude.earthFromWind()*Vector3d::UnitX();
+//	uR = velocity(0);
+//	vR = velocity(1);
+//	wR = velocity(2);
+//	rhoR = 1.0;
+//
+//	right.rho = 1;
+//	right.p = 1 / _gamma /_mach / _mach;
+//	left.vel = RealVectorValue(velocity(0), velocity(1), velocity(2));
+//	right.c = _mach * 1;
+//
+//    left.rho = ul[0];
+//    left.vel = RealVectorValue(ul[1], ul[2], ul[3])/ul[0];
+//    left.p = pressure(ul);
+//    left.c = sqrt(fabs(_gamma * left.p / left.rho));
+//
+//	Real vn_left = left.vel*normal;
+//	Real vn_right = right.vel*normal;
+//	vel = left.vel.size();
+//
+//	if (vel >= cL) {	//超声速
+//		if (vnL >= 0.0) //exit
+//		{
+//			ur[0] = ul[0];
+//			ur[1] = ul[1];
+//			ur[2] = ul[2];
+//			ur[3] = ul[3];
+//			ur[4] = ul[4];
+//		}
+//		else //inlet
+//		{
+//			ur[0] = right.rho;
+//			ur[1] = right.rho*right.vel(0);
+//			ur[2] = right.rho*right.vel(1);
+//			ur[3] = right.rho*right.vel(2);
+//			ur[4] = right.p/(_gamma - 1) + 0.5*right.rho*right.vel.size();
+//		}
+//	}
+//	else
+//	{ 	//  亚声速
+//		if (vnL >= 0.0)
+//		{			//exit
+//			s = pL / pow(rhoL, _gamma);
+//			Rp = vnL + 2 * cL / (_gamma - 1);
+//			Rm = vnR - 2 * cR / (_gamma - 1);
+//			vnb = (Rp + Rm) / 2.0;
+//			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+//
+//			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+//			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
+//			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
+//			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
+//			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+//		}
+//		else
+//		{
+//			s = pR / pow(rhoR, _gamma);
+//			Rp = -vnR + 2.0 * cR / (_gamma - 1);
+//			Rm = -vnL - 2.0 * cL / (_gamma - 1);
+//			vnb = -(Rp + Rm) / 2.0;
+//			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+//
+//			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+//			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
+//			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
+//			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
+//			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+//		}
+//	}
 }
 
 //void EulerProblem::farFieldRiemann(Real *ur,  Real *ul, Point &normal)

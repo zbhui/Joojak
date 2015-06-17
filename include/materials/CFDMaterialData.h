@@ -22,5 +22,5 @@ public:
 
 	void reinit(CFDProblem &cfd_problem);
 
-	virtual void InvisFlux(RealVectorValue* inviscous_term);
+	virtual void InvisFlux(RealVectorValue* inviscous_term){};
 };
