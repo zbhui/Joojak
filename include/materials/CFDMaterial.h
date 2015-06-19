@@ -5,7 +5,7 @@
 #include "CFDMaterialData.h"
 
 using std::vector;
-class CLawProblem;
+class CFDProblem;
 
 class CFDMaterial : public CLawMaterial
 {
@@ -15,6 +15,9 @@ public:
 public:
 	MaterialProperty<CFDMaterialData >& _material_data;
 	virtual void computeQpProperties();
+
+private:
+	  CFDProblem &_cfd_problem;
 };
 
 template<>

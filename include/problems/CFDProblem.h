@@ -11,6 +11,8 @@ class CFDProblem : public CLawProblem
 public:
 	CFDProblem(const std::string & name, InputParameters params);
 
+	virtual Real initialCondition(const Point & point, int eq);
+
 	virtual Real physicalViscosity(Real *uh);
 	virtual void stressTerm(RealTensorValue &tau, Real* uh, RealGradient* duh);
 	virtual void heatFluxTerm(RealVectorValue &heat_flux, Real* uh, RealGradient* duh);
@@ -23,6 +25,14 @@ public:
 	virtual void eigenValue(Real *lam, Real *uh, const Point &normal);
 
 	virtual Real computeAuxValue(std::string name, Real *uh);
+
+private:
+	  virtual Real density(const Point &p);
+	  virtual Real momentumX(const Point &p);
+	  virtual Real momentumY(const Point &p);
+	  virtual Real momentumZ(const Point &p);
+	  virtual Real energyTotal(const Point &p);
+
 public:
 	Real _mach;
 	Real _gamma;
@@ -36,6 +46,7 @@ public:
 	Real _roll;			///滚转角
 
 	Attitude _attitude;
+	Real _velocity;
 //	MooseEnum _bc_types;
 };
 

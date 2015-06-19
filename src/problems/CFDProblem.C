@@ -17,7 +17,7 @@ InputParameters validParams<CFDProblem>()
   params.addParam<Real>("pitch", 0., "俯仰角");
   params.addParam<Real>("yaw", 180., "偏航角");
   params.addParam<Real>("roll", -90., "滚转角");
-
+  params.addParam<Real>("init_vel", 1.0, "初始流体速度");
   return params;
 }
 
@@ -34,7 +34,8 @@ CFDProblem::CFDProblem(const std::string & name, InputParameters params) :
 	_yaw(getParam<Real>("yaw")*libMesh::pi/180),
 	_roll(getParam<Real>("roll")*libMesh::pi/180),
 
-	_attitude(Attitude(_attack, _sideslip, _pitch, _yaw, _roll))
+	_attitude(Attitude(_attack, _sideslip, _pitch, _yaw, _roll)),
+    _velocity(getParam<Real>("init_vel"))
 //	_bc_types(MooseEnum("isothermal_wall adiabatic_wall far_field symmetric pressure_out none", "none"))
 {
 }
@@ -129,4 +130,65 @@ Real CFDProblem::computeAuxValue(std::string var_name, Real* uh)
 
 	mooseError("未知的辅助变量");
 	return 0;
+}
+
+Real CFDProblem::initialCondition(const Point& p, int eq)
+{
+	switch (eq) {
+		case 0:
+			return density(p);
+			break;
+		case 1:
+			return momentumX(p);
+			break;
+		case 2:
+			return momentumY(p);
+			break;
+		case 3:
+			return momentumZ(p);
+			break;
+		case 4:
+			return energyTotal(p);
+			break;
+		default:
+			return 0.0;
+			break;
+	}
+}
+
+Real CFDProblem::density(const Point &p)
+{
+	return 1.0;
+}
+
+Real CFDProblem::momentumX(const Point &p)
+{
+	Vector3d vel = _velocity*(_attitude.earthFromWind()*Vector3d::UnitX());
+	return density(p)*vel(0);
+}
+
+Real CFDProblem::momentumY(const Point &p)
+{
+	Vector3d vel = _velocity*(_attitude.earthFromWind()*Vector3d::UnitX());
+	return density(p)*vel(1);
+}
+
+Real CFDProblem::momentumZ(const Point &p)
+{
+	Vector3d vel = _velocity*(_attitude.earthFromWind()*Vector3d::UnitX());
+	if(_mesh.dimension() == 2)
+		return 0.;
+	else if(_mesh.dimension() == 3)
+		return density(p)*vel(2);
+	else
+	{
+		mooseError("一维问题此处需要调试");
+		return 0.;
+	}
+}
+
+Real CFDProblem::energyTotal(const Point &p)
+{
+	Real pre = 1./_gamma/_mach/_mach;
+	return pre/(_gamma-1) + 0.5*density(p)*(_velocity*_velocity);
 }

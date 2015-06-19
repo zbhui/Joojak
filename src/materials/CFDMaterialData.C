@@ -4,6 +4,11 @@
 
 void CFDMaterialData::reinit(CFDProblem &cfd_problem)
 {
+	_gamma = cfd_problem._gamma;
+	_reynolds = cfd_problem._reynolds;
+	_prandtl = cfd_problem._prandtl;
+	_mach = cfd_problem._mach;
+
 	r = uh[0];
 	mom(0) = uh[1]; mom(1) = uh[2]; mom(2) = uh[3]; mom_size = mom.size();
 	re = uh[4];
