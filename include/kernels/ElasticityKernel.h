@@ -14,7 +14,7 @@ public:
   ElasticityKernel(const std::string & name, InputParameters parameters);
 
 protected:
-  MaterialProperty<RealTensorValue> & _stress;
+  const MaterialProperty<RealTensorValue> & _stress;
   int _component;
 
   virtual Real computeQpResidual();
