@@ -193,7 +193,8 @@ void NavierStokesProblem::boundaryCondition(Real *ur, Real *ul, Point &normal, s
 	}
 	if(bc_type == "far_field")
 	{
-		farField(ur, ul, normal);
+//		farField(ur, ul, normal);
+		farFieldHarteamann(ur, ul, normal);
 		return;
 	}
 	if(bc_type == "symmetric")
@@ -288,66 +289,86 @@ void NavierStokesProblem::symmetric(Real *ur,  Real *ul, Point &normal)
     ur[4] = pre/(_gamma-1) + 0.5*momentum.size_sq()/ur[0];
 }
 //
-//void NavierStokesProblem::farFieldRiemann(Real *ur, RealGradient *dur, Real *ul, RealGradient *dul)
-//{
-//	for (int eq = 0; eq < _n_equations; ++eq)
-//		dur[eq] = dul[eq];
-//
-//	const Point &normal = _normals[_qp];
-//
-//	Vector3d vel_inf = earthFromWind()*Vector3d::UnitX();
-//	if(_current_elem->dim() == 2)
-//		vel_inf(2) = 0.;
-//
-//	Real rho_inf = 1.;
-//	Real p_inf = 1/_gamma/_mach/_mach;
-//	Real pl = pressure(ul);
-//	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
-////	Real vel = vel_left.norm();
-//	Real vel = vel_inf.norm();
-//	Real cl = sqrt(fabs(_gamma * pl /ul[0]));
-////	Real vn = vel_left(0)*normal(0)+vel_left(1)*normal(1)+vel_left(2)*normal(2);
-//	Real vn = vel_inf(0)*normal(0)+vel_inf(1)*normal(1)+vel_inf(2)*normal(2);
-//
-//	if(vn < 0)  // 入口
-//	{
-//		if (vel > cl) //超音速
-//		{
-//			ur[0] = rho_inf;
-//			ur[1] = rho_inf*vel_inf(0);
-//			ur[2] = rho_inf*vel_inf(1);
-//			ur[3] = rho_inf*vel_inf(2);
-//			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
-//		}
-//		else	//亚音速
-//		{
-//			ur[0] = rho_inf;
-//			ur[1] = rho_inf*vel_inf(0);
-//			ur[2] = rho_inf*vel_inf(1);
-//			ur[3] = rho_inf*vel_inf(2);
-//			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
-//		}
-//	}
-//	else  //出口
-//	{
-//		if (vel > cl) //超音速
-//		{
-//			ur[0] = ul[0];
-//			ur[1] = ul[1];
-//			ur[2] = ul[2];
-//			ur[3] = ul[3];
-//			ur[4] = ul[4];
-//		}
-//		else	//亚音速
-//		{
-//			ur[0] = ul[0];
-//			ur[1] = ul[1];
-//			ur[2] = ul[2];
-//			ur[3] = ul[3];
-//			ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
-//		}
-//	}
-//}
+void NavierStokesProblem::farFieldHarteamann(Real *ur,  Real *ul, Point &normal)
+{
+	Real rhoR, uR, vR, wR, pR;
+	Real rhoL, uL, vL, wL, pL;
+	Real cR, cL, cb;
+	Real vnR, vnL, vnb;
+	Real vel, s;
+	Real Rp, Rm;
+
+	Vector3d vel_inf = _attitude.earthFromWind()*Vector3d::UnitX();
+	if(_mesh.dimension() == 2)
+		vel_inf(2) = 0.;
+
+	uR = vel_inf(0);
+	vR = vel_inf(1);
+	wR = vel_inf(2);
+
+	Real lam[3];
+	eigenValue(lam, ul, normal);
+
+	rhoR = 1.0;
+
+	pR = 1 / _gamma /_mach / _mach;
+	cR = sqrt(fabs(_gamma * pR / rhoR));
+	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
+
+	rhoL = ul[0];
+	uL = ul[1] / rhoL;
+	vL = ul[2] / rhoL;
+	wL = ul[3] / rhoL;
+	vel = sqrt(uL * uL + vL * vL + wL * wL);
+	pL = pressure(ul);
+	cL = sqrt(fabs(_gamma * pL / rhoL));
+	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
+
+	Real rho_inf = 1.;
+	Real p_inf = 1/_gamma/_mach/_mach;
+	Real pl = pressure(ul);
+	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
+
+	if(vnR <= 0)  // 入口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+		}
+		else	//亚音速
+		{
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
+		}
+	}
+	else  //出口
+	{
+		if (vel > cL) //超音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = ul[4];
+		}
+		else	//亚音速
+		{
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
+		}
+	}
+
+}
 //
 void NavierStokesProblem::farField(Real *ur, Real *ul, Point &normal)
 {

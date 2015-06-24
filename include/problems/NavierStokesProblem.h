@@ -18,6 +18,7 @@ protected:
 	void isothermalWall(Real *ur,  Real *ul, Point &normal);
 	void adiabaticWall(Real *ur,  Real *ul, Point &normal);
 	void farField(Real *ur,  Real *ul, Point &normal);
+	void farFieldHarteamann(Real *ur,  Real *ul, Point &normal);
 	void symmetric(Real *ur,  Real *ul, Point &normal);
 
 	void viscousTermAdiabatic(RealVectorValue* viscous_term, Real* uh, RealGradient *duh);

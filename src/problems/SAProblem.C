@@ -21,8 +21,6 @@ SAProblem::SAProblem(const std::string & name, InputParameters params) :
 {
 	_cw1 = _cb1/_kappa/_kappa + (1+_cb2)/_sigma_sa;
 	_cw3_pow6 = _cw3*_cw3*_cw3*_cw3*_cw3*_cw3;
-
-	_n_equations = 6;
 }
 
 void SAProblem::inviscousTerm(RealVectorValue* inviscous_term, Real* uh)
@@ -178,6 +176,7 @@ void SAProblem::sourceTerm(Real* source_term, Real* uh, RealGradient* duh)
 {
 	Real rho(uh[0]);
 	Real d(uh[6]);     //uh[6] 为壁面距离
+//	std::cout << d <<std::endl;
 	RealVectorValue velocity(uh[1]/rho, uh[2]/rho, uh[3]/rho);
 	RealGradient grad_rho(duh[0]);
 	RealTensor momentum_tensor(duh[1], duh[2], duh[3]);
@@ -248,6 +247,8 @@ void SAProblem::sourceTerm(Real* source_term, Real* uh, RealGradient* duh)
 	source_term[component] = _cb1*s_title*mu*psi
 						   + _cb2/_sigma_sa/_reynolds*rho*grad_nu.size_sq()
 						   - _cw1/_reynolds/rho*fw*(mu*mu*psi*psi/d/d);
+
+//	source_term[component]  = 0.;
 }
 
 void SAProblem::fluxRiemann(Real* flux, Real* ul, Real* ur, Point &normal)
@@ -354,7 +355,7 @@ void SAProblem::adiabaticWall(Real *ur,  Real *ul, Point &normal)
 void SAProblem::symmetric(Real *ur,  Real *ul, Point &normal)
 {
     NavierStokesProblem::symmetric(ur, ul, normal);
-    ur[5] = ul[5];
+    ur[5] = 1*_nu_infty;
 }
 void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 {
@@ -383,7 +384,6 @@ void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
 
 	rhoL = ul[0];
-	Real rho = ul[0];
 	uL = ul[1] / rhoL;
 	vL = ul[2] / rhoL;
 	wL = ul[3] / rhoL;
@@ -392,31 +392,30 @@ void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 	cL = sqrt(fabs(_gamma * pL / rhoL));
 	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
 
-	if(lam[1] < 0)  // 入口
+	Real rho_inf = 1.;
+	Real p_inf = 1/_gamma/_mach/_mach;
+	Real pl = pressure(ul);
+	Vector3d vel_left(ul[1]/ul[0], ul[2]/ul[0], ul[3]/ul[0]);
+
+	if(vnR <= 0)  // 入口
 	{
 		if (vel > cL) //超音速
 		{
-			ur[0] = rhoR;
-			ur[1] = rhoR * uR;
-			ur[2] = rhoR * vR;
-			ur[3] = rhoR * wR;
-			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = p_inf/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
 		}
 		else	//亚音速
 		{
-			s = pR / pow(rhoR, _gamma);
-			Rp = -vnR + 2.0 * cR / (_gamma - 1);
-			Rm = -vnL - 2.0 * cL / (_gamma - 1);
-			vnb = -(Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
-			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
-			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+			ur[0] = rho_inf;
+			ur[1] = rho_inf*vel_inf(0);
+			ur[2] = rho_inf*vel_inf(1);
+			ur[3] = rho_inf*vel_inf(2);
+			ur[4] = pl/(_gamma - 1) + 0.5 * rho_inf*vel_inf.squaredNorm();
 		}
-		ur[5] = rho*_nu_infty;
+		ur[5] = rho_inf*_nu_infty;
 	}
 	else  //出口
 	{
@@ -430,20 +429,101 @@ void SAProblem::farField(Real *ur, Real *ul, Point &normal)
 		}
 		else	//亚音速
 		{
-			s = pL / pow(rhoL, _gamma);
-			Rp = vnL + 2 * cL / (_gamma - 1);
-			Rm = vnR - 2 * cR / (_gamma - 1);
-			vnb = (Rp + Rm) / 2.0;
-			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
-
-			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
-			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
-			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
-			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
-			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+			ur[0] = ul[0];
+			ur[1] = ul[1];
+			ur[2] = ul[2];
+			ur[3] = ul[3];
+			ur[4] = p_inf/(_gamma - 1) + 0.5*ur[0]*vel_left.squaredNorm();
 		}
 		ur[5] = ul[5];
 	}
+
+//	Real rhoR, uR, vR, wR, pR;
+//	Real rhoL, uL, vL, wL, pL;
+//	Real cR, cL, cb;
+//	Real vnR, vnL, vnb;
+//	Real vel, s;
+//	Real Rp, Rm;
+//
+//	Vector3d vel_inf = _attitude.earthFromWind()*Vector3d::UnitX();
+//	if(_mesh.dimension() == 2)
+//		vel_inf(2) = 0.;
+//
+//	uR = vel_inf(0);
+//	vR = vel_inf(1);
+//	wR = vel_inf(2);
+//
+//	Real lam[3];
+//	eigenValue(lam, ul, normal);
+//
+//	rhoR = 1.0;
+//
+//	pR = 1 / _gamma /_mach / _mach;
+//	cR = sqrt(fabs(_gamma * pR / rhoR));
+//	vnR = normal(0) * uR + normal(1) * vR + normal(2) * wR;
+//
+//	rhoL = ul[0];
+//	Real rho = ul[0];
+//	uL = ul[1] / rhoL;
+//	vL = ul[2] / rhoL;
+//	wL = ul[3] / rhoL;
+//	vel = sqrt(uL * uL + vL * vL + wL * wL);
+//	pL = pressure(ul);
+//	cL = sqrt(fabs(_gamma * pL / rhoL));
+//	vnL =  normal(0) * uL + normal(1) * vL + normal(2) * wL;
+//
+//	if(lam[1] < 0)  // 入口
+//	{
+//		if (vel > cL) //超音速
+//		{
+//			ur[0] = rhoR;
+//			ur[1] = rhoR * uR;
+//			ur[2] = rhoR * vR;
+//			ur[3] = rhoR * wR;
+//			ur[4] = pR / (_gamma - 1) + 0.5 * rhoR * (uR * uR + vR * vR + wR * wR);
+//		}
+//		else	//亚音速
+//		{
+//			s = pR / pow(rhoR, _gamma);
+//			Rp = -vnR + 2.0 * cR / (_gamma - 1);
+//			Rm = -vnL - 2.0 * cL / (_gamma - 1);
+//			vnb = -(Rp + Rm) / 2.0;
+//			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+//
+//			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+//			ur[1] = ur[0] * (uR + normal(0) * (vnb - vnR));
+//			ur[2] = ur[0] * (vR + normal(1) * (vnb - vnR));
+//			ur[3] = ur[0] * (wR + normal(2) * (vnb - vnR));
+//			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+//		}
+//		ur[5] = rho*_nu_infty;
+//	}
+//	else  //出口
+//	{
+//		if (vel > cL) //超音速
+//		{
+//			ur[0] = ul[0];
+//			ur[1] = ul[1];
+//			ur[2] = ul[2];
+//			ur[3] = ul[3];
+//			ur[4] = ul[4];
+//		}
+//		else	//亚音速
+//		{
+//			s = pL / pow(rhoL, _gamma);
+//			Rp = vnL + 2 * cL / (_gamma - 1);
+//			Rm = vnR - 2 * cR / (_gamma - 1);
+//			vnb = (Rp + Rm) / 2.0;
+//			cb = (Rp - Rm) * (_gamma - 1) / 4.0;
+//
+//			ur[0] = pow((cb * cb) / (s * _gamma), 1.0 / (_gamma - 1));
+//			ur[1] = ur[0] * (uL + normal(0) * (vnb - vnL));
+//			ur[2] = ur[0] * (vL + normal(1) * (vnb - vnL));
+//			ur[3] = ur[0] * (wL + normal(2) * (vnb - vnL));
+//			ur[4] = cb * cb * ur[0] / _gamma / (_gamma - 1) + 0.5 * (ur[1] * ur[1] + ur[2] * ur[2] + ur[3] * ur[3]) / ur[0];
+//		}
+//		ur[5] = ul[5];
+//	}
 }
 
 Real SAProblem::eddyViscosity(Real* uh)
