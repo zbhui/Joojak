@@ -141,33 +141,33 @@ void CLawProblem::computeCellMaterial(CLawCellMaterial& cell)
 		Real *source = material[qp]._source_term;
 		computeCellFlux(flux, source, uh, duh);
 
-//		for (int q = 0; q < _n_equations; ++q)
-//		{
-//			uh[q] += _ds;
-//			computeCellFlux(flux_new, source_new, uh, duh);
-//			for (int p = 0; p < _n_equations; ++p)
-//			{
-//				material[qp]._flux_jacobi_variable[p][q] = (flux_new[p] - flux[p])/_ds;
-//				material[qp]._source_jacobi_variable[p][q] = (source_new[p] - source[p])/_ds;
-//			}
-//			uh[q] -= _ds;
-//		}
-//
-//		for (int q = 0; q < _n_equations; ++q)
-//		for (int beta = 0; beta < 3; ++beta)
-//		{
-//			duh[q](beta) += _ds;
-//			computeCellFlux(flux_new, source_new, uh, duh);
-//			for (int p = 0; p < _n_equations; ++p)
-//			{
-//				material[qp]._source_jacobi_grad_variable[p][q](beta) = (source_new[p] - source[p])/_ds;
-//				for (int alpha = 0; alpha< 3; ++alpha)
-//				{
-//					material[qp]._flux_jacobi_grad_variable[p][q](alpha, beta) = (flux_new[p](alpha) - flux[p](alpha))/_ds;
-//				}
-//			}
-//			duh[q](beta) -= _ds;
-//		}
+		for (int q = 0; q < _n_equations; ++q)
+		{
+			uh[q] += _ds;
+			computeCellFlux(flux_new, source_new, uh, duh);
+			for (int p = 0; p < _n_equations; ++p)
+			{
+				material[qp]._flux_jacobi_variable[p][q] = (flux_new[p] - flux[p])/_ds;
+				material[qp]._source_jacobi_variable[p][q] = (source_new[p] - source[p])/_ds;
+			}
+			uh[q] -= _ds;
+		}
+
+		for (int q = 0; q < _n_equations; ++q)
+		for (int beta = 0; beta < 3; ++beta)
+		{
+			duh[q](beta) += _ds;
+			computeCellFlux(flux_new, source_new, uh, duh);
+			for (int p = 0; p < _n_equations; ++p)
+			{
+				material[qp]._source_jacobi_grad_variable[p][q](beta) = (source_new[p] - source[p])/_ds;
+				for (int alpha = 0; alpha< 3; ++alpha)
+				{
+					material[qp]._flux_jacobi_grad_variable[p][q](alpha, beta) = (flux_new[p](alpha) - flux[p](alpha))/_ds;
+				}
+			}
+			duh[q](beta) -= _ds;
+		}
 	}
 }
 
