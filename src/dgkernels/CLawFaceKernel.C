@@ -21,10 +21,10 @@ Real CLawFaceKernel::computeQpResidual(Moose::DGResidualType type)
 	switch (type)
 	{
 	case Moose::Element:
-		return  _face[_qp]._flux[_eq] * _test[_i][_qp] ;//+ _lift[_qp][_eq]*_grad_test[_i][_qp];
+		return  _face[_qp]._flux[_eq] * _test[_i][_qp] + _face[_qp]._lift[_eq]*_grad_test[_i][_qp];
 		break;
 	case Moose::Neighbor:
-		return -_face[_qp]._flux[_eq] * _test_neighbor[_i][_qp] ;//+ _lift[_qp][_eq]*_grad_test_neighbor[_i][_qp];
+		return -_face[_qp]._flux[_eq] * _test_neighbor[_i][_qp] + _face[_qp]._lift[_eq]*_grad_test_neighbor[_i][_qp];
 		break;
 	}
 
