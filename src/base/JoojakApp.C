@@ -40,6 +40,8 @@
 #include "EmptyTimeDerivative.h"
 
 /// 材料属性
+#include "CFDMaterial.h"
+
 #include "CLawFaceMaterial.h"
 #include "CLawCellMaterial.h"
 #include "CLawBoundaryMaterial.h"
@@ -58,6 +60,7 @@
 
 /// UserObject
 #include "CFDForceUserObject.h"
+#include "CFDUserObject.h"
 
 /// VectorPostProcessor
 
@@ -161,6 +164,7 @@ void JoojakApp::registerObjects(Factory & factory)
 	/// 注册材料属性
     registerMaterial(LinearElasticityMaterial);
 
+    registerMaterial(CFDMaterial);
     registerMaterial(CLawFaceMaterial);
     registerMaterial(CLawCellMaterial);
     registerMaterial(CLawBoundaryMaterial);
@@ -185,6 +189,7 @@ void JoojakApp::registerObjects(Factory & factory)
 
 	/// 注册UserObject
 	registerPostprocessor(CFDForceUserObject);
+	registerPostprocessor(CFDUserObject);
 
 //	registerExecutioner(SteadyTransientExecutioner);
 

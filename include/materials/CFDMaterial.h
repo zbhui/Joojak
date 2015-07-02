@@ -6,6 +6,7 @@
 
 using std::vector;
 class CFDProblem;
+class CFDUserObject;
 
 class CFDMaterial : public CLawMaterial
 {
@@ -18,6 +19,7 @@ public:
 
 private:
 	  CFDProblem &_cfd_problem;
+	  const CFDUserObject & _cfd_user_object;
 };
 
 template<>
