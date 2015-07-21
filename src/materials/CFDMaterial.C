@@ -22,6 +22,21 @@ CFDMaterial::CFDMaterial(const std::string & name, InputParameters parameter):
 
 void CFDMaterial::computeQpProperties()
 {
+	_material_data[_qp].reinit(_cfd_problem);
+
+	if(_bnd)
+	{
+		if(_neighbor)
+		{
+
+		}
+	}
+
+	CFDMaterialData cfd_data;
+	cfd_data.reinit(_cfd_problem);
+
+	cfd_data.invis_flux;
+
 	std::vector<VariableValue*> value = _cfd_user_object.value();
 	for(int eq = 0; eq < 5; ++eq)
 	{
